@@ -170,7 +170,7 @@ button_action_cb (Ihandle *ih)
 
   if (p0.room)  {
     *p = p0;
-    mr_scroll_into_view (p0.room);
+    mr_scroll_into_view (&global_mr, p0.room);
   }
 
   return IUP_DEFAULT;

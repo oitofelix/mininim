@@ -184,8 +184,8 @@ physics_in (struct actor *k)
         kid_haptic (k, KID_HAPTIC_HARM);
       }
       if (k->id == current_kid_id) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
       }
     } else if (k->i > 3 && ! k->float_timer) {
       play_audio (&hit_ground_audio, NULL, k->id);

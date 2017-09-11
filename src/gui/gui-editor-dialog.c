@@ -487,7 +487,7 @@ move_selection_hotkeys_cb (Ihandle *ih, int c)
   default: return IUP_CONTINUE;
   }
 
-  ui_move_locked_place_selection (d);
+  ui_move_locked_place_selection (&global_mr, d);
 
   return IUP_IGNORE;
 }

@@ -156,7 +156,8 @@ enum edit {
   EDIT_NUMERICAL_BG, EDIT_NUMERICAL_EXT,
 };
 
-struct multi_room {
+/* multi-room */
+struct mr {
   int w, h;
   int x, y;
   int dx, dy;
@@ -205,7 +206,7 @@ struct mr_origin {
 
 struct mouse_coord {
   struct coord c;
-  struct mr_origin mr;
+  struct mr_origin o;
   int x, y;
   int sx, sy;
 };
@@ -646,6 +647,25 @@ struct message_box {
   char *title, *heading, *text, *buttons;
   int flags;
 };
+
+struct rect_sel {
+  struct level *level;
+
+  int tl, tr, bl, br;
+
+  int *t, *b;
+  size_t w_nmemb;
+
+  int *l, *r;
+  size_t h_nmemb;
+
+  int *c;
+  size_t c_nmemb;
+
+  int tl_place, tl_floor;
+  int br_place, br_floor;
+} rs;
+
 
 /*********
  * TILES *

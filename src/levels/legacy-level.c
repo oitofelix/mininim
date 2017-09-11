@@ -73,10 +73,10 @@ legacy_level_start (void)
 
   /* define camera's starting room */
   if (global_level.n == 7) {
-    mr_center_room (1);
+    mr_center_room (&global_mr, 1);
     camera_follow_kid = -1;
   } else {
-    mr_center_room (k->f.c.room);
+    mr_center_room (&global_mr, k->f.c.room);
     camera_follow_kid = k->id;
   }
 
@@ -102,7 +102,7 @@ legacy_level_start (void)
       int dy = +15;
       place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
 
-      mr_center_room (2);
+      mr_center_room (&global_mr, 2);
       k->total_hp = checkpoint_total_hp;
       k->current_hp = checkpoint_current_hp;
       k->skill = checkpoint_skill;
@@ -236,7 +236,7 @@ legacy_level_special_events (void)
 
     /* if the level door is open and the camera is on room 4, make
        the mirror appear */
-    if (is_pos_visible (&mirror_pos)
+    if (is_pos_visible (&global_mr, &mirror_pos)
         && fg (&mirror_pos) != MIRROR
         && get_exit_level_door (&global_level, 0)) {
       register_tile_undo (&undo, &mirror_pos,
@@ -285,7 +285,7 @@ legacy_level_special_events (void)
     /* if there is a door sufficiently open, and a potion in room 24,
        and the camera is there, create a kid's shadow to drink the
        potion */
-    if (is_pos_visible (&potion_pos)
+    if (is_pos_visible (&global_mr, &potion_pos)
         && shadow_id == -1
         && fg (&door_pos) == DOOR
         && is_potion (&potion_pos)
@@ -394,7 +394,8 @@ legacy_level_special_events (void)
 
     /* if enough cycles have passed since the start of the countdown
        and the camera is at room 16, make the mouse appear */
-    if (mouse_timer == 138 && is_room_visible (mouse_pos.room)) {
+    if (mouse_timer == 138
+        && is_room_visible (&global_mr, mouse_pos.room)) {
       mouse_id = create_actor (NULL, MOUSE, &mouse_pos, RIGHT);
       m = &actor[mouse_id];
       m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
@@ -464,8 +465,8 @@ legacy_level_special_events (void)
 
       /* any harm caused to the shadow reflects to the kid */
       if (ks->action == guard_sword_hit && ks->i == 0) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
         play_audio (&harm_audio, NULL, k0->id);
         k0->splash = true;
         k0->current_hp--;
@@ -477,8 +478,8 @@ legacy_level_special_events (void)
 
       /* any harm caused to the kid reflects to the shadow */
       if (k0->action == kid_sword_hit && k0->i == 0) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
         play_audio (&guard_hit_audio, NULL, ks->id);
         ks->splash = true;
         ks->current_hp--;
@@ -509,8 +510,8 @@ legacy_level_special_events (void)
       if (k0->current_hp <= 0
           && shadow_disappearance_wait == 0
           && ! ks->invisible) {
-        mr.flicker = 8;
-        mr.color = WHITE;
+        global_mr.flicker = 8;
+        global_mr.color = WHITE;
         ks->invisible = true;
       }
 
@@ -555,8 +556,8 @@ legacy_level_special_events (void)
         place_on_the_ground (&k0->f, &k0->f.c);
         kid_turn_run (k0);
         k0->current_hp = ++k0->total_hp;
-        mr.flicker = 8;
-        mr.color = WHITE;
+        global_mr.flicker = 8;
+        global_mr.color = WHITE;
         glow_duration = 12 * DEFAULT_HZ;
       }
       /* while the merge doesn't happen and neither the shadow nor the
@@ -629,8 +630,8 @@ legacy_level_special_events (void)
          the play timer and display the remaining time */
       if (v->current_hp <= 0
           && ! played_vizier_death_sample) {
-        mr.flicker = 12;
-        mr.color = WHITE;
+        global_mr.flicker = 12;
+        global_mr.color = WHITE;
         stop_audio_instance (&meet_vizier_audio, NULL, kc->id);
         play_audio (&vizier_death_audio, NULL, kc->id);
         played_vizier_death_sample = true;

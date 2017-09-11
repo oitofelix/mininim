@@ -64,10 +64,10 @@ BEGIN_LUA (__index)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "width")) {
-      lua_pushnumber (L, mr.w);
+      lua_pushnumber (L, global_mr.w);
       return 1;
     } else if (! strcasecmp (key, "height")) {
-      lua_pushnumber (L, mr.h);
+      lua_pushnumber (L, global_mr.h);
       return 1;
     } else break;
   default: break;
@@ -86,11 +86,11 @@ BEGIN_LUA (__newindex)
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "width")) {
       int w = lua_tonumber (L, 3);
-      set_multi_room (w, mr.h);
+      mr_set_dim (&global_mr, w, global_mr.h);
       return 0;
     } else if (! strcasecmp (key, "height")) {
       int h = lua_tonumber (L, 3);
-      set_multi_room (mr.w, h);
+      mr_set_dim (&global_mr, global_mr.w, h);
       return 0;
     } else break;
   default: break;

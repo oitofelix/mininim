@@ -346,7 +346,8 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection, relock_selection, select_room;
+    uint16_t lock_selection, unlock_selection, relock_selection, select_room,
+      rect_sel;
   } aux;
 } item;
 
@@ -381,10 +382,9 @@ ALLEGRO_BITMAP *small_logo_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
   *heart_icon, *plus_icon, *minus_icon, *lock_icon, *lock_icon_trimmed,
-  *unlock_icon;
+  *unlock_icon, *rect_sel_icon;
 
-static struct pos aux_pos;
-
+struct pos aux_pos;
 
 
 
@@ -529,6 +529,7 @@ load_icons (void)
   lock_icon = load_icon (LOCK_ICON);
   lock_icon_trimmed = trim_bitmap (lock_icon, TRANSPARENT_COLOR);
   unlock_icon = load_icon (UNLOCK_ICON);
+  rect_sel_icon = load_icon (RECT_SEL_ICON);
 }
 
 void
@@ -641,6 +642,7 @@ unload_icons (void)
   al_destroy_bitmap (lock_icon);
   al_destroy_bitmap (lock_icon_trimmed);
   al_destroy_bitmap (unlock_icon);
+  al_destroy_bitmap (rect_sel_icon);
 }
 
 
@@ -1136,15 +1138,15 @@ zoom_menu (intptr_t index)
 {
   item.main.view.zoom.reset =
     menu_hitem (! cutscene && ! title_demo
-                && (mr.w != 1 || mr.h != 1
-                    || mr.fit_mode != MR_FIT_NONE),
-                "MULTI-ROOM %ix%i", mr.w, mr.h);
+                && (global_mr.w != 1 || global_mr.h != 1
+                    || global_mr.fit_mode != MR_FIT_NONE),
+                "MULTI-ROOM %ix%i", global_mr.w, global_mr.h);
 
   menu_sub (&menu.main.view.zoom.fit.m, ! cutscene && ! title_demo,
-            zoom_fit_icon (mr.fit_mode), zoom_fit_menu, 0, "&Fit (M)");
+            zoom_fit_icon (global_mr.fit_mode), zoom_fit_menu, 0, "&Fit (M)");
 
   menu_sub (&menu.main.view.zoom.in.m,
-            ! cutscene && ! title_demo && (mr.w > 1 || mr.h > 1),
+            ! cutscene && ! title_demo && (global_mr.w > 1 || global_mr.h > 1),
             zoom_in_icon, zoom_in_menu, 0, "&In");
 
   menu_sub (&menu.main.view.zoom.out.m, ! cutscene && ! title_demo,
@@ -1166,15 +1168,15 @@ void
 zoom_fit_menu (intptr_t index)
 {
   item.main.view.zoom.fit.none =
-    menu_citem (true, mr.fit_mode == MR_FIT_NONE, zoom_none_icon,
+    menu_citem (true, global_mr.fit_mode == MR_FIT_NONE, zoom_none_icon,
                 "&None");
 
   item.main.view.zoom.fit.stretch =
-    menu_citem (true, mr.fit_mode == MR_FIT_STRETCH, zoom_stretch_icon,
+    menu_citem (true, global_mr.fit_mode == MR_FIT_STRETCH, zoom_stretch_icon,
                 "&Stretch");
 
   item.main.view.zoom.fit.ratio =
-    menu_citem (true, mr.fit_mode == MR_FIT_RATIO, zoom_ratio_icon,
+    menu_citem (true, global_mr.fit_mode == MR_FIT_RATIO, zoom_ratio_icon,
                 "&Ratio");
 }
 
@@ -1195,21 +1197,21 @@ void
 zoom_in_menu (intptr_t index)
 {
   item.main.view.zoom.in.both =
-    menu_sitem (mr.w > 1 && mr.h > 1, vh_icon,
+    menu_sitem (global_mr.w > 1 && global_mr.h > 1, vh_icon,
                 "&Both ([)");
 
   item.main.view.zoom.in.vertical =
-    menu_sitem (mr.h > 1, vertical_icon, "&Vertical (Alt+[)");
+    menu_sitem (global_mr.h > 1, vertical_icon, "&Vertical (Alt+[)");
 
   item.main.view.zoom.in.horizontal =
-    menu_sitem (mr.w > 1, horizontal_icon, "&Horizontal (Ctrl+[)");
+    menu_sitem (global_mr.w > 1, horizontal_icon, "&Horizontal (Ctrl+[)");
 }
 
 void
 navigation_menu (intptr_t index)
 {
   item.main.view.nav.current_room =
-    menu_hitem (true, "ROOM %i", mr.room);
+    menu_hitem (true, "ROOM %i", global_mr.room);
 
   menu_sub (&menu.main.view.nav.select.m, true, room_icon,
             nav_room_menu, 0, "Room &Selection");
@@ -1222,7 +1224,7 @@ navigation_menu (intptr_t index)
 
   struct actor *k = get_actor_by_id (current_kid_id);
   item.main.view.nav.home =
-    menu_sitem (k && k->f.c.room != mr.room, home_icon, "&Home (Home)");
+    menu_sitem (k && k->f.c.room != global_mr.room, home_icon, "&Home (Home)");
 
   item.main.view.nav.center =
     menu_sitem (true, repeat_icon, "Cen&ter (Shift+Home)");
@@ -1238,19 +1240,19 @@ void
 nav_room_menu (intptr_t index)
 {
   item.main.view.nav.select.left =
-    menu_sitem (roomd (&global_level, mr.room, LEFT),
+    menu_sitem (roomd (&global_level, global_mr.room, LEFT),
                 l_icon, "&Left (H)");
 
   item.main.view.nav.select.above =
-    menu_sitem (roomd (&global_level, mr.room, ABOVE),
+    menu_sitem (roomd (&global_level, global_mr.room, ABOVE),
                 a_icon, "&Above (U)");
 
   item.main.view.nav.select.right =
-    menu_sitem (roomd (&global_level, mr.room, RIGHT),
+    menu_sitem (roomd (&global_level, global_mr.room, RIGHT),
                 r_icon, "&Right (J)");
 
   item.main.view.nav.select.below =
-    menu_sitem (roomd (&global_level, mr.room, BELOW),
+    menu_sitem (roomd (&global_level, global_mr.room, BELOW),
                 b_icon, "&Below (N)");
 }
 
@@ -1829,8 +1831,14 @@ aux_menu (void)
               "&Lock selection", "&Unlock selection");
 
   item.aux.select_room =
-    menu_sitem (is_valid_pos (&aux_pos) && mr.room != aux_pos.room, room_icon,
+    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room, room_icon,
                 "Select &Room");
+
+  item.aux.rect_sel =
+    menu_sitem (is_valid_pos (&aux_pos) && is_valid_pos (&selection_pos)
+                && selection_locked
+                /* && ! peq (&aux_pos, &selection_pos) */, rect_sel_icon,
+                "Rectangular &Selection");
 
   end_menu ();
 }
@@ -1839,7 +1847,7 @@ void
 show_aux_menu (void)
 {
   if (edit == EDIT_NONE) return;
-  get_mouse_pos (&aux_pos);
+  get_mouse_pos (&global_mr, &aux_pos);
   aux_menu ();
   al_popup_menu (menu.aux.m, display);
 }
@@ -1909,48 +1917,60 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.view.screenshot)
     ui_screenshot ();
   else if (id == item.main.view.zoom.reset) {
-    ui_zoom_fit (MR_FIT_NONE);
-    ui_set_multi_room (1 - mr.w, 1 - mr.h, false);
+    ui_zoom_fit (&global_mr, MR_FIT_NONE);
+    ui_mr_set_dim (&global_mr, 1 - global_mr.w, 1 - global_mr.h, false);
   } else if (id == item.main.view.zoom.fit.none)
-    ui_zoom_fit (MR_FIT_NONE);
+    ui_zoom_fit (&global_mr, MR_FIT_NONE);
   else if (id == item.main.view.zoom.fit.stretch)
-    ui_zoom_fit (MR_FIT_STRETCH);
+    ui_zoom_fit (&global_mr, MR_FIT_STRETCH);
   else if (id == item.main.view.zoom.fit.ratio)
-    ui_zoom_fit (MR_FIT_RATIO);
+    ui_zoom_fit (&global_mr, MR_FIT_RATIO);
   else if (id == item.main.view.zoom.in.both)
-    ui_set_multi_room (-1, -1, false);
+    ui_mr_set_dim (&global_mr, -1, -1, false);
   else if (id == item.main.view.zoom.in.vertical)
-    ui_set_multi_room (+0, -1, false);
+    ui_mr_set_dim (&global_mr, +0, -1, false);
   else if (id == item.main.view.zoom.in.horizontal)
-    ui_set_multi_room (-1, +0, false);
+    ui_mr_set_dim (&global_mr, -1, +0, false);
   else if (id == item.main.view.zoom.out.both)
-    ui_set_multi_room (+1, +1, false);
+    ui_mr_set_dim (&global_mr, +1, +1, false);
   else if (id == item.main.view.zoom.out.vertical)
-    ui_set_multi_room (+0, +1, false);
+    ui_mr_set_dim (&global_mr, +0, +1, false);
   else if (id == item.main.view.zoom.out.horizontal)
-    ui_set_multi_room (+1, +0, false);
+    ui_mr_set_dim (&global_mr, +1, +0, false);
   else if (id == item.main.view.nav.current_room)
-    mr.select_cycles = SELECT_CYCLES;
+    global_mr.select_cycles = SELECT_CYCLES;
   else if (id == item.main.view.nav.home)
     ui_home ();
   else if (id == item.main.view.nav.center)
-    mr_center_room (mr.room);
+    mr_center_room (&global_mr, global_mr.room);
   else if (id == item.main.view.nav.coord)
     ui_show_coordinates ();
   else if (id == item.main.view.nav.ind_coord)
     ui_show_indirect_coordinates ();
-  else if (id == item.main.view.nav.select.left) mr_room_trans (LEFT);
-  else if (id == item.main.view.nav.select.above) mr_room_trans (ABOVE);
-  else if (id == item.main.view.nav.select.right) mr_room_trans (RIGHT);
-  else if (id == item.main.view.nav.select.below) mr_room_trans (BELOW);
-  else if (id == item.main.view.nav.cell.left) mr_row_trans (LEFT);
-  else if (id == item.main.view.nav.cell.above) mr_row_trans (ABOVE);
-  else if (id == item.main.view.nav.cell.right) mr_row_trans (RIGHT);
-  else if (id == item.main.view.nav.cell.below) mr_row_trans (BELOW);
-  else if (id == item.main.view.nav.page.left) mr_page_trans (LEFT);
-  else if (id == item.main.view.nav.page.above) mr_page_trans (ABOVE);
-  else if (id == item.main.view.nav.page.right) mr_page_trans (RIGHT);
-  else if (id == item.main.view.nav.page.below) mr_page_trans (BELOW);
+  else if (id == item.main.view.nav.select.left)
+    mr_room_trans (&global_mr, LEFT);
+  else if (id == item.main.view.nav.select.above)
+    mr_room_trans (&global_mr, ABOVE);
+  else if (id == item.main.view.nav.select.right)
+    mr_room_trans (&global_mr, RIGHT);
+  else if (id == item.main.view.nav.select.below)
+    mr_room_trans (&global_mr, BELOW);
+  else if (id == item.main.view.nav.cell.left)
+    mr_row_trans (&global_mr, LEFT);
+  else if (id == item.main.view.nav.cell.above)
+    mr_row_trans (&global_mr, ABOVE);
+  else if (id == item.main.view.nav.cell.right)
+    mr_row_trans (&global_mr, RIGHT);
+  else if (id == item.main.view.nav.cell.below)
+    mr_row_trans (&global_mr, BELOW);
+  else if (id == item.main.view.nav.page.left)
+    mr_page_trans (&global_mr, LEFT);
+  else if (id == item.main.view.nav.page.above)
+    mr_page_trans (&global_mr, ABOVE);
+  else if (id == item.main.view.nav.page.right)
+    mr_page_trans (&global_mr, RIGHT);
+  else if (id == item.main.view.nav.page.below)
+    mr_page_trans (&global_mr, BELOW);
   else if (id == item.main.view.em.original) ui_em (ORIGINAL_EM);
   else if (id == item.main.view.em.dungeon) ui_em (DUNGEON);
   else if (id == item.main.view.em.palace) ui_em (PALACE);
@@ -2041,11 +2061,18 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   /* int i; */
 
   if (id == item.aux.lock_selection)
-    select_pos (&aux_pos);
+    select_pos (&global_mr, &aux_pos);
   else if (id == item.aux.unlock_selection)
     selection_locked = ! selection_locked;
   else if (id == item.aux.relock_selection)
-    select_pos (&aux_pos);
+    select_pos (&global_mr, &aux_pos);
   else if (id == item.aux.select_room)
-    mr_focus_room (aux_pos.room);
+    mr_focus_room (&global_mr, aux_pos.room);
+  else if (id == item.aux.rect_sel) {
+    destroy_rect_sel (&global_rect_sel);
+    bool success = new_rect_sel (&global_mr, &global_rect_sel,
+                                 &selection_pos, &aux_pos);
+    if (! success)
+      ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
+  }
 }

@@ -182,9 +182,9 @@ _update_cb (Ihandle *ih)
   Ihandle *zoom_in_h_button = (void *)
     IupGetAttribute (ih, "_ZOOM_IN_H_BUTTON");
 
-  gui_control_active (zoom_in_vh_button, mr.w > 1 && mr.h > 1);
-  gui_control_active (zoom_in_v_button, mr.h > 1);
-  gui_control_active (zoom_in_h_button, mr.w > 1);
+  gui_control_active (zoom_in_vh_button, global_mr.w > 1 && global_mr.h > 1);
+  gui_control_active (zoom_in_v_button, global_mr.h > 1);
+  gui_control_active (zoom_in_h_button, global_mr.w > 1);
 
   return IUP_DEFAULT;
 }
@@ -215,26 +215,26 @@ button_action_cb (Ihandle *ih)
     IupGetAttribute (ih, "_ZOOM_OUT_H_BUTTON");
 
   if (ih == zoom_button) {
-    ui_zoom_fit (MR_FIT_NONE);
-    ui_set_multi_room (1 - mr.w, 1 - mr.h, false);
+    ui_zoom_fit (&global_mr, MR_FIT_NONE);
+    ui_mr_set_dim (&global_mr, 1 - global_mr.w, 1 - global_mr.h, false);
   } else if (ih == zoom_none_button)
-    ui_zoom_fit (MR_FIT_NONE);
+    ui_zoom_fit (&global_mr, MR_FIT_NONE);
   else if (ih == zoom_stretch_button)
-    ui_zoom_fit (MR_FIT_STRETCH);
+    ui_zoom_fit (&global_mr, MR_FIT_STRETCH);
   else if (ih == zoom_ratio_button)
-    ui_zoom_fit (MR_FIT_RATIO);
+    ui_zoom_fit (&global_mr, MR_FIT_RATIO);
   else if (ih == zoom_in_vh_button)
-    ui_set_multi_room (-1, -1, false);
+    ui_mr_set_dim (&global_mr, -1, -1, false);
   else if (ih == zoom_in_v_button)
-    ui_set_multi_room (+0, -1, false);
+    ui_mr_set_dim (&global_mr, +0, -1, false);
   else if (ih == zoom_in_h_button)
-    ui_set_multi_room (-1, +0, false);
+    ui_mr_set_dim (&global_mr, -1, +0, false);
   else if (ih == zoom_out_vh_button)
-    ui_set_multi_room (+1, +1, false);
+    ui_mr_set_dim (&global_mr, +1, +1, false);
   else if (ih == zoom_out_v_button)
-    ui_set_multi_room (+0, +1, false);
+    ui_mr_set_dim (&global_mr, +0, +1, false);
   else if (ih == zoom_out_h_button)
-    ui_set_multi_room (+1, +0, false);
+    ui_mr_set_dim (&global_mr, +1, +0, false);
 
   return IUP_DEFAULT;
 }

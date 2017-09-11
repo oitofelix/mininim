@@ -401,16 +401,29 @@ function video.OBJECT:CREATE_BITMAP ()
 end
 
 -- BOX
-video.BOX = new (video.OBJECT, {{}, {}, {}, {}, {}, {}})
+video.BOX = new (video.OBJECT)
+
+for i = 1, 9 do
+   video.BOX[i] = {}
+end
+
+function video.BOX.selection_palette (c)
+   if c == C ("white") then return C (0, 255, 0) end
+   return c
+end
 
 function video.BOX.lock_palette (c)
-   if c == C ("white") then return C ("red") end
+   if c == C ("white") then return C (255, 0, 0) end
+   return c
+end
+
+function video.BOX.rect_sel_palette (c)
+   if c == C ("white") then return C (255, 255, 0) end
    return c
 end
 
 function video.BOX:DRAW (part, p)
-   local i = mod (MININIM.cycle, 3) + 1
-   if part == 2 then i = i + 3 end
+   local i = (part - 1) * 3 + mod (MININIM.cycle, 3) + 1
    self[i]:DRAW (p)
 end
 
@@ -420,7 +433,7 @@ video.BOX[1].rect = function (self, p)
                  p.room)
 end
 
-for i = 2, 6 do video.BOX[i].rect = video.BOX[1].rect end
+for i = 2, 9 do video.BOX[i].rect = video.BOX[1].rect end
 
 -- SWORD ITEM
 video.SWORD_ITEM = new (video.OBJECT, {normal = {}, shiny = {}})
@@ -2536,10 +2549,15 @@ function ASSET:load_box ()
    local o = new (video.BOX)
    for i = 1, 3 do
       o[i].bitmap = load_bitmap ("box/%i.png", i)
+         .apply_palette (video.BOX.selection_palette, true)
    end
    for i = 4, 6 do
-      o[i].bitmap = o[i - 3].bitmap
+      o[i].bitmap = load_bitmap ("box/%i.png", i - 3)
          .apply_palette (video.BOX.lock_palette, true)
+   end
+   for i = 7, 9 do
+      o[i].bitmap = load_bitmap ("box/%i.png", i - 6)
+         .apply_palette (video.BOX.rect_sel_palette, true)
    end
    self.BOX = o
 end

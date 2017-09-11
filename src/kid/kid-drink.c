@@ -70,8 +70,8 @@ flow (struct actor *k)
       kid_haptic (k, KID_HAPTIC_HARM);
       if (k->current_hp == 0) k->death_reason = POTION_DEATH;
       if (k->id == current_kid_id) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
       }
       break;
     case BIG_POISON_POTION:
@@ -82,8 +82,8 @@ flow (struct actor *k)
       k->death_reason = POTION_DEATH;
       play_audio (&harm_audio, NULL, k->id);
       if (k->id == current_kid_id) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
       }
       break;
     case FLOAT_POTION: float_kid (k); break;

@@ -32,7 +32,7 @@ void change_tile_fg (struct pos *p, enum tile_fg f);
 void change_tile_fake (struct pos *p, enum tile_fg f);
 void change_tile_bg (struct pos *p, enum tile_bg b);
 void change_tile_ext (struct pos *p, int e);
-void select_pos (struct pos *p);
+void select_pos (struct mr *mr, struct pos *p);
 
 bool can_edit (void);
 void editor (void);

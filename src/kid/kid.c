@@ -321,8 +321,8 @@ increase_kid_current_hp (struct actor *k)
   if (! is_audio_source_playing (&small_hp_potion_audio))
     play_audio (&small_hp_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
-    mr.flicker = 8;
-    mr.color = get_flicker_blood_color ();
+    global_mr.flicker = 8;
+    global_mr.color = get_flicker_blood_color ();
   }
 
   kid_haptic (k, KID_HAPTIC_DRINK);
@@ -340,8 +340,8 @@ increase_kid_total_hp (struct actor *k)
   if (! is_audio_source_playing (&big_hp_potion_audio))
     play_audio (&big_hp_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
-    mr.flicker = 8;
-    mr.color = get_flicker_blood_color ();
+    global_mr.flicker = 8;
+    global_mr.color = get_flicker_blood_color ();
   }
 
   kid_haptic (k, KID_HAPTIC_STRONG_DRINK);
@@ -356,8 +356,8 @@ float_kid (struct actor *k)
   while (stop_audio_instance (&floating_audio, NULL, k->id));
   play_audio (&floating_audio, NULL, k->id);
   if (k->id == current_kid_id) {
-    mr.flicker = 8;
-    mr.color = get_flicker_float_color ();
+    global_mr.flicker = 8;
+    global_mr.color = get_flicker_float_color ();
   }
 }
 
@@ -587,8 +587,8 @@ create_fellow_shadow (bool select)
       k->style = -1;
       k->style = next_fellow_shadow_style ();
       k->current_hp += required_strength;
-      mr.flicker = 12;
-      mr.color = get_flicker_raise_sword_color ();
+      global_mr.flicker = 12;
+      global_mr.color = get_flicker_raise_sword_color ();
       L_play_audio (main_L, "SUSPENSE", NULL, k->id);
 
       if (select) select_controllable_by_id (id);

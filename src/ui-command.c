@@ -143,22 +143,22 @@ ui_full_screen (void)
 }
 
 void
-ui_zoom_fit (enum mr_fit_mode fit)
+ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit)
 {
   char *key = "MULTI ROOM FIT MODE";
   char *value;
 
   switch (fit) {
   case MR_FIT_NONE:
-    mr.fit_mode = MR_FIT_NONE;
+    mr->fit_mode = MR_FIT_NONE;
     value = "NONE";
     break;
   case MR_FIT_STRETCH:
-    mr.fit_mode = MR_FIT_STRETCH;
+    mr->fit_mode = MR_FIT_STRETCH;
     value = "STRETCH";
     break;
   case MR_FIT_RATIO:
-    mr.fit_mode = MR_FIT_RATIO;
+    mr->fit_mode = MR_FIT_RATIO;
     value = "RATIO";
     break;
   default:
@@ -166,7 +166,7 @@ ui_zoom_fit (enum mr_fit_mode fit)
     return;
   }
 
-  apply_mr_fit_mode ();
+  apply_mr_fit_mode (mr);
 
   ui_msg (1, "ZOOM FIT: %s", value);
 
@@ -174,30 +174,30 @@ ui_zoom_fit (enum mr_fit_mode fit)
 }
 
 bool
-ui_set_multi_room (int dw, int dh, bool correct_mouse)
+ui_mr_set_dim (struct mr *mr, int dw, int dh, bool correct_mouse)
 {
   char *key = "MULTI ROOM";
   char *value;
 
-  if (mr.w + dw < 1 || mr.h + dh < 1) {
-    ui_msg (1, "MULTI-ROOM %ix%i", mr.w, mr.h);
+  if (mr->w + dw < 1 || mr->h + dh < 1) {
+    ui_msg (1, "MULTI-ROOM %ix%i", mr->w, mr->h);
     return false;
   }
 
   struct mouse_coord m;
-  get_mouse_coord (&m);
+  get_mouse_coord (mr, &m);
 
-  if (mr.w + dw != mr.w || mr.h + dh != mr.h)
-    set_multi_room (mr.w + dw, mr.h + dh);
+  if (mr->w + dw != mr->w || mr->h + dh != mr->h)
+    mr_set_dim (mr, mr->w + dw, mr->h + dh);
 
-  mr_center_room (mr.room);
+  mr_center_room (mr, mr->room);
 
-  if (mr_coord (m.c.room, -1, NULL, NULL) && correct_mouse)
-    set_mouse_coord (&m);
+  if (mr_coord (mr, m.c.room, -1, NULL, NULL) && correct_mouse)
+    set_mouse_coord (mr, &m);
 
-  ui_msg (1, "MULTI-ROOM %ix%i", mr.w, mr.h);
+  ui_msg (1, "MULTI-ROOM %ix%i", mr->w, mr->h);
 
-  value = xasprintf ("%ix%i", mr.w, mr.h);
+  value = xasprintf ("%ix%i", mr->w, mr->h);
   ui_save_setting (NULL, key, value);
   al_free (value);
 
@@ -207,13 +207,13 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
 void
 ui_show_coordinates (void)
 {
-  int s = mr.room;
+  int s = global_mr.room;
   int l = roomd (&global_level, s, LEFT);
   int r = roomd (&global_level, s, RIGHT);
   int a = roomd (&global_level, s, ABOVE);
   int b = roomd (&global_level, s, BELOW);
 
-  mr.select_cycles = SELECT_CYCLES;
+  global_mr.select_cycles = SELECT_CYCLES;
 
   ui_msg (1, "S%i L%i R%i A%i B%i", s, l, r, a, b);
 }
@@ -221,14 +221,14 @@ ui_show_coordinates (void)
 void
 ui_show_indirect_coordinates (void)
 {
-  int a = roomd (&global_level, mr.room, ABOVE);
-  int b = roomd (&global_level, mr.room, BELOW);
+  int a = roomd (&global_level, global_mr.room, ABOVE);
+  int b = roomd (&global_level, global_mr.room, BELOW);
   int al = roomd (&global_level, a, LEFT);
   int ar = roomd (&global_level, a, RIGHT);
   int bl = roomd (&global_level, b, LEFT);
   int br = roomd (&global_level, b, RIGHT);
 
-  mr.select_cycles = SELECT_CYCLES;
+  global_mr.select_cycles = SELECT_CYCLES;
 
   ui_msg (1, "LV%i AL%i AR%i BL%i BR%i",
           global_level.n, al, ar, bl, br);
@@ -817,7 +817,7 @@ ui_change_kcd (int d)
 void
 ui_home (void)
 {
-  mr_focus_room (get_actor_by_id (current_kid_id)->f.c.room);
+  mr_focus_room (&global_mr, get_actor_by_id (current_kid_id)->f.c.room);
 }
 
 
@@ -1168,7 +1168,7 @@ display_skill (struct actor *k)
 
 
 void
-ui_move_locked_place_selection (enum dir d)
+ui_move_locked_place_selection (struct mr *mr, enum dir d)
 {
   if (! selection_locked) return;
 
@@ -1190,5 +1190,5 @@ ui_move_locked_place_selection (enum dir d)
   default: assert (false);
   }
 
-  select_pos (&p);
+  select_pos (mr, &p);
 }

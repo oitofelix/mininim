@@ -60,8 +60,8 @@ void ui_jump_to_level_menu (int i, int lower);
 void ui_save_game (void);
 void ui_gm (enum gm new_gm);
 void ui_undo_pass (struct undo *u, int dir, char *prefix);
-void ui_zoom_fit (enum mr_fit_mode fit);
-bool ui_set_multi_room (int dw, int dh, bool correct_mouse);
+void ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit);
+bool ui_mr_set_dim (struct mr *mr, int dw, int dh, bool correct_mouse);
 void ui_show_coordinates (void);
 void ui_show_indirect_coordinates (void);
 void ui_room_drawing (bool draw);
@@ -95,6 +95,6 @@ void ui_toggle_time_frequency_constraint (void);
 void ui_toggle_pause_game (void);
 void ui_next_frame (void);
 
-void ui_move_locked_place_selection (enum dir d);
+void ui_move_locked_place_selection (struct mr *mr, enum dir d);
 
 #endif	/* MININIM_UI_COMMAND_H */

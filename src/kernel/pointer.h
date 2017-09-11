@@ -28,10 +28,10 @@ extern struct pos selection_pos;
 /* functions */
 void init_mouse (void);
 void finalize_mouse (void);
-struct mouse_coord *get_mouse_coord (struct mouse_coord *m);
-struct pos *get_mouse_pos (struct pos *p);
-void set_mouse_coord (struct mouse_coord *m);
-void set_mouse_pos (struct pos *p);
-void set_mouse_room (int room);
+struct mouse_coord *get_mouse_coord (struct mr *mr, struct mouse_coord *m);
+struct pos *get_mouse_pos (struct mr *mr, struct pos *p);
+void set_mouse_coord (struct mr *mr, struct mouse_coord *m);
+void set_mouse_pos (struct mr *mr, struct pos *p);
+void set_mouse_room (struct mr *mr, int room);
 
 #endif	/* MININIM_POINTER_H */

@@ -106,11 +106,11 @@ init_video (void)
   main_menu ();
   if (! is_fullscreen ()) show_menu ();
 
-  if (mr.fit_w == 0 && mr.fit_h == 0) {
-    mr.fit_w = 1;
-    mr.fit_h = 1;
+  if (global_mr.fit_w == 0 && global_mr.fit_h == 0) {
+    global_mr.fit_w = 1;
+    global_mr.fit_h = 1;
   }
-  set_multi_room (mr.fit_w, mr.fit_h);
+  mr_set_dim (&global_mr, global_mr.fit_w, global_mr.fit_h);
 
   cutscene_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
@@ -882,15 +882,15 @@ hgc_palette (ALLEGRO_COLOR c)
 }
 
 void
-draw_mr_select_rect (int x, int y, ALLEGRO_COLOR color)
+draw_mr_select_rect (struct mr *mr, int x, int y, ALLEGRO_COLOR color)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
-  int tw, th; mr_get_resolution (&tw, &th);
+  int tw, th; mr_get_resolution (mr, &tw, &th);
   tw = OW (tw);
   th = OH (th);
 
-  ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
+  ALLEGRO_BITMAP *screen = mr->cell[x][y].screen;
   int sw = get_bitmap_width (screen);
   int sh = get_bitmap_height (screen);
   float dx = ((OW (ORIGINAL_WIDTH) * x) * w) / (float) tw;
@@ -901,7 +901,7 @@ draw_mr_select_rect (int x, int y, ALLEGRO_COLOR color)
 }
 
 void
-flip_display (ALLEGRO_BITMAP *bitmap)
+flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
@@ -919,9 +919,9 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     al_draw_scaled_bitmap
       (bitmap, 0, 0, bw, bh, 0, 0, w, h, flags);
   } else {
-    if (has_mr_view_changed ()
+    if (has_mr_view_changed (mr)
         && ! no_room_drawing) {
-      draw_multi_rooms ();
+      draw_multi_rooms (mr);
       force_full_redraw = true;
     }
 
@@ -938,15 +938,15 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     int x, y;
     int tw, th;
-    mr_get_resolution (&tw, &th);
+    mr_get_resolution (mr, &tw, &th);
     tw = OW (tw);
     th = OH (th);
 
-    for (y = mr.h - 1; y >= 0; y--)
-      for (x = 0; x < mr.w; x++) {
+    for (y = mr->h - 1; y >= 0; y--)
+      for (x = 0; x < mr->w; x++) {
         ALLEGRO_BITMAP *screen =
-          (mr.cell[x][y].room || no_room_drawing)
-          ? mr.cell[x][y].screen : mr.cell[x][y].cache;
+          (mr->cell[x][y].room || no_room_drawing)
+          ? mr->cell[x][y].screen : mr->cell[x][y].cache;
         int sw = get_bitmap_width (screen);
         int sh = get_bitmap_height (screen);
         float dx = ((OW (ORIGINAL_WIDTH) * x) * w) / (float) tw;
@@ -954,9 +954,9 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
 
-        if (mr.cell[x][y].room
-            || mr.last.display_width != w
-            || mr.last.display_height != h
+        if (mr->cell[x][y].room
+            || mr->last.display_width != w
+            || mr->last.display_height != h
             || force_full_redraw)
           al_draw_scaled_bitmap
             (screen, 0, 0, sw, sh, dx, dy, dw, dh, 0);
@@ -965,33 +965,34 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     al_set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
-    if ((mr.w > 1 || mr.h > 1) && mr.room_select > 0)
-      for (y = mr.h - 1; y >= 0; y--)
-        for (x = 0; x < mr.w; x++)
-          if (mr.cell[x][y].room == mr.room_select) {
+    if ((mr->w > 1 || mr->h > 1) && mr->room_select > 0)
+      for (y = mr->h - 1; y >= 0; y--)
+        for (x = 0; x < mr->w; x++)
+          if (mr->cell[x][y].room == mr->room_select) {
             int rx = x, ry = y;
             if (flags & ALLEGRO_FLIP_HORIZONTAL)
-              rx = (mr.w - 1) - x;
+              rx = (mr->w - 1) - x;
             if (flags & ALLEGRO_FLIP_VERTICAL)
-              ry = (mr.h - 1) - y;
-            draw_mr_select_rect (rx, ry, GREEN);
+              ry = (mr->h - 1) - y;
+            draw_mr_select_rect (mr, rx, ry, GREEN);
           }
 
-    if (mr.room != mr.last.room
-        || mr.x != mr.last.x
-        || mr.y != mr.last.y
-        || mr.w != mr.last.w
-        || mr.h != mr.last.h)
-      mr.select_cycles = SELECT_CYCLES;
+    if (mr->room != mr->last.room
+        || mr->x != mr->last.x
+        || mr->y != mr->last.y
+        || mr->w != mr->last.w
+        || mr->h != mr->last.h)
+      mr->select_cycles = SELECT_CYCLES;
 
-    if ((mr.w > 1 || mr.h > 1) && mr.select_cycles > 0) {
-      int rx = mr.x, ry = mr.y;
+    if ((mr->w > 1 || mr->h > 1)
+        && mr->select_cycles > 0) {
+      int rx = mr->x, ry = mr->y;
       if (flags & ALLEGRO_FLIP_HORIZONTAL)
-        rx = (mr.w - 1) - mr.x;
+        rx = (mr->w - 1) - mr->x;
       if (flags & ALLEGRO_FLIP_VERTICAL)
-        ry = (mr.h - 1) - mr.y;
-      draw_mr_select_rect (rx, ry, RED);
-      if (! pause_anim) mr.select_cycles--;
+        ry = (mr->h - 1) - mr->y;
+      draw_mr_select_rect (mr, rx, ry, RED);
+      if (! pause_anim) mr->select_cycles--;
     }
   }
 
@@ -1113,7 +1114,7 @@ show (void)
 
   switch (video_effect.type) {
   case VIDEO_NO_EFFECT:
-    flip_display (cutscene ? cutscene_screen : NULL); return;
+    flip_display (&global_mr, cutscene ? cutscene_screen : NULL); return;
   case VIDEO_OFF: return;
   default: break;
   }
@@ -1168,7 +1169,7 @@ show (void)
     }
   }
 
-  flip_display (effect_buffer);
+  flip_display (&global_mr, effect_buffer);
 }
 
 bool
@@ -1490,7 +1491,7 @@ show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon)
   rendering = VIDEO_RENDERING;
   draw_logo (cutscene_screen, text0, text1, icon);
   rendering = rendering_backup;
-  flip_display (cutscene_screen);
+  flip_display (&global_mr, cutscene_screen);
 }
 
 void

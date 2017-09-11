@@ -40,14 +40,14 @@ finalize_mouse (void)
 }
 
 struct mouse_coord *
-get_mouse_coord (struct mouse_coord *m)
+get_mouse_coord (struct mr *mr, struct mouse_coord *m)
 {
-  mr_save_origin (&m->mr);
+  mr_save_origin (mr, &m->o);
 
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
   int sw, sh;
-  mr_get_resolution (&sw, &sh);
+  mr_get_resolution (mr, &sw, &sh);
 
   al_get_mouse_state (&mouse_state);
   m->sx = mouse_state.x;
@@ -71,7 +71,7 @@ get_mouse_coord (struct mouse_coord *m)
   } else {
     m->x = x / ORIGINAL_WIDTH;
     m->y = (y - 3) / ROOM_HEIGHT;
-    m->c.room = mr.cell[m->x][m->y].room;
+    m->c.room = mr->cell[m->x][m->y].room;
     m->c.room = (m->c.room > 0) ? m->c.room : 0;
   }
 
@@ -82,10 +82,10 @@ get_mouse_coord (struct mouse_coord *m)
 }
 
 struct pos *
-get_mouse_pos (struct pos *p)
+get_mouse_pos (struct mr *mr, struct pos *p)
 {
   struct mouse_coord m;
-  get_mouse_coord (&m);
+  get_mouse_coord (mr, &m);
 
   if (! is_valid_coord (&m.c)) {
     invalid_pos (p);
@@ -128,7 +128,7 @@ get_mouse_pos (struct pos *p)
 }
 
 void
-set_mouse_coord (struct mouse_coord *m)
+set_mouse_coord (struct mr *mr, struct mouse_coord *m)
 {
   if (m->c.x < 0 || m->c.x >= ORIGINAL_WIDTH
       || m->c.y < 0 || m->c.y >= ORIGINAL_HEIGHT)
@@ -136,29 +136,29 @@ set_mouse_coord (struct mouse_coord *m)
 
   int x, y;
 
-  mr_restore_origin (&m->mr);
+  mr_restore_origin (mr, &m->o);
 
   if (! m->c.room) {
     al_set_mouse_xy (display, m->sx, m->sy);
     return;
   }
 
-  if (! mr_coord (m->c.room, -1, &x, &y)) {
-    mr_center_room (m->c.room);
-    x = mr.x;
-    y = mr.y;
+  if (! mr_coord (mr, m->c.room, -1, &x, &y)) {
+    mr_center_room (mr, m->c.room);
+    x = mr->x;
+    y = mr->y;
   }
 
   struct mouse_coord m0;
-  get_mouse_coord (&m0);
+  get_mouse_coord (mr, &m0);
   if (m0.x >= 0 && m0.y >= 0 &&
-      mr.cell[m0.x][m0.y].room == m->c.room) {
+      mr->cell[m0.x][m0.y].room == m->c.room) {
     x = m0.x;
     y = m0.y;
   }
 
   int tw, th;
-  mr_get_resolution (&tw, &th);
+  mr_get_resolution (mr, &tw, &th);
 
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
@@ -183,51 +183,52 @@ set_mouse_coord (struct mouse_coord *m)
     al_get_mouse_state (&mouse_state);
   } while (mouse_state.x != mx || mouse_state.y != my);
 
-  mr.select_cycles = SELECT_CYCLES;
+  mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-set_mouse_pos (struct pos *p)
+set_mouse_pos (struct mr *mr, struct pos *p)
 {
   struct mouse_coord m;
 
   struct pos np; npos (p, &np);
 
-  m.mr.w = mr.w;
-  m.mr.h = mr.h;
-  m.mr.room = mr.room = np.room;
+  m.o.w = mr->w;
+  m.o.h = mr->h;
+  m.o.room = mr->room = np.room;
 
   tile_coord (&np, _m, &m.c);
 
   int x, y;
-  if (! mr_coord (np.room, -1, &x, &y)) {
-    mr_center_room (np.room);
-    x = mr.x;
-    y = mr.y;
+  if (! mr_coord (mr, np.room, -1, &x, &y)) {
+    mr_center_room (mr, np.room);
+    x = mr->x;
+    y = mr->y;
   }
 
-  m.mr.x = mr.x = x;
-  m.mr.y = mr.y = y;
+  m.o.x = mr->x = x;
+  m.o.y = mr->y = y;
 
-  set_mouse_coord (&m);
+  set_mouse_coord (mr, &m);
 }
 
 void
-set_mouse_room (int room)
+set_mouse_room (struct mr *mr, int room)
 {
   struct mouse_coord m;
 
   int x, y;
-  if (mr_coord (room, -1, &x, &y))
-    mr_set_origin (room, x, y);
+  if (mr_coord (mr, room, -1, &x, &y))
+    mr_set_origin (mr, room, x, y);
 
-  mr_save_origin (&m.mr);
-  new_coord (&m.c, &global_level, room, ORIGINAL_WIDTH / 2, ORIGINAL_HEIGHT / 2);
-  set_mouse_coord (&m);
+  mr_save_origin (mr, &m.o);
+  new_coord (&m.c, &global_level, room,
+             ORIGINAL_WIDTH / 2, ORIGINAL_HEIGHT / 2);
+  set_mouse_coord (mr, &m);
 
   if (! room) {
-    mr_center_room (0);
-    mr.select_cycles = 0;
+    mr_center_room (mr, 0);
+    mr->select_cycles = 0;
     int w = al_get_display_width (display);
     int h = al_get_display_height (display);
     al_set_mouse_xy (display, w / 2, h / 2);

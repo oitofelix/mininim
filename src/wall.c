@@ -39,14 +39,14 @@ draw_wall_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
   struct rect nr; rect_object_part (&nr, "WALL", "FRONT", &np);
   struct coord vc; coord2room (&r.c, room_view, &vc);
   int x, y;
-  if (mr_coord (np.room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nr.c.x, nr.c.y,
+  if (mr_coord (&global_mr, np.room, -1, &x, &y))
+    draw_bitmap_regionc (global_mr.cell[x][y].cache, bitmap, nr.c.x, nr.c.y,
                          PLACE_WIDTH, PLACE_HEIGHT, &r.c, 0);
-  else if (mr_coord (vc.room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, vc.x, vc.y,
+  else if (mr_coord (&global_mr, vc.room, -1, &x, &y))
+    draw_bitmap_regionc (global_mr.cell[x][y].cache, bitmap, vc.x, vc.y,
                          PLACE_WIDTH, PLACE_HEIGHT, &vc, 0);
-  else if (mr_coord (p->room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, r.c.x, r.c.y,
+  else if (mr_coord (&global_mr, p->room, -1, &x, &y))
+    draw_bitmap_regionc (global_mr.cell[x][y].cache, bitmap, r.c.x, r.c.y,
                          PLACE_WIDTH, PLACE_HEIGHT, &r.c, 0);
   else {
     draw_object_part (bitmap, "WALL", "FRONT", p);

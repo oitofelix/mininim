@@ -74,7 +74,7 @@ void start_video_effect (enum video_effect_type type, int duration);
 void stop_video_effect (void);
 bool is_video_effect_started (void);
 void show (void);
-void flip_display (ALLEGRO_BITMAP *bitmap);
+void flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
 void process_display_events (void);
 int bool2bitmap_flags (bool v, bool h);

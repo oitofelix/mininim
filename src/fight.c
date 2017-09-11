@@ -1336,8 +1336,8 @@ fight_hit (struct actor *k, struct actor *ke)
   kid_haptic (ke, KID_HAPTIC_HARM);
 
   if (k->id == current_kid_id) {
-    mr.flicker = 2;
-    mr.color = get_flicker_blood_color ();
+    global_mr.flicker = 2;
+    global_mr.color = get_flicker_blood_color ();
     play_audio (&harm_audio, NULL, k->id);
   } else play_audio (&guard_hit_audio, NULL, k->id);
 

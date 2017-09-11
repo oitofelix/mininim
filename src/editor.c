@@ -77,7 +77,7 @@ change_tile_bg (struct pos *p, enum tile_bg b)
 }
 
 void
-select_pos (struct pos *p)
+select_pos (struct mr *mr, struct pos *p)
 {
   struct pos np;
   npos (p, &np);
@@ -86,7 +86,7 @@ select_pos (struct pos *p)
 
   selection_locked = true;
   selection_pos = np;
-  mr_scroll_into_view (np.room);
+  mr_scroll_into_view (mr, np.room);
 }
 
 void
@@ -122,7 +122,7 @@ editor (void)
 {
   if (edit == EDIT_NONE) return;
 
-  mr.select_cycles = SELECT_CYCLES;
+  global_mr.select_cycles = SELECT_CYCLES;
   gui_run_callback_IFn ("_UPDATE_CB", gui_editor_dialog);
 
   struct bmenu_item bmain_menu[] =
@@ -994,12 +994,12 @@ editor (void)
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'T':
       edit = EDIT_EVENT2TILE;
-      get_mouse_coord (&last_mouse_coord);
+      get_mouse_coord (&global_mr, &last_mouse_coord);
       s = last_event;
       break;
     case 'F':
       edit = EDIT_EVENT2FLOOR;
-      get_mouse_coord (&last_mouse_coord);
+      get_mouse_coord (&global_mr, &last_mouse_coord);
       invalid_pos (&last_event2floor_pos);
       t = last_event;
       next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &t);
@@ -1021,12 +1021,13 @@ editor (void)
       al_set_mouse_xy (display, 0, 0);
     } else {
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      set_mouse_pos (&event (&global_level, s)->p);
+      set_mouse_pos (&global_mr, &event (&global_level, s)->p);
     }
     bb = event (&global_level, s)->next;
     switch (bmenu_int (&s, &bb, 0,
                        global_level.event_nmemb - 1, "ED>EVENT", "N")) {
-    case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
+    case -1: set_mouse_coord (&global_mr, &last_mouse_coord);
+      edit = EDIT_EVENT; break;
     case 0: break;
     case 1:
       edit = EDIT_EVENT;
@@ -1040,11 +1041,12 @@ editor (void)
       al_set_mouse_xy (display, 0, 0);
     } else {
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      set_mouse_pos (&last_event2floor_pos);
+      set_mouse_pos (&global_mr, &last_event2floor_pos);
     }
     switch (bmenu_list (&s, &r, t, 0,
                         global_level.event_nmemb - 1, "EF>EVENT")) {
-    case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
+    case -1: set_mouse_coord (&global_mr, &last_mouse_coord);
+      edit = EDIT_EVENT; break;
     case 0: break;
     case 1:
       edit = EDIT_EVENT;
@@ -1109,13 +1111,13 @@ editor (void)
     }
     break;
   case EDIT_ROOM:
-    mr.select_cycles = SELECT_CYCLES;
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    mr_focus_mouse ();
+    mr_focus_mouse (&global_mr);
     switch (bmenu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
-      get_mouse_coord (&last_mouse_coord);
+      get_mouse_coord (&global_mr, &last_mouse_coord);
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
@@ -1125,36 +1127,36 @@ editor (void)
       b2 = globally_unique_links;
       break;
     case 'X':
-      get_mouse_coord (&last_mouse_coord);
+      get_mouse_coord (&global_mr, &last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      apply_to_room (&global_level, mr.room, clear_tile, NULL,
+      apply_to_room (&global_level, global_mr.room, clear_tile, NULL,
                      "CLEAR ROOM");
       break;
     case 'R':
-      apply_to_room (&global_level, mr.room, random_tile, NULL,
+      apply_to_room (&global_level, global_mr.room, random_tile, NULL,
                      "RANDOMIZE ROOM");
       break;
     case 'D':
-      apply_to_room (&global_level, mr.room, decorate_tile, NULL,
+      apply_to_room (&global_level, global_mr.room, decorate_tile, NULL,
                      "DECORATE ROOM");
       break;
     case 'M': edit = EDIT_ROOM_MIRROR; break;
     case 'C':
-      copy_room (&room_copy, &global_level, mr.room);
+      copy_room (&room_copy, &global_level, global_mr.room);
       editor_msg ("COPY ROOM", EDITOR_CYCLES_3);
       break;
     case 'P':
-      paste_room (&global_level, mr.room, &room_copy, "PASTE ROOM");
+      paste_room (&global_level, global_mr.room, &room_copy, "PASTE ROOM");
       break;
     case '!':
-      apply_to_room (&global_level, mr.room, fix_tile, NULL, "FIX ROOM");
+      apply_to_room (&global_level, global_mr.room, fix_tile, NULL, "FIX ROOM");
       break;
     }
     break;
   case EDIT_ROOM_MIRROR:
-    mr_focus_mouse ();
-    mr.select_cycles = SELECT_CYCLES;
+    mr_focus_mouse (&global_mr);
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_menu, "RM>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
@@ -1164,109 +1166,109 @@ editor (void)
     }
     break;
   case EDIT_ROOM_MIRROR_TILES:
-    mr_focus_mouse ();
-    mr.select_cycles = SELECT_CYCLES;
+    mr_focus_mouse (&global_mr);
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RMC>")) {
     case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
       register_h_room_mirror_tile_undo
-        (&undo, mr.room, "ROOM MIRROR TILES H.");
+        (&undo, global_mr.room, "ROOM MIRROR TILES H.");
       break;
     case 'V':
       register_v_room_mirror_tile_undo
-        (&undo, mr.room, "ROOM MIRROR TILES V.");
+        (&undo, global_mr.room, "ROOM MIRROR TILES V.");
       break;
     case 'B':
       register_h_room_mirror_tile_undo
-        (&undo, mr.room, NULL);
+        (&undo, global_mr.room, NULL);
       register_v_room_mirror_tile_undo
-        (&undo, mr.room, "ROOM MIRROR TILES H+V.");
+        (&undo, global_mr.room, "ROOM MIRROR TILES H+V.");
       break;
     case 'R':
       register_random_room_mirror_tile_undo
-        (&undo, mr.room, false, "ROOM MIRROR TILES R.");
+        (&undo, global_mr.room, false, "ROOM MIRROR TILES R.");
       break;
     }
     break;
   case EDIT_ROOM_MIRROR_LINKS:
-    mr_focus_mouse ();
-    mr.select_cycles = SELECT_CYCLES;
+    mr_focus_mouse (&global_mr);
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RML>")) {
     case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, LEFT, RIGHT);
+      editor_mirror_link (global_mr.room, LEFT, RIGHT);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'V':
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, ABOVE, BELOW);
+      editor_mirror_link (global_mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'B':
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, LEFT, RIGHT);
-      editor_mirror_link (mr.room, ABOVE, BELOW);
+      editor_mirror_link (global_mr.room, LEFT, RIGHT);
+      editor_mirror_link (global_mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'R':
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, random_dir (), random_dir ());
+      editor_mirror_link (global_mr.room, random_dir (), random_dir ());
       register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
       destroy_array ((void **) &l, NULL);
       break;
     }
     break;
   case EDIT_ROOM_MIRROR_BOTH:
-    mr_focus_mouse ();
-    mr.select_cycles = SELECT_CYCLES;
+    mr_focus_mouse (&global_mr);
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RMB>")) {
     case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
-      register_h_room_mirror_tile_undo (&undo, mr.room, NULL);
+      register_h_room_mirror_tile_undo (&undo, global_mr.room, NULL);
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, LEFT, RIGHT);
+      editor_mirror_link (global_mr.room, LEFT, RIGHT);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'V':
       register_v_room_mirror_tile_undo
-        (&undo, mr.room, NULL);
+        (&undo, global_mr.room, NULL);
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, ABOVE, BELOW);
+      editor_mirror_link (global_mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS V.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'B':
       register_h_room_mirror_tile_undo
-        (&undo, mr.room, NULL);
+        (&undo, global_mr.room, NULL);
       register_v_room_mirror_tile_undo
-        (&undo, mr.room, NULL);
+        (&undo, global_mr.room, NULL);
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, LEFT, RIGHT);
-      editor_mirror_link (mr.room, ABOVE, BELOW);
+      editor_mirror_link (global_mr.room, LEFT, RIGHT);
+      editor_mirror_link (global_mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H+V.");
       destroy_array ((void **) &l, NULL);
       break;
     case 'R':
       register_random_room_mirror_tile_undo
-        (&undo, mr.room, false, NULL);
+        (&undo, global_mr.room, false, NULL);
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
-      editor_mirror_link (mr.room, random_dir (), random_dir ());
+      editor_mirror_link (global_mr.room, random_dir (), random_dir ());
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS R.");
       destroy_array ((void **) &l, NULL);
       break;
@@ -1276,26 +1278,30 @@ editor (void)
     bmenu_select_room (EDIT_ROOM, "RJ>ROOM");
     break;
   case EDIT_LINK:
-    mr.select_cycles = SELECT_CYCLES;
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    mr_focus_mouse ();
+    mr_focus_mouse (&global_mr);
     switch (bmenu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
-      get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (&global_level, mr.room, LEFT));
+      get_mouse_coord (&global_mr, &last_mouse_coord);
+      set_mouse_room (&global_mr,
+                      roomd (&global_level, global_mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
-      get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (&global_level, mr.room, RIGHT));
+      get_mouse_coord (&global_mr, &last_mouse_coord);
+      set_mouse_room (&global_mr,
+                      roomd (&global_level, global_mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
-      get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (&global_level, mr.room, ABOVE));
+      get_mouse_coord (&global_mr, &last_mouse_coord);
+      set_mouse_room (&global_mr,
+                      roomd (&global_level, global_mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
-      get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (&global_level, mr.room, BELOW));
+      get_mouse_coord (&global_mr, &last_mouse_coord);
+      set_mouse_room (&global_mr,
+                      roomd (&global_level, global_mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -1314,28 +1320,28 @@ editor (void)
   case EDIT_ROOM_EXCHANGE:
     r = bmenu_select_room (EDIT_ROOM, "RX>ROOM");
 
-    mr.room_select = last_mouse_coord.c.room;
+    global_mr.room_select = last_mouse_coord.c.room;
 
     if (r == 1) {
       l = copy_array (global_level.link, global_level.room_nmemb,
                       NULL, sizeof (*l));
 
       int room0 = last_mouse_coord.c.room;
-      int room1 = mr.room;
+      int room1 = global_mr.room;
 
       exchange_rooms (&global_level, room0, room1);
 
       register_link_undo (&undo, l, "ROOM EXCHANGE");
       last_mouse_coord.c.room = room1;
-      last_mouse_coord.mr.room = room1;
-      set_mouse_coord (&last_mouse_coord);
-      mr.room_select = -1;
+      last_mouse_coord.o.room = room1;
+      set_mouse_coord (&global_mr, &last_mouse_coord);
+      global_mr.room_select = -1;
       destroy_array ((void **) &l, NULL);
-    } else if (r == -1) mr.room_select = -1;
+    } else if (r == -1) global_mr.room_select = -1;
     break;
   case EDIT_LINKING_SETTINGS:
-    mr_focus_mouse ();
-    mr.select_cycles = SELECT_CYCLES;
+    mr_focus_mouse (&global_mr);
+    global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     switch (bmenu_bool (linking_settings_menu, "RS>", false, &b0,
                        &b1, &b2)) {
@@ -1357,7 +1363,7 @@ editor (void)
       ui_place_kid (get_actor_by_id (current_kid_id), &p);
       break;
     case 'J':
-      set_mouse_pos (&global_level.start_pos);
+      set_mouse_pos (&global_mr, &global_level.start_pos);
       break;
     case 'S':
       if (! is_valid_pos (&p)) {
@@ -1367,14 +1373,14 @@ editor (void)
       register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
-      if (! is_pos_visible (&global_level.start_pos)) {
+      if (! is_pos_visible (&global_mr, &global_level.start_pos)) {
         editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
       register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
-      if (! is_pos_visible (&global_level.start_pos)) {
+      if (! is_pos_visible (&global_mr, &global_level.start_pos)) {
         editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
@@ -1689,7 +1695,7 @@ editor (void)
     switch (bmenu_enum (guard_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'G': edit = EDIT_GUARD_SELECT;
-      s = guard_index; get_mouse_coord (&last_mouse_coord); break;
+      s = guard_index; get_mouse_coord (&global_mr, &last_mouse_coord); break;
     case 'P':
       ui_place_guard (get_guard_actor_by_level_id (guard_index), &p);
       break;
@@ -1706,14 +1712,14 @@ editor (void)
                                      "GUARD START POSITION");
       break;
     case 'J':
-      get_mouse_coord (&last_mouse_coord);
+      get_mouse_coord (&global_mr, &last_mouse_coord);
       mouse2guard (guard_index); break;
     case 'D':
       if (! is_guard_by_type (g->type)) {
         editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
-      if (! is_pos_visible (&g->p)) {
+      if (! is_pos_visible (&global_mr, &g->p)) {
         editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
@@ -1757,7 +1763,7 @@ editor (void)
     str = xasprintf ("G%iG>GUARD", guard_index);
     switch (bmenu_int (&s, NULL, 0, global_level.guard_nmemb - 1, str, NULL)) {
     case -1: edit = EDIT_GUARD;
-      set_mouse_coord (&last_mouse_coord); break;
+      set_mouse_coord (&global_mr, &last_mouse_coord); break;
     case 0: break;
     case 1:
       guard_index = s;
@@ -1955,7 +1961,7 @@ exit_editor (Ihandle *ih)
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (is_game_paused ()) print_game_paused (0);
   else ui_msg_clear (0);
-  mr.room_select = -1;
+  global_mr.room_select = -1;
   return IUP_DEFAULT;
 }
 
@@ -1986,17 +1992,18 @@ bmenu_int_ext (struct pos *p, int steps, int fases,
 static char
 bmenu_select_room (enum edit up_edit, char *prefix)
 {
-  mr_focus_mouse ();
-  int room = mr.room;
+  mr_focus_mouse (&global_mr);
+  int room = global_mr.room;
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  char r = bmenu_int (&room, NULL, 0, global_level.room_nmemb - 1, prefix, NULL);
+  char r = bmenu_int (&room, NULL, 0, global_level.room_nmemb - 1,
+                      prefix, NULL);
   switch (r) {
   case -1: edit = up_edit;
-    set_mouse_coord (&last_mouse_coord);
+    set_mouse_coord (&global_mr, &last_mouse_coord);
     break;
   case 0: break;
   case 1: edit = up_edit; break;
-  default: set_mouse_room (room); break;
+  default: set_mouse_room (&global_mr, room); break;
   }
   return r;
 }
@@ -2033,18 +2040,18 @@ bmenu_link (enum dir dir)
   char r = bmenu_select_room (EDIT_LINK, prefix);
   al_free (prefix);
 
-  mr.room_select = last_mouse_coord.c.room;
+  global_mr.room_select = last_mouse_coord.c.room;
 
   if (r == 1) {
     struct room_linking *l =
       copy_array (global_level.link, global_level.room_nmemb,
                   NULL, sizeof (*l));
-    editor_link (last_mouse_coord.c.room, mr.room, dir);
+    editor_link (last_mouse_coord.c.room, global_mr.room, dir);
     register_link_undo (&undo, l, "LINK");
-    set_mouse_coord (&last_mouse_coord);
-    mr.room_select = -1;
+    set_mouse_coord (&global_mr, &last_mouse_coord);
+    global_mr.room_select = -1;
     destroy_array ((void **) &l, NULL);
-  } else if (r == -1) mr.room_select = -1;
+  } else if (r == -1) global_mr.room_select = -1;
 
   return r;
 }
@@ -2056,7 +2063,7 @@ mouse2guard (int i)
   if (is_guard_by_type (g->type)
       && is_valid_pos (&g->p)) {
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    set_mouse_pos (&g->p);
+    set_mouse_pos (&global_mr, &g->p);
   }
   else {
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);

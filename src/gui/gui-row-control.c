@@ -67,42 +67,42 @@ button_action_cb (Ihandle *ih)
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
   Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
 
-  if (ih == c_button) mr_simple_center_room (mr.room);
-  else if (ih == l_button) mr_row_trans (LEFT);
-  else if (ih == r_button) mr_row_trans (RIGHT);
-  else if (ih == a_button) mr_row_trans (ABOVE);
-  else if (ih == b_button) mr_row_trans (BELOW);
+  if (ih == c_button) mr_simple_center_room (&global_mr, global_mr.room);
+  else if (ih == l_button) mr_row_trans (&global_mr, LEFT);
+  else if (ih == r_button) mr_row_trans (&global_mr, RIGHT);
+  else if (ih == a_button) mr_row_trans (&global_mr, ABOVE);
+  else if (ih == b_button) mr_row_trans (&global_mr, BELOW);
   else if (ih == al_button) {
     if (selected == v_toggle) {
-      mr_row_trans (ABOVE);
-      mr_row_trans (LEFT);
+      mr_row_trans (&global_mr, ABOVE);
+      mr_row_trans (&global_mr, LEFT);
     } else if (selected == h_toggle) {
-      mr_row_trans (LEFT);
-      mr_row_trans (ABOVE);
+      mr_row_trans (&global_mr, LEFT);
+      mr_row_trans (&global_mr, ABOVE);
     }
   } else if (ih == ar_button) {
     if (selected == v_toggle) {
-      mr_row_trans (ABOVE);
-      mr_row_trans (RIGHT);
+      mr_row_trans (&global_mr, ABOVE);
+      mr_row_trans (&global_mr, RIGHT);
     } else if (selected == h_toggle) {
-      mr_row_trans (RIGHT);
-      mr_row_trans (ABOVE);
+      mr_row_trans (&global_mr, RIGHT);
+      mr_row_trans (&global_mr, ABOVE);
     }
   } else if (ih == bl_button) {
     if (selected == v_toggle) {
-      mr_row_trans (BELOW);
-      mr_row_trans (LEFT);
+      mr_row_trans (&global_mr, BELOW);
+      mr_row_trans (&global_mr, LEFT);
     } else if (selected == h_toggle) {
-      mr_row_trans (LEFT);
-      mr_row_trans (BELOW);
+      mr_row_trans (&global_mr, LEFT);
+      mr_row_trans (&global_mr, BELOW);
     }
   } else if (ih == br_button) {
     if (selected == v_toggle) {
-      mr_row_trans (BELOW);
-      mr_row_trans (RIGHT);
+      mr_row_trans (&global_mr, BELOW);
+      mr_row_trans (&global_mr, RIGHT);
     } else if (selected == h_toggle) {
-      mr_row_trans (RIGHT);
-      mr_row_trans (BELOW);
+      mr_row_trans (&global_mr, RIGHT);
+      mr_row_trans (&global_mr, BELOW);
     }
   }
 

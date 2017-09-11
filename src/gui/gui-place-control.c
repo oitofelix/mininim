@@ -112,41 +112,45 @@ button_action_cb (Ihandle *ih)
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
 
   if (ih == c_button) ui_place_kid (get_actor_by_id (current_kid_id), p);
-  else if (ih == l_button) ui_move_locked_place_selection (LEFT);
-  else if (ih == r_button) ui_move_locked_place_selection (RIGHT);
-  else if (ih == a_button) ui_move_locked_place_selection (ABOVE);
-  else if (ih == b_button) ui_move_locked_place_selection (BELOW);
+  else if (ih == l_button)
+    ui_move_locked_place_selection (&global_mr, LEFT);
+  else if (ih == r_button)
+    ui_move_locked_place_selection (&global_mr, RIGHT);
+  else if (ih == a_button)
+    ui_move_locked_place_selection (&global_mr, ABOVE);
+  else if (ih == b_button)
+    ui_move_locked_place_selection (&global_mr, BELOW);
   else if (ih == al_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (ABOVE);
-      ui_move_locked_place_selection (LEFT);
+      ui_move_locked_place_selection (&global_mr, ABOVE);
+      ui_move_locked_place_selection (&global_mr, LEFT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (LEFT);
-      ui_move_locked_place_selection (ABOVE);
+      ui_move_locked_place_selection (&global_mr, LEFT);
+      ui_move_locked_place_selection (&global_mr, ABOVE);
     }
   } else if (ih == ar_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (ABOVE);
-      ui_move_locked_place_selection (RIGHT);
+      ui_move_locked_place_selection (&global_mr, ABOVE);
+      ui_move_locked_place_selection (&global_mr, RIGHT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (RIGHT);
-      ui_move_locked_place_selection (ABOVE);
+      ui_move_locked_place_selection (&global_mr, RIGHT);
+      ui_move_locked_place_selection (&global_mr, ABOVE);
     }
   } else if (ih == bl_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (BELOW);
-      ui_move_locked_place_selection (LEFT);
+      ui_move_locked_place_selection (&global_mr, BELOW);
+      ui_move_locked_place_selection (&global_mr, LEFT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (LEFT);
-      ui_move_locked_place_selection (BELOW);
+      ui_move_locked_place_selection (&global_mr, LEFT);
+      ui_move_locked_place_selection (&global_mr, BELOW);
     }
   } else if (ih == br_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (BELOW);
-      ui_move_locked_place_selection (RIGHT);
+      ui_move_locked_place_selection (&global_mr, BELOW);
+      ui_move_locked_place_selection (&global_mr, RIGHT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (RIGHT);
-      ui_move_locked_place_selection (BELOW);
+      ui_move_locked_place_selection (&global_mr, RIGHT);
+      ui_move_locked_place_selection (&global_mr, BELOW);
     }
   }
 

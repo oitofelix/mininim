@@ -226,7 +226,7 @@ replace_playing_level (struct level *l)
   register_tiles ();
   em = global_level.em;
   hue = global_level.hue;
-  mr.full_update = true;
+  global_mr.full_update = true;
 }
 
 void
@@ -272,7 +272,7 @@ play_level (struct level *lv)
 
   normalize_level (&global_level);
 
-  apply_mr_fit_mode ();
+  apply_mr_fit_mode (&global_mr);
 
   register_tiles ();
   register_actors ();
@@ -714,7 +714,7 @@ compute_level (void)
     }
   }
 
-  camera_follow_kid = (k->f.c.room == mr.room)
+  camera_follow_kid = (k->f.c.room == global_mr.room)
     ? k->id : -1;
 
   int prev_room = k->f.c.room;
@@ -791,36 +791,36 @@ compute_level (void)
   if (k->f.c.room != prev_room
       && k->f.c.room != 0
       && camera_follow_kid == k->id)  {
-    if (! is_room_visible (k->f.c.room)) {
-      mr_coord (k->f.c.prev_room,
-                k->f.c.xd, &mr.x, &mr.y);
-      mr_set_origin (k->f.c.room, mr.x, mr.y);
-    } else mr_focus_room (k->f.c.room);
-    mr.select_cycles = 0;
+    if (! is_room_visible (&global_mr, k->f.c.room)) {
+      mr_coord (&global_mr, k->f.c.prev_room,
+                k->f.c.xd, &global_mr.x, &global_mr.y);
+      mr_set_origin (&global_mr, k->f.c.room, global_mr.x, global_mr.y);
+    } else mr_focus_room (&global_mr, k->f.c.room);
+    global_mr.select_cycles = 0;
   }
 
-  if (mr.w > 1
+  if (global_mr.w > 1
       && k->current_hp > 0
       && k->f.c.room != 0
       && camera_follow_kid == k->id
       && (ke = get_reciprocal_enemy (k))
-      && ! is_room_visible (ke->f.c.room)) {
+      && ! is_room_visible (&global_mr, ke->f.c.room)) {
     if (ke->f.c.room == roomd (&global_level, k->f.c.room, LEFT)) {
-      mr_row_trans (LEFT);
-      mr_focus_room (k->f.c.room);
-      mr.room_select = ke->f.c.room;
+      mr_row_trans (&global_mr, LEFT);
+      mr_focus_room (&global_mr, k->f.c.room);
+      global_mr.room_select = ke->f.c.room;
     } else if (ke->f.c.room == roomd (&global_level, k->f.c.room, RIGHT)) {
-      mr_row_trans (RIGHT);
-      mr_focus_room (k->f.c.room);
-      mr.room_select = ke->f.c.room;
+      mr_row_trans (&global_mr, RIGHT);
+      mr_focus_room (&global_mr, k->f.c.room);
+      global_mr.room_select = ke->f.c.room;
     }
-  } else if (mr.room_select > 0
-             && (mr.select_cycles == 0
-                 || mr.room != k->f.c.room))
-    mr.room_select = -1;
+  } else if (global_mr.room_select > 0
+             && (global_mr.select_cycles == 0
+                 || global_mr.room != k->f.c.room))
+    global_mr.room_select = -1;
 
   /* save individual multi-room origin */
-  mr_save_origin (&k->mr_origin);
+  mr_save_origin (&global_mr, &k->mr_origin);
 
   if (global_level.special_events) global_level.special_events ();
 
@@ -889,7 +889,7 @@ process_death (void)
 void
 draw_level (void)
 {
-  draw_multi_rooms ();
+  draw_multi_rooms (&global_mr);
 
   draw_hp (uscreen, get_actor_by_id (current_kid_id));
 
@@ -928,7 +928,7 @@ draw_hp (ALLEGRO_BITMAP *bitmap, struct actor *k)
   bool nrlc = no_recursive_links_continuity;
   no_recursive_links_continuity = true;
 
-  if (is_room_visible (k->f.c.room)) {
+  if (is_room_visible (&global_mr, k->f.c.room)) {
     draw_kid_hp (bitmap, k);
     struct actor *ke = NULL;
     if (k->enemy_id != -1) {

@@ -88,6 +88,7 @@ play_anim (anim_callback_t draw_callback,
   invalid_pos (&mouse_pos);
   invalid_pos (&selection_pos);
   selection_locked = false;
+  destroy_rect_sel (&global_rect_sel);
 
   while (! quit_anim) {
     L_gc (main_L);
@@ -163,9 +164,9 @@ play_anim (anim_callback_t draw_callback,
 
         /* update selection position */
         if (! cutscene) {
-          get_mouse_pos (&mouse_pos);
+          get_mouse_pos (&global_mr, &mouse_pos);
           if (! selection_locked)
-            get_mouse_pos (&selection_pos);
+            get_mouse_pos (&global_mr, &selection_pos);
         }
 
         /* message box */
@@ -289,7 +290,7 @@ play_anim (anim_callback_t draw_callback,
       switch (event.mouse.button) {
       case 1: ui_editor (); break;
       case 3: {
-        struct pos p; get_mouse_pos (&p);
+        struct pos p; get_mouse_pos (&global_mr, &p);
         ui_place_kid (get_actor_by_id (current_kid_id), &p);
         break;
       }
@@ -336,10 +337,10 @@ play_anim (anim_callback_t draw_callback,
       if (flip_gamepad_vertical) dz *= -1;
       if (flip_gamepad_horizontal) dw *= -1;
 
-      if (dz < 0) while (dz++ < 0) mr_row_trans (BELOW);
-      else if (dz > 0) while (dz-- > 0) mr_row_trans (ABOVE);
-      if (dw < 0) while (dw++ < 0) mr_row_trans (LEFT);
-      else if (dw > 0) while (dw-- > 0) mr_row_trans (RIGHT);
+      if (dz < 0) while (dz++ < 0) mr_row_trans (&global_mr, BELOW);
+      else if (dz > 0) while (dz-- > 0) mr_row_trans (&global_mr, ABOVE);
+      if (dw < 0) while (dw++ < 0) mr_row_trans (&global_mr, LEFT);
+      else if (dw > 0) while (dw-- > 0) mr_row_trans (&global_mr, RIGHT);
 
       break;
 

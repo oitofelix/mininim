@@ -78,8 +78,8 @@ kid_die_spiked (struct actor *k)
     k->death_reason = SPIKES_DEATH;
 
     if (k->id == current_kid_id) {
-      mr.flicker = 2;
-      mr.color = get_flicker_blood_color ();
+      global_mr.flicker = 2;
+      global_mr.color = get_flicker_blood_color ();
       kid_haptic (k, KID_HAPTIC_DEATH);
     }
     play_audio (&spiked_audio, NULL, k->id);
@@ -113,8 +113,8 @@ kid_die_chomped (struct actor *k)
     k->death_reason = CHOMPER_DEATH;
 
     if (k->id == current_kid_id) {
-      mr.flicker = 2;
-      mr.color = get_flicker_blood_color ();
+      global_mr.flicker = 2;
+      global_mr.color = get_flicker_blood_color ();
       kid_haptic (k, KID_HAPTIC_DEATH);
     }
     play_audio (&chomped_audio, NULL, k->id);

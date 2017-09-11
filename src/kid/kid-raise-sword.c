@@ -80,8 +80,8 @@ physics_out (struct actor *k)
   /* sound */
   if (k->i == 0 && k->wait == 5) {
     if (k->id == current_kid_id) {
-      mr.flicker = 8;
-      mr.color = get_flicker_raise_sword_color ();
+      global_mr.flicker = 8;
+      global_mr.color = get_flicker_raise_sword_color ();
     }
     play_audio (&glory_audio, NULL, k->id);
     kid_haptic (k, KID_HAPTIC_RAISE_SWORD);

@@ -142,7 +142,7 @@ button_action_cb (Ihandle *ih)
 
   if (ih == lock_button) {
     if (! selection_locked)
-      new_pos (&selection_pos, &global_level, mr.room, 1,  4);
+      new_pos (&selection_pos, &global_level, global_mr.room, 1,  4);
     selection_locked = ! selection_locked;
   } else if (ih == pause_button) ui_toggle_pause_game ();
   else if (ih == full_screen_button) ui_full_screen ();

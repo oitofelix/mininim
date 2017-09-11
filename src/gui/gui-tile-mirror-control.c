@@ -380,19 +380,19 @@ button_action_cb (Ihandle *ih)
     } else if (room) {
       if (tiles && links) {
         register_random_room_mirror_tile_undo
-          (&undo, mr.room, false, NULL);
+          (&undo, p->room, false, NULL);
         struct room_linking *l =
           copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (mr.room, random_dir (), random_dir ());
+        editor_mirror_link (p->room, random_dir (), random_dir ());
         register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS R.");
         destroy_array ((void **) &l, NULL);
       } else if (tiles)
         register_random_room_mirror_tile_undo
-          (&undo, mr.room, false, "ROOM MIRROR TILES R.");
+          (&undo, p->room, false, "ROOM MIRROR TILES R.");
       else if (links) {
         struct room_linking *l =
           copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (mr.room, random_dir (), random_dir ());
+        editor_mirror_link (p->room, random_dir (), random_dir ());
         register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
         destroy_array ((void **) &l, NULL);
       }

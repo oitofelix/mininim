@@ -679,7 +679,7 @@ selection_cb (Ihandle *tree, int id, int status)
   int depth = IupGetIntId (tree, "DEPTH", id);
   if (depth != EVENT_DEPTH) {
     struct pos *p = IupTreeGetUserId (tree, id);
-    select_pos (p);
+    select_pos (&global_mr, p);
   }
 
   return IUP_DEFAULT;

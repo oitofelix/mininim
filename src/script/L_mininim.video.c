@@ -488,10 +488,10 @@ setup_video_mode (char *requested_vm)
   uscreen = create_bitmap (OW (CUTSCENE_WIDTH), OH (CUTSCENE_HEIGHT));
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
-  set_multi_room (mr.w, mr.h);
+  mr_set_dim (&global_mr, global_mr.w, global_mr.h);
 
   update_room0_cache ();
-  update_cache ();
+  update_cache (&global_mr);
 
   if (is_game_paused ()) step_cycle = 1;
   if (anim_compute_callback) anim_compute_callback ();

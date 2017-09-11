@@ -833,9 +833,9 @@ Levels have been converted using module %s into native format at\n\
     e = optval_to_enum (&i, key, arg, state, multi_room_fit_mode_enum, 0);
     if (e) return e;
     switch (i) {
-    case 0: mr.fit_mode = MR_FIT_NONE; break;
-    case 1: mr.fit_mode = MR_FIT_STRETCH; break;
-    case 2: mr.fit_mode = MR_FIT_RATIO; break;
+    case 0: global_mr.fit_mode = MR_FIT_NONE; break;
+    case 1: global_mr.fit_mode = MR_FIT_STRETCH; break;
+    case 2: global_mr.fit_mode = MR_FIT_RATIO; break;
     }
     break;
   case GAMEPAD_MODE_OPTION:
@@ -958,7 +958,7 @@ Levels have been converted using module %s into native format at\n\
     break;
   case MULTI_ROOM_OPTION:
     e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
-                         &mr.fit_w, &mr.fit_h,
+                         &global_mr.fit_w, &global_mr.fit_h,
                          &multi_room_range, &multi_room_range);
     if (e) return e;
     break;
@@ -1045,7 +1045,7 @@ Levels have been converted using module %s into native format at\n\
     case 0: semantics = NATIVE_SEMANTICS; break;
     case 1:
       semantics = LEGACY_SEMANTICS;
-      mr.fit_w = mr.fit_h = 1;
+      global_mr.fit_w = global_mr.fit_h = 1;
       break;
     }
     break;

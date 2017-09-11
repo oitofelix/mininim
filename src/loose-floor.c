@@ -341,8 +341,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       place_on_the_ground (&a->f, &a->f.c);
       alert_guards (&kpmt);
       if (a->id == current_kid_id) {
-        mr.flicker = 2;
-        mr.color = get_flicker_blood_color ();
+        global_mr.flicker = 2;
+        global_mr.color = get_flicker_blood_color ();
       }
       if (a->current_hp <= 0) {
         a->p = kpmt;
@@ -493,7 +493,8 @@ loose_floor_fall_debug (void)
             cv.room, cv.x, cv.y,
             peq (&l->p, &pv),
             cpos (&l->p, &pv));
-    draw_falling_loose_floor (mr.cell[mr.dx][mr.dy].screen,
-                              &loose_floor[i].p);
+    draw_falling_loose_floor
+      (global_mr.cell[global_mr.dx][global_mr.dy].screen,
+       &loose_floor[i].p);
   }
 }
