@@ -877,6 +877,8 @@ get_tile_bitmap (struct tile *tile_ref, union tile_state *ts,
     }
   }
 
+  destroy_tile_at_pos (&p);
+
   tile_caching = false;
   *t = t_bkp;
 
