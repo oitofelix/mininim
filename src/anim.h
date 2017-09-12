@@ -57,6 +57,7 @@ extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 extern uint64_t anim_cycle;
+extern uint64_t anim_tick;
 extern ALLEGRO_EVENT_QUEUE *event_queue;
 extern ALLEGRO_TIMER *timer;
 ALLEGRO_TIMER *menu_timer;

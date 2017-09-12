@@ -664,10 +664,10 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
         bool s3 = sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0
           && is_pos_in_sel_set_hist (&global_sel_set_hist, &p);
 
-        if (s1 && s2 && s3) part = anim_cycle % 3 + 1;
-        else if (s1 && s2) part = anim_cycle % 2 ? 1 : 2;
-        else if (s2 && s3) part = anim_cycle % 2 ? 2 : 3;
-        else if (s1 && s3) part = anim_cycle % 2 ? 1 : 3;
+        if (s1 && s2 && s3) part = anim_tick % 3 + 1;
+        else if (s1 && s2) part = anim_tick % 2 ? 1 : 2;
+        else if (s2 && s3) part = anim_tick % 2 ? 2 : 3;
+        else if (s1 && s3) part = anim_tick % 2 ? 1 : 3;
         else if (s1) part = 1;
         else if (s2) part = 2;
         else if (s3) part = 3;

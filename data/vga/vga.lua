@@ -542,7 +542,7 @@ function video.BOX.rect_sel_palette (c)
 end
 
 function video.BOX:DRAW (part, p)
-   local i = (part - 1) * 3 + mod (MININIM.cycle, 3) + 1
+   local i = (part - 1) * 3 + mod (MININIM.tick, 3) + 1
    self[i]:DRAW (p)
 end
 

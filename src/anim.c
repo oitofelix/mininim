@@ -26,6 +26,7 @@ bool pause_anim;
 bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
+uint64_t anim_tick;
 ALLEGRO_TIMER *timer;
 int anim_freq = DEFAULT_HZ;
 int anim_freq_real;
@@ -41,11 +42,13 @@ play_anim (anim_callback_t draw_callback,
            anim_callback_t cleanup_callback)
 {
   assert (! anim_cycle
+          && ! anim_tick
           && ! anim_draw_callback
           && ! anim_compute_callback
           && ! anim_cleanup_callback);
 
   anim_cycle = 0;
+  anim_tick = 0;
   quit_anim = NO_QUIT;
   anim_draw_callback = draw_callback;
   anim_compute_callback = compute_callback;
@@ -212,6 +215,7 @@ play_anim (anim_callback_t draw_callback,
 
           if (! is_game_paused ())
             anim_cycle++;
+          anim_tick++;
 
           if (! title_demo
               && replay_mode == PLAY_REPLAY
@@ -410,6 +414,7 @@ play_anim (anim_callback_t draw_callback,
 
   al_stop_timer (timer);
   anim_cycle = 0;
+  anim_tick = 0;
   anim_draw_callback = NULL;
   anim_compute_callback = NULL;
   anim_cleanup_callback = NULL;

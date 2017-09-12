@@ -149,6 +149,9 @@ BEGIN_LUA (__index)
     if (! strcasecmp (key, "cycle")) {
       lua_pushnumber (L, anim_cycle);
       return 1;
+    } else if (! strcasecmp (key, "tick")) {
+      lua_pushnumber (L, anim_tick);
+      return 1;
     } else if (! strcasecmp (key, "place_width")) {
       lua_pushnumber (L, PLACE_WIDTH);
       return 1;
