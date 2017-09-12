@@ -26,6 +26,8 @@
 #define GREEN (al_map_rgb (0, 255, 0))
 #define BLUE (al_map_rgb (0, 0, 255))
 #define YELLOW (al_map_rgb (255, 255, 0))
+#define MAGENTA (al_map_rgb (255, 0, 255))
+#define CYAN (al_map_rgb (0, 255, 255))
 #define WHITE (al_map_rgb (255, 255, 255))
 
 #define NO_FLOOR_SELECTION_COLOR (al_map_rgb (64, 64, 64))

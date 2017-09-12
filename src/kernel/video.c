@@ -882,22 +882,40 @@ hgc_palette (ALLEGRO_COLOR c)
 }
 
 void
-draw_mr_select_rect (struct mr *mr, int x, int y, ALLEGRO_COLOR color)
+draw_mr_select_rect (struct mr *mr, int x, int y, ALLEGRO_COLOR color,
+                     int flags)
 {
+  int rx = x, ry = y;
+  if (flags & ALLEGRO_FLIP_HORIZONTAL)
+    rx = (mr->w - 1) - x;
+  if (flags & ALLEGRO_FLIP_VERTICAL)
+    ry = (mr->h - 1) - y;
+
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
   int tw, th; mr_get_resolution (mr, &tw, &th);
   tw = OW (tw);
   th = OH (th);
 
-  ALLEGRO_BITMAP *screen = mr->cell[x][y].screen;
+  ALLEGRO_BITMAP *screen = mr->cell[rx][ry].screen;
   int sw = get_bitmap_width (screen);
   int sh = get_bitmap_height (screen);
-  float dx = ((OW (ORIGINAL_WIDTH) * x) * w) / (float) tw;
-  float dy = ((OH (ROOM_HEIGHT) * y) * h) / (float) th;
+  float dx = ((OW (ORIGINAL_WIDTH) * rx) * w) / (float) tw;
+  float dy = ((OH (ROOM_HEIGHT) * ry) * h) / (float) th;
   float dw = (sw * w) / (float) tw;
   float dh = (sh * h) / (float) th;
   al_draw_rectangle (dx, dy, dx + dw, dy + dh, color, 2);
+}
+
+void
+draw_room_select_rect (struct mr *mr, int room, ALLEGRO_COLOR color,
+                       int flags)
+{
+  int x, y;
+  for (y = mr->h - 1; y >= 0; y--)
+    for (x = 0; x < mr->w; x++)
+      if (mr->cell[x][y].room == room)
+        draw_mr_select_rect (mr, x, y, color, flags);
 }
 
 void
@@ -965,17 +983,26 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
     al_set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
+    if (edit != EDIT_NONE && (mr->w > 1 || mr->h > 1)) {
+      for (int y = mr->h - 1; y >= 0; y--)
+        for (int x = 0; x < mr->w; x++)
+          if (is_room_in_sel_set_hist
+              (&global_sel_set_hist, mr->cell[x][y].room))
+            draw_room_select_rect (mr, mr->cell[x][y].room, YELLOW, flags);
+
+      if (selection_locked && is_valid_pos (&selection_pos)) {
+        struct pos p; npos (&selection_pos, &p);
+        draw_room_select_rect (mr, p.room, RED, flags);
+      }
+
+      if (is_valid_pos (&mouse_pos)) {
+        struct pos p; npos (&mouse_pos, &p);
+        draw_room_select_rect (mr, p.room, GREEN, flags);
+      }
+    }
+
     if ((mr->w > 1 || mr->h > 1) && mr->room_select > 0)
-      for (y = mr->h - 1; y >= 0; y--)
-        for (x = 0; x < mr->w; x++)
-          if (mr->cell[x][y].room == mr->room_select) {
-            int rx = x, ry = y;
-            if (flags & ALLEGRO_FLIP_HORIZONTAL)
-              rx = (mr->w - 1) - x;
-            if (flags & ALLEGRO_FLIP_VERTICAL)
-              ry = (mr->h - 1) - y;
-            draw_mr_select_rect (mr, rx, ry, GREEN);
-          }
+      draw_room_select_rect (mr, mr->room_select, MAGENTA, flags);
 
     if (mr->room != mr->last.room
         || mr->x != mr->last.x
@@ -986,12 +1013,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
 
     if ((mr->w > 1 || mr->h > 1)
         && mr->select_cycles > 0) {
-      int rx = mr->x, ry = mr->y;
-      if (flags & ALLEGRO_FLIP_HORIZONTAL)
-        rx = (mr->w - 1) - mr->x;
-      if (flags & ALLEGRO_FLIP_VERTICAL)
-        ry = (mr->h - 1) - mr->y;
-      draw_mr_select_rect (mr, rx, ry, RED);
+      draw_mr_select_rect (mr, mr->x, mr->y, BLUE, flags);
       if (! pause_anim) mr->select_cycles--;
     }
   }
