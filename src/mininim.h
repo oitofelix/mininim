@@ -191,6 +191,7 @@
 #include "debug.h"
 #include "undo.h"
 #include "multi-room.h"
+#include "sel-set.h"
 #include "replay.h"
 #include "hotkeys.h"
 #include "ui-command.h"

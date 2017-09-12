@@ -21,8 +21,43 @@
 #ifndef MININIM_TYPES_H
 #define MININIM_TYPES_H
 
+struct rect_sel {
+  enum rect_sel_type {
+    RECT_SEL_ADD, RECT_SEL_SUB,
+  } type;
+
+  struct level *level;
+
+  int tl, tr, bl, br;
+
+  int *t, *b;
+  size_t w_nmemb;
+
+  int *l, *r;
+  size_t h_nmemb;
+
+  int *c;
+  size_t c_nmemb;
+
+  int tl_place, tl_floor;
+  int br_place, br_floor;
+};
+
+struct sel_set {
+  struct rect_sel *rs;
+  size_t nmemb;
+  size_t c_nmemb;
+};
+
+struct sel_set_hist {
+  struct sel_set *ss;
+  size_t nmemb;
+  size_t c_nmemb;
+};
+
 enum scope {
-  PLACE_SCOPE, ROOM_SCOPE, LEVEL_SCOPE, PLACE_RECT_SEL_SCOPE, ROOM_RECT_SEL_SCOPE,
+  PLACE_SCOPE, ROOM_SCOPE, LEVEL_SCOPE, PLACE_SEL_SET_HIST_SCOPE,
+  ROOM_SEL_SET_HIST_SCOPE,
 };
 
 enum tile_part {
@@ -647,25 +682,6 @@ struct message_box {
   char *title, *heading, *text, *buttons;
   int flags;
 };
-
-struct rect_sel {
-  struct level *level;
-
-  int tl, tr, bl, br;
-
-  int *t, *b;
-  size_t w_nmemb;
-
-  int *l, *r;
-  size_t h_nmemb;
-
-  int *c;
-  size_t c_nmemb;
-
-  int tl_place, tl_floor;
-  int br_place, br_floor;
-} rs;
-
 
 /*********
  * TILES *

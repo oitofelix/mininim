@@ -88,7 +88,7 @@ play_anim (anim_callback_t draw_callback,
   invalid_pos (&mouse_pos);
   invalid_pos (&selection_pos);
   selection_locked = false;
-  destroy_rect_sel (&global_rect_sel);
+  destroy_sel_set_hist (&global_sel_set_hist);
 
   while (! quit_anim) {
     L_gc (main_L);

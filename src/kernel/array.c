@@ -39,7 +39,7 @@ add_to_array (void *s_base, size_t s_nmemb,
 
   /* Move data in the destination array */
   if (d_index < *d_nmemb)
-    memmove ((char *) ptr + (d_index + s_nmemb - 1) * size,
+    memmove ((char *) ptr + (d_index + s_nmemb) * size,
              (char *) ptr + d_index * size,
              (*d_nmemb - d_index) * size);
 

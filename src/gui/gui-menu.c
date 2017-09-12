@@ -135,6 +135,8 @@ static void statistics_widget (void);
 static void pause_menu_widget (void);
 static void speed_menu_widget (void);
 
+static void sel_set_menu (intptr_t index);
+
 
 static struct {
   /* main display menu */
@@ -238,6 +240,9 @@ static struct {
   struct {
     ALLEGRO_MENU *m;
     ALLEGRO_EVENT_SOURCE *event_source;
+    struct {
+      ALLEGRO_MENU *m;
+    } sel_set;
   } aux;
 } menu;
 
@@ -346,8 +351,10 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection, select_room,
-      rect_sel, clear_rect_sel;
+    uint16_t lock_selection, unlock_selection, select_room;
+    struct {
+      uint16_t add, sub, undo, redo, clear, set, prev, next, new, del;
+    } sel_set;
   } aux;
 } item;
 
@@ -382,7 +389,10 @@ ALLEGRO_BITMAP *small_logo_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
   *heart_icon, *plus_icon, *minus_icon, *lock_icon, *lock_icon_trimmed,
-  *unlock_icon, *rect_sel_icon, *clear_rect_sel_icon;
+  *unlock_icon, *sel_set_icon, *sel_set_add_icon, *sel_set_sub_icon,
+  *sel_set_undo_icon, *sel_set_redo_icon, *sel_set_clear_icon,
+  *sel_set_set_icon, *sel_set_prev_icon, *sel_set_next_icon,
+  *sel_set_new_icon, *sel_set_del_icon;
 
 struct pos aux_pos;
 
@@ -529,8 +539,17 @@ load_icons (void)
   lock_icon = load_icon (LOCK_ICON);
   lock_icon_trimmed = trim_bitmap (lock_icon, TRANSPARENT_COLOR);
   unlock_icon = load_icon (UNLOCK_ICON);
-  rect_sel_icon = load_icon (RECT_SEL_ICON);
-  clear_rect_sel_icon = load_icon (CLEAR_RECT_SEL_ICON);
+  sel_set_icon = load_icon (SEL_SET_ICON);
+  sel_set_add_icon = load_icon (SEL_SET_ADD_ICON);
+  sel_set_sub_icon = load_icon (SEL_SET_SUB_ICON);
+  sel_set_undo_icon = load_icon (SEL_SET_UNDO_ICON);
+  sel_set_redo_icon = load_icon (SEL_SET_REDO_ICON);
+  sel_set_clear_icon = load_icon (SEL_SET_CLEAR_ICON);
+  sel_set_set_icon = load_icon (SEL_SET_SET_ICON);
+  sel_set_prev_icon = load_icon (SEL_SET_PREV_ICON);
+  sel_set_next_icon = load_icon (SEL_SET_NEXT_ICON);
+  sel_set_new_icon = load_icon (SEL_SET_NEW_ICON);
+  sel_set_del_icon = load_icon (SEL_SET_DEL_ICON);
 }
 
 void
@@ -643,8 +662,17 @@ unload_icons (void)
   al_destroy_bitmap (lock_icon);
   al_destroy_bitmap (lock_icon_trimmed);
   al_destroy_bitmap (unlock_icon);
-  al_destroy_bitmap (rect_sel_icon);
-  al_destroy_bitmap (clear_rect_sel_icon);
+  al_destroy_bitmap (sel_set_icon);
+  al_destroy_bitmap (sel_set_add_icon);
+  al_destroy_bitmap (sel_set_sub_icon);
+  al_destroy_bitmap (sel_set_undo_icon);
+  al_destroy_bitmap (sel_set_redo_icon);
+  al_destroy_bitmap (sel_set_clear_icon);
+  al_destroy_bitmap (sel_set_set_icon);
+  al_destroy_bitmap (sel_set_prev_icon);
+  al_destroy_bitmap (sel_set_next_icon);
+  al_destroy_bitmap (sel_set_new_icon);
+  al_destroy_bitmap (sel_set_del_icon);
 }
 
 
@@ -1830,20 +1858,76 @@ aux_menu (void)
   item.aux.unlock_selection =
     menu_sitem (selection_locked, unlock_icon, "&Unlock place selection");
 
-  item.aux.rect_sel =
-    menu_sitem (is_valid_pos (&aux_pos) && is_valid_pos (&selection_pos)
-                && selection_locked, rect_sel_icon,
-                "Set &rectangular selection");
-
-  item.aux.clear_rect_sel =
-    menu_sitem (is_valid_rect_sel (&global_rect_sel), clear_rect_sel_icon,
-                "&Clear rectangular selection");
+  menu_sub (&menu.aux.sel_set.m,
+            is_valid_pos (&aux_pos)
+            || sel_set_hist_can_undo (&global_sel_set_hist, -1)
+            || sel_set_hist_can_undo (&global_sel_set_hist, +1)
+            || sel_set_hist_can_go_next (&global_sel_set_hist, -1)
+            || sel_set_hist_can_go_next (&global_sel_set_hist, +1)
+            || sel_set_hist_ss_nmemb (&global_sel_set_hist) > 0,
+            sel_set_icon, sel_set_menu, 0, "Selection &set");
 
   item.aux.select_room =
     menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
                 room_icon, "Set room as &MR origin");
 
   end_menu ();
+}
+
+void
+sel_set_menu (intptr_t index)
+{
+  menu_hitem (false, "%zu/%zu - %zu/%zu",
+              global_sel_set_hist.c_nmemb,
+              global_sel_set_hist.nmemb,
+              sel_set_hist_ss_c_nmemb (&global_sel_set_hist),
+              sel_set_hist_ss_nmemb (&global_sel_set_hist));
+
+  item.aux.sel_set.add =
+    menu_sitem (is_valid_pos (&aux_pos), sel_set_add_icon,
+                "&Add");
+
+  item.aux.sel_set.sub =
+    menu_sitem (is_valid_pos (&aux_pos)
+                && sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0,
+                sel_set_sub_icon, "&Sub");
+
+  menu_sep (NULL);
+
+  item.aux.sel_set.undo =
+    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, -1),
+                sel_set_undo_icon, "&Undo");
+
+  item.aux.sel_set.redo =
+    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, +1),
+                sel_set_redo_icon, "&Redo");
+
+  item.aux.sel_set.clear =
+    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, -1),
+                sel_set_clear_icon, "&Clear");
+
+  item.aux.sel_set.set =
+    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, +1),
+                sel_set_set_icon, "Se&t");
+
+  menu_sep (NULL);
+
+  item.aux.sel_set.prev =
+    menu_sitem (sel_set_hist_can_go_next (&global_sel_set_hist, -1),
+                sel_set_prev_icon, "&Previous");
+
+  item.aux.sel_set.next =
+    menu_sitem (sel_set_hist_can_go_next (&global_sel_set_hist, +1),
+                sel_set_next_icon, "&Next");
+
+  item.aux.sel_set.new =
+    menu_sitem (sel_set_hist_ss_nmemb (&global_sel_set_hist) > 0,
+                sel_set_new_icon, "Ne&w");
+
+  item.aux.sel_set.del =
+    menu_sitem (global_sel_set_hist.nmemb > 0,
+                sel_set_del_icon, "&Delete");
+
 }
 
 void
@@ -2069,12 +2153,34 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     selection_locked = ! selection_locked;
   else if (id == item.aux.select_room)
     mr_focus_room (&global_mr, aux_pos.room);
-  else if (id == item.aux.rect_sel) {
-    destroy_rect_sel (&global_rect_sel);
-    bool success = new_rect_sel (&global_mr, &global_rect_sel,
-                                 &selection_pos, &aux_pos);
-    if (! success)
-      ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
-  } else if (id == item.aux.clear_rect_sel)
-    destroy_rect_sel (&global_rect_sel);
+  else if (id == item.aux.sel_set.add
+           || id == item.aux.sel_set.sub) {
+    struct pos *p =
+      (selection_locked && is_valid_pos (&selection_pos))
+      ? &selection_pos : &aux_pos;
+    enum rect_sel_type type =
+      id == item.aux.sel_set.add ? RECT_SEL_ADD : RECT_SEL_SUB;
+
+    bool success = add_rect_sel_to_sel_set_hist
+      (&global_mr, &global_sel_set_hist, type, &aux_pos, p);
+
+    if (success && p == &selection_pos) selection_pos = aux_pos;
+    else if (! success) ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
+
+  } else if (id == item.aux.sel_set.undo)
+    sel_set_hist_undo_pass (&global_sel_set_hist, -1);
+  else if (id == item.aux.sel_set.redo)
+    sel_set_hist_undo_pass (&global_sel_set_hist, +1);
+  else if (id == item.aux.sel_set.clear)
+    while (sel_set_hist_undo_pass (&global_sel_set_hist, -1));
+  else if (id == item.aux.sel_set.set)
+    while (sel_set_hist_undo_pass (&global_sel_set_hist, +1));
+  else if (id == item.aux.sel_set.new)
+    new_sel_set_hist_entry (&global_sel_set_hist);
+  else if (id == item.aux.sel_set.del)
+    del_sel_set_hist_entry (&global_sel_set_hist);
+  else if (id == item.aux.sel_set.prev)
+    sel_set_hist_go_next (&global_sel_set_hist, -1);
+  else if (id == item.aux.sel_set.next)
+    sel_set_hist_go_next (&global_sel_set_hist, +1);
 }

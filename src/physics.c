@@ -1006,15 +1006,14 @@ apply_to_place (struct pos *p, pos_trans f, void *data, char *desc)
 }
 
 void
-apply_to_place_rect_sel (struct rect_sel *rs, pos_trans f,
-                         void *data, char *desc)
+apply_to_place_sel_set_hist
+(struct sel_set_hist *sh, pos_trans f, void *data, char *desc)
 {
-  for (size_t room = 1; room < rs->level->room_nmemb; room++) {
-    if (! is_room_in_rect_sel (rs, room)) continue;
-    struct pos p; new_pos (&p, rs->level, room, -1, -1);
+  for (size_t room = 1; room < sh->ss[0].rs[0].level->room_nmemb; room++) {
+    struct pos p; new_pos (&p, sh->ss[0].rs[0].level, room, -1, -1);
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (is_pos_in_rect_sel (rs, &p))
+        if (is_pos_in_sel_set_hist (sh, &p))
           apply_to_place (&p, f, data, NULL);
   }
   end_undo_set (&undo, desc);
@@ -1033,12 +1032,13 @@ apply_to_room (struct level *l, int room, pos_trans f,
 }
 
 void
-apply_to_room_rect_sel (struct rect_sel *rs, pos_trans f,
-                        void *data, char *desc)
+apply_to_room_sel_set_hist
+(struct sel_set_hist *sh, pos_trans f, void *data, char *desc)
 {
-  for (size_t room = 1; room < rs->level->room_nmemb; room++) {
-    if (! is_room_in_rect_sel (rs, room)) continue;
-    apply_to_room (rs->level, room, f, data, NULL);
+  for (size_t room = 1;
+       room < sh->ss[0].rs[0].level->room_nmemb; room++) {
+    if (! is_room_in_sel_set_hist (sh, room)) continue;
+    apply_to_room (sh->ss[0].rs[0].level, room, f, data, NULL);
   }
   end_undo_set (&undo, desc);
 }
@@ -1051,8 +1051,8 @@ apply_to_level (struct level *l, pos_trans f, void *data, char *desc)
 }
 
 void
-apply_to_scope (struct pos *p, struct rect_sel *rs, pos_trans f, void *data,
-                char *base_desc, enum scope scope)
+apply_to_scope (struct pos *p, struct sel_set_hist *sh, pos_trans f,
+                void *data, char *base_desc, enum scope scope)
 {
   char *desc;
   switch (scope) {
@@ -1060,17 +1060,17 @@ apply_to_scope (struct pos *p, struct rect_sel *rs, pos_trans f, void *data,
     desc = xasprintf ("%s (PLACE)", base_desc);
     apply_to_place (p, f, data, desc);
     break;
-  case PLACE_RECT_SEL_SCOPE:
+  case PLACE_SEL_SET_HIST_SCOPE:
     desc = xasprintf ("%s (PLACE RECT. SEL.)", base_desc);
-    apply_to_place_rect_sel (rs, f, data, desc);
+    apply_to_place_sel_set_hist (sh, f, data, desc);
     break;
   case ROOM_SCOPE:
     desc = xasprintf ("%s (ROOM)", base_desc);
     apply_to_room (p->l, p->room, f, data, desc);
     break;
-  case ROOM_RECT_SEL_SCOPE:
+  case ROOM_SEL_SET_HIST_SCOPE:
     desc = xasprintf ("%s (ROOM RECT. SEL.)", base_desc);
-    apply_to_room_rect_sel (rs, f, data, desc);
+    apply_to_room_sel_set_hist (sh, f, data, desc);
     break;
   case LEVEL_SCOPE:
     desc = xasprintf ("%s (LEVEL)", base_desc);

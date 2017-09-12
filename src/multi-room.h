@@ -27,7 +27,6 @@ extern bool tile_caching;
 extern struct mr global_mr;
 extern int room_view;
 extern int mr_room, mr_x, mr_y;
-extern struct rect_sel global_rect_sel;
 
 /* visibility functions */
 bool is_pos_visible (struct mr *mr, struct pos *p);
@@ -82,15 +81,5 @@ void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (struct mr *mr);
 void mr_stabilize_origin (struct mr *mr, struct mr_origin *o);
 void mr_busy (struct mr *mr);
-
-/* rectangular selection */
-struct rect_sel *new_rect_sel (struct mr *mr,
-                               struct rect_sel *rs,
-                               struct pos *a,
-                               struct pos *b);
-bool is_valid_rect_sel (struct rect_sel *rs);
-void destroy_rect_sel (struct rect_sel *rs);
-bool is_room_in_rect_sel (struct rect_sel *rs, int _room);
-bool is_pos_in_rect_sel (struct rect_sel *rs, struct pos *p);
 
 #endif	/* MININIM_MULTI_ROOM_H */

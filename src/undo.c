@@ -58,6 +58,7 @@ free_undo_tail (struct undo *u)
   }
 
   u->count = u->current + 1;
+  u->pass = xrealloc (u->pass, u->count * sizeof (* u->pass));
 }
 
 void

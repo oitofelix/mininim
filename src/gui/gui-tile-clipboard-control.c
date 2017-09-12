@@ -37,7 +37,7 @@ static int paste_button_action_cb (Ihandle *ih);
 
 Ihandle *
 gui_create_tile_clipboard_control (struct pos *p,
-                                   struct rect_sel *rs,
+                                   struct sel_set_hist *sh,
                                    char *norm_group)
 {
   Ihandle *ih, *vbox, *button, *radio, *place_toggle, *room_toggle,
@@ -93,7 +93,7 @@ gui_create_tile_clipboard_control (struct pos *p,
   IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
 
   IupSetAttribute (ih, "_POS", (void *) p);
-  IupSetAttribute (ih, "_RECT_SEL", (void *) rs);
+  IupSetAttribute (ih, "_SEL_SET_HIST", (void *) sh);
 
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
@@ -118,13 +118,15 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
-  gui_control_active (ih, is_valid_pos (p) || is_valid_rect_sel (rs));
+  struct sel_set_hist *sh = (void *) IupGetAttribute (ih, "_SEL_SET_HIST");
+  gui_control_active
+    (ih, is_valid_pos (p) || sel_set_hist_ss_c_nmemb (sh) > 0);
 
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
   gui_control_active (button, is_valid_pos (p));
 
-  if (! is_valid_pos (p) && ! is_valid_rect_sel (rs)) return IUP_DEFAULT;
+  if (! is_valid_pos (p) && ! sel_set_hist_ss_c_nmemb (sh))
+    return IUP_DEFAULT;
 
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
@@ -170,7 +172,7 @@ paste_button_action_cb (Ihandle *ih)
 {
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
+  struct sel_set_hist *sh = (void *) IupGetAttribute (ih, "_SEL_SET_HIST");
 
   Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
   Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
@@ -180,14 +182,16 @@ paste_button_action_cb (Ihandle *ih)
 
   enum scope scope;
   if (selected == place_toggle)
-    scope = is_valid_rect_sel (rs) ? PLACE_RECT_SEL_SCOPE : PLACE_SCOPE;
+    scope = sel_set_hist_ss_c_nmemb (sh) > 0
+      ? PLACE_SEL_SET_HIST_SCOPE : PLACE_SCOPE;
   else if (selected == room_toggle)
-    scope = is_valid_rect_sel (rs) ? ROOM_RECT_SEL_SCOPE : ROOM_SCOPE;
+    scope = sel_set_hist_ss_c_nmemb (sh) > 0
+      ? ROOM_SEL_SET_HIST_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);
 
-  apply_to_scope (p, rs, (pos_trans) paste_tile, &last->tile_copy, "PASTE",
-                  scope);
+  apply_to_scope (p, sh,(pos_trans) paste_tile, &last->tile_copy,
+                  "PASTE", scope);
 
   return IUP_DEFAULT;
 }

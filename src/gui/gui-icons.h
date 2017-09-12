@@ -145,7 +145,16 @@
 #define BOTTOM_ICON "data/icons/bottom.png"
 #define EVENT_SOURCE_ICON "data/icons/event-source.png"
 #define EVENT_TARGET_ICON "data/icons/event-target.png"
-#define RECT_SEL_ICON "data/icons/rect-sel.png"
-#define CLEAR_RECT_SEL_ICON "data/icons/clear-rect-sel.png"
+#define SEL_SET_ICON "data/icons/sel-set.png"
+#define SEL_SET_ADD_ICON "data/icons/sel-set-add.png"
+#define SEL_SET_SUB_ICON "data/icons/sel-set-sub.png"
+#define SEL_SET_UNDO_ICON "data/icons/sel-set-undo.png"
+#define SEL_SET_REDO_ICON "data/icons/sel-set-redo.png"
+#define SEL_SET_CLEAR_ICON "data/icons/sel-set-clear.png"
+#define SEL_SET_SET_ICON "data/icons/sel-set-set.png"
+#define SEL_SET_PREV_ICON "data/icons/sel-set-prev.png"
+#define SEL_SET_NEXT_ICON "data/icons/sel-set-next.png"
+#define SEL_SET_NEW_ICON "data/icons/sel-set-new.png"
+#define SEL_SET_DEL_ICON "data/icons/sel-set-del.png"
 
 #endif	/* MININIM_GUI_ICONS_H */
