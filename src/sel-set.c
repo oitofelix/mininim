@@ -237,95 +237,115 @@ is_pos_in_rect_sel (struct rect_sel *rs, struct pos *p)
  **********************************************************************/
 
 bool
-is_valid_sel_set (struct sel_set *s)
+is_valid_sel_set (struct sel_set *ss)
 {
-  return s && s->rs && s->nmemb;
+  return ss && ss->rs && ss->nmemb;
 }
 
 bool
-is_pos_in_sel_set (struct sel_set *s, struct pos *p)
+is_room_possibly_in_sel_set (struct sel_set *ss, int room)
 {
-  if (! is_valid_sel_set (s)) return false;
+  if (! is_valid_sel_set (ss)) return false;
+  for (size_t i = 0; i < ss->c_nmemb; i++)
+    if (ss->rs[i].type == RECT_SEL_ADD
+        && is_room_in_rect_sel (&ss->rs[i], room))
+      return true;
+  return false;
+}
+
+bool
+is_pos_in_sel_set (struct sel_set *ss, struct pos *p)
+{
+  if (! is_valid_sel_set (ss)) return false;
+  struct pos np; npos (p, &np);
+
+  if (! is_room_possibly_in_sel_set (ss, np.room))
+    return false;
+
   bool r = false;
-  for (size_t i = 0; i < s->c_nmemb; i++)
-    if (is_pos_in_rect_sel (&s->rs[i], p))
-      r = s->rs[i].type == RECT_SEL_ADD;
+  for (size_t i = 0; i < ss->c_nmemb; i++)
+    if (is_pos_in_rect_sel (&ss->rs[i], &np))
+      r = ss->rs[i].type == RECT_SEL_ADD;
   return r;
 }
 
 bool
-is_room_in_sel_set (struct sel_set *s, int _room)
+is_room_in_sel_set (struct sel_set *ss, int _room)
 {
-  if (! is_valid_sel_set (s)) return false;
-  int room = room_val (s->rs[0].level, _room);
-  struct pos p; new_pos (&p, s->rs[0].level, room, -1, -1);
+  if (! is_valid_sel_set (ss)) return false;
+  int room = room_val (ss->rs[0].level, _room);
+
+  if (! is_room_possibly_in_sel_set (ss, room))
+    return false;
+
+  struct pos p; new_pos (&p, ss->rs[0].level, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      if (is_pos_in_sel_set (s, &p))
+      if (is_pos_in_sel_set (ss, &p))
         return true;
   return false;
 }
 
 bool
-is_empty_sel_set (struct sel_set *s)
+is_empty_sel_set (struct sel_set *ss)
 {
-  if (! is_valid_sel_set (s)) return true;
-  for (int room = 1; room < s->rs[0].level->room_nmemb; room++)
-    if (is_room_in_sel_set (s, room)) return false;
+  if (! is_valid_sel_set (ss)) return true;
+  for (int room = 1; room < ss->rs[0].level->room_nmemb; room++)
+    if (is_room_in_sel_set (ss, room)) return false;
   return true;
 }
 
 void
-destroy_sel_set_tail (struct sel_set *s)
+destroy_sel_set_tail (struct sel_set *ss)
 {
-  if (! is_valid_sel_set (s)) return;
-  for (size_t i = s->c_nmemb; i < s->nmemb; i++)
-    destroy_rect_sel (&s->rs[i]);
-  s->nmemb = s->c_nmemb;
-  s->rs = xrealloc (s->rs, s->nmemb * sizeof (* s->rs));
+  if (! is_valid_sel_set (ss)) return;
+  for (size_t i = ss->c_nmemb; i < ss->nmemb; i++)
+    destroy_rect_sel (&ss->rs[i]);
+  ss->nmemb = ss->c_nmemb;
+  ss->rs = xrealloc (ss->rs, ss->nmemb * sizeof (* ss->rs));
 }
 
 void
-destroy_sel_set (struct sel_set *s)
+destroy_sel_set (struct sel_set *ss)
 {
-  if (! is_valid_sel_set (s)) return;
-  s->c_nmemb = 0;
-  destroy_sel_set_tail (s);
+  if (! is_valid_sel_set (ss)) return;
+  ss->c_nmemb = 0;
+  destroy_sel_set_tail (ss);
 }
 
 bool
-is_rect_sel_subset_of_sel_set (struct rect_sel *a, struct sel_set *s)
+is_rect_sel_subset_of_sel_set (struct rect_sel *a, struct sel_set *ss)
 {
-  if (! is_valid_sel_set (s)) return false;
-  struct pos p; new_pos (&p, s->rs[0].level, -1, -1, -1);
+  if (! is_valid_sel_set (ss)) return false;
+  struct pos p; new_pos (&p, ss->rs[0].level, -1, -1, -1);
   for (p.room = 1; p.room < p.l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (is_pos_in_rect_sel (a, &p) && ! is_pos_in_sel_set (s, &p))
+        if (is_pos_in_rect_sel (a, &p) && ! is_pos_in_sel_set (ss, &p))
           return false;
   return true;
 }
 
 bool
-is_rect_sel_and_sel_set_inter_empty (struct rect_sel *a, struct sel_set *s)
+is_rect_sel_and_sel_set_inter_empty (struct rect_sel *a, struct sel_set *ss)
 {
-  if (! is_valid_sel_set (s)) return true;
-  struct pos p; new_pos (&p, s->rs[0].level, -1, -1, -1);
+  if (! is_valid_sel_set (ss)) return true;
+  struct pos p; new_pos (&p, ss->rs[0].level, -1, -1, -1);
   for (p.room = 1; p.room < p.l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (is_pos_in_rect_sel (a, &p) && is_pos_in_sel_set (s, &p))
+        if (is_pos_in_rect_sel (a, &p) && is_pos_in_sel_set (ss, &p))
           return false;
   return true;
 }
 
 bool
-is_rect_sel_helpful_for_sel_set (struct rect_sel *a, struct sel_set *s)
+is_rect_sel_helpful_for_sel_set (struct rect_sel *a, struct sel_set *ss)
 {
   if (a->type == RECT_SEL_ADD)
-    return ! is_rect_sel_subset_of_sel_set (a, s);
+    return ! is_rect_sel_subset_of_sel_set (a, ss);
   else if (a->type == RECT_SEL_SUB)
-    return ! is_rect_sel_and_sel_set_inter_empty (a, s);
+    return ! is_rect_sel_and_sel_set_inter_empty (a, ss);
   else {
     assert (false);
     return false;
@@ -333,20 +353,20 @@ is_rect_sel_helpful_for_sel_set (struct rect_sel *a, struct sel_set *s)
 }
 
 bool
-sel_set_can_undo (struct sel_set *s, int dir)
+sel_set_can_undo (struct sel_set *ss, int dir)
 {
-  return (s->c_nmemb > 0 || dir >= 0)
-    && (s->c_nmemb < s->nmemb || dir < 0)
-    && is_valid_sel_set (s);
+  return (ss->c_nmemb > 0 || dir >= 0)
+    && (ss->c_nmemb < ss->nmemb || dir < 0)
+    && is_valid_sel_set (ss);
 }
 
 bool
-sel_set_undo_pass (struct sel_set *s, int dir)
+sel_set_undo_pass (struct sel_set *ss, int dir)
 {
-  if (! sel_set_can_undo (s, dir)) return false;
+  if (! sel_set_can_undo (ss, dir)) return false;
 
-  if (dir >= 0) s->c_nmemb++;
-  else s->c_nmemb--;
+  if (dir >= 0) ss->c_nmemb++;
+  else ss->c_nmemb--;
 
   return true;
 }

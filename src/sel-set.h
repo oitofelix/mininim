@@ -38,6 +38,7 @@ bool is_pos_in_rect_sel_array (struct rect_sel *rs, size_t rs_nmemb,
 
 /* Selection Set */
 bool is_valid_sel_set (struct sel_set *s);
+bool is_room_possibly_in_sel_set (struct sel_set *ss, int room);
 bool is_pos_in_sel_set (struct sel_set *s, struct pos *p);
 bool is_room_in_sel_set (struct sel_set *s, int _room);
 bool is_empty_sel_set (struct sel_set *s);
