@@ -939,7 +939,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
   } else {
     if (has_mr_view_changed (mr)
         && ! no_room_drawing) {
-      draw_multi_rooms (mr);
+      mr_draw (mr);
       force_full_redraw = true;
     }
 
@@ -986,8 +986,8 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
     if (edit != EDIT_NONE && (mr->w > 1 || mr->h > 1)) {
       for (int y = mr->h - 1; y >= 0; y--)
         for (int x = 0; x < mr->w; x++)
-          if (is_room_in_sel_set_hist
-              (&global_sel_set_hist, mr->cell[x][y].room))
+          if (is_room_in_sel_ring
+              (&global_sel_ring, mr->cell[x][y].room))
             draw_room_select_rect (mr, mr->cell[x][y].room, YELLOW, flags);
 
       if (selection_locked && is_valid_pos (&selection_pos)) {
@@ -997,7 +997,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
 
       if (is_valid_pos (&mouse_pos)) {
         struct pos p; npos (&mouse_pos, &p);
-        draw_room_select_rect (mr, p.room, GREEN, flags);
+        draw_room_select_rect (mr, p.room, BLUE, flags);
       }
     }
 
@@ -1013,7 +1013,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
 
     if ((mr->w > 1 || mr->h > 1)
         && mr->select_cycles > 0) {
-      draw_mr_select_rect (mr, mr->x, mr->y, BLUE, flags);
+      draw_mr_select_rect (mr, mr->x, mr->y, GREEN, flags);
       if (! pause_anim) mr->select_cycles--;
     }
   }

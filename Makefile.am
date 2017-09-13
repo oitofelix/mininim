@@ -95,11 +95,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
 	  src/kernel/xstring.c src/kernel/xstring.h src/bmenu.c src/bmenu.h	\
 	  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
-	  src/undo.h src/multi-room.c src/multi-room.h src/sel-set.c				\
-	  src/sel-set.h src/replay.c src/replay.h src/script/repl.c					\
-	  src/script/repl.h src/script/script.c src/script/script.h					\
-	  src/script/L_mininim.c src/script/L_mininim.h											\
-	  src/script/L_mininim.level.c src/script/L_mininim.level.h					\
+	  src/undo.h src/multi-room.c src/multi-room.h src/sel-ring.c				\
+	  src/sel-ring.h src/view-ring.c src/view-ring.h src/replay.c				\
+	  src/replay.h src/script/repl.c src/script/repl.h									\
+	  src/script/script.c src/script/script.h src/script/L_mininim.c		\
+	  src/script/L_mininim.h src/script/L_mininim.level.c								\
+	  src/script/L_mininim.level.h																			\
 	  src/script/L_mininim.level.position.c															\
 	  src/script/L_mininim.level.position.h															\
 	  src/script/L_mininim.actor.c src/script/L_mininim.actor.h					\

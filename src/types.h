@@ -23,7 +23,7 @@
 
 struct rect_sel {
   enum rect_sel_type {
-    RECT_SEL_ADD, RECT_SEL_SUB,
+    RECT_SEL_ADD, RECT_SEL_SUB, RECT_SEL_INV
   } type;
 
   struct level *level;
@@ -49,15 +49,21 @@ struct sel_set {
   size_t c_nmemb;
 };
 
-struct sel_set_hist {
+struct sel_ring {
   struct sel_set *ss;
   size_t nmemb;
   size_t c_nmemb;
 };
 
+struct view_ring {
+  struct mr_origin *o;
+  size_t nmemb;
+  size_t c_nmemb;
+};
+
 enum scope {
-  PLACE_SCOPE, ROOM_SCOPE, LEVEL_SCOPE, PLACE_SEL_SET_HIST_SCOPE,
-  ROOM_SEL_SET_HIST_SCOPE,
+  PLACE_SCOPE, ROOM_SCOPE, LEVEL_SCOPE, PLACE_SEL_RING_SCOPE,
+  ROOM_SEL_RING_SCOPE,
 };
 
 enum tile_part {

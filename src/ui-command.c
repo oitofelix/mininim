@@ -174,12 +174,12 @@ ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit)
 }
 
 bool
-ui_mr_set_dim (struct mr *mr, int dw, int dh, bool correct_mouse)
+ui_mr_set_dim (struct mr *mr, int w, int h, bool correct_mouse)
 {
   char *key = "MULTI ROOM";
   char *value;
 
-  if (mr->w + dw < 1 || mr->h + dh < 1) {
+  if (w < 1 || h < 1) {
     ui_msg (1, "MULTI-ROOM %ix%i", mr->w, mr->h);
     return false;
   }
@@ -187,8 +187,7 @@ ui_mr_set_dim (struct mr *mr, int dw, int dh, bool correct_mouse)
   struct mouse_coord m;
   get_mouse_coord (mr, &m);
 
-  if (mr->w + dw != mr->w || mr->h + dh != mr->h)
-    mr_set_dim (mr, mr->w + dw, mr->h + dh);
+  if (w != mr->w || h != mr->h) mr_set_dim (mr, w, h);
 
   mr_center_room (mr, mr->room);
 
@@ -1191,4 +1190,12 @@ ui_move_locked_place_selection (struct mr *mr, enum dir d)
   }
 
   select_pos (mr, &p);
+}
+
+void
+unlock_relock_place_selection (void)
+{
+  if (! selection_locked && is_valid_pos (&last_selection_pos))
+    selection_pos = last_selection_pos;
+  selection_locked = ! selection_locked;
 }

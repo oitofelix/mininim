@@ -29,7 +29,7 @@ gui_create_place_control (struct pos *p, char *norm_group)
 {
   Ihandle *ih = IupSetCallbacks
     (gui_create_directional_control
-     ("Place", "PLACE_ICON", button_action_cb, norm_group),
+     ("L. place", "PLACE_SEL_LOCK_ICON", button_action_cb, norm_group),
      "_UPDATE_CB", _update_cb,
      NULL);
 

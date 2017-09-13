@@ -216,7 +216,7 @@ button_action_cb (Ihandle *ih)
 
   if (ih == zoom_button) {
     ui_zoom_fit (&global_mr, MR_FIT_NONE);
-    ui_mr_set_dim (&global_mr, 1 - global_mr.w, 1 - global_mr.h, false);
+    ui_mr_set_dim (&global_mr, 1, 1, false);
   } else if (ih == zoom_none_button)
     ui_zoom_fit (&global_mr, MR_FIT_NONE);
   else if (ih == zoom_stretch_button)
@@ -224,17 +224,17 @@ button_action_cb (Ihandle *ih)
   else if (ih == zoom_ratio_button)
     ui_zoom_fit (&global_mr, MR_FIT_RATIO);
   else if (ih == zoom_in_vh_button)
-    ui_mr_set_dim (&global_mr, -1, -1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h - 1, false);
   else if (ih == zoom_in_v_button)
-    ui_mr_set_dim (&global_mr, +0, -1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h - 1, false);
   else if (ih == zoom_in_h_button)
-    ui_mr_set_dim (&global_mr, -1, +0, false);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h + 0, false);
   else if (ih == zoom_out_vh_button)
-    ui_mr_set_dim (&global_mr, +1, +1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 1, false);
   else if (ih == zoom_out_v_button)
-    ui_mr_set_dim (&global_mr, +0, +1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h + 1, false);
   else if (ih == zoom_out_h_button)
-    ui_mr_set_dim (&global_mr, +1, +0, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 0, false);
 
   return IUP_DEFAULT;
 }

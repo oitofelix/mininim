@@ -135,7 +135,8 @@ static void statistics_widget (void);
 static void pause_menu_widget (void);
 static void speed_menu_widget (void);
 
-static void sel_set_menu (intptr_t index);
+static void sel_ring_menu (intptr_t index);
+static void view_ring_menu (intptr_t index);
 
 
 static struct {
@@ -242,7 +243,10 @@ static struct {
     ALLEGRO_EVENT_SOURCE *event_source;
     struct {
       ALLEGRO_MENU *m;
-    } sel_set;
+    } sel_ring;
+    struct {
+      ALLEGRO_MENU *m;
+    } view_ring;
   } aux;
 } menu;
 
@@ -351,10 +355,13 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection, select_room;
+    uint16_t lock_selection, unlock_selection;
     struct {
-      uint16_t add, sub, undo, redo, clear, set, prev, next, new, del;
-    } sel_set;
+      uint16_t add, sub, inv, undo, redo, clear, set, prev, next, new, del;
+    } sel_ring;
+    struct {
+      uint16_t set_mr_origin, prev, next, new, del;
+    } view_ring;
   } aux;
 } item;
 
@@ -377,7 +384,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
   *zoom_ratio_icon, *vh_icon, *zoom_out_icon,
   *zoom_in_icon, *heading_icon, *zoom_icon,
-  *navigation_icon, *room_icon, *cell_icon, *page_icon,
+  *navigation_icon, *cell_icon, *page_icon,
   *l_icon, *r_icon, *a_icon, *b_icon,
   *home_icon, *repeat_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
@@ -388,11 +395,16 @@ ALLEGRO_BITMAP *small_logo_icon,
   *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
-  *heart_icon, *plus_icon, *minus_icon, *lock_icon, *lock_icon_trimmed,
-  *unlock_icon, *sel_set_icon, *sel_set_add_icon, *sel_set_sub_icon,
-  *sel_set_undo_icon, *sel_set_redo_icon, *sel_set_clear_icon,
-  *sel_set_set_icon, *sel_set_prev_icon, *sel_set_next_icon,
-  *sel_set_new_icon, *sel_set_del_icon;
+  *heart_icon, *plus_icon, *minus_icon, *place_sel_lock_icon,
+  *place_sel_last_icon,
+  /* *place_sel_lock_icon_trimmed, */
+  *place_sel_unlock_icon, *sel_ring_icon, *sel_ring_add_icon,
+  *sel_ring_sub_icon,
+  *sel_ring_inv_icon, *sel_ring_undo_icon, *sel_ring_redo_icon,
+  *sel_ring_clear_icon, *sel_ring_set_icon, *sel_ring_prev_icon,
+  *sel_ring_next_icon, *sel_ring_new_icon, *sel_ring_del_icon,
+  *view_ring_icon, *view_ring_prev_icon, *view_ring_next_icon,
+  *view_ring_new_icon, *view_ring_del_icon;
 
 struct pos aux_pos;
 
@@ -489,7 +501,6 @@ load_icons (void)
   heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
-  room_icon = load_icon (ROOM_ICON);
   cell_icon = load_icon (ROW_ICON);
   page_icon = load_icon (PAGE_ICON);
   l_icon = load_icon (L_ICON);
@@ -536,20 +547,28 @@ load_icons (void)
   heart_icon = load_icon (HEART_ICON);
   plus_icon = load_icon (PLUS_ICON);
   minus_icon = load_icon (MINUS_ICON);
-  lock_icon = load_icon (LOCK_ICON);
-  lock_icon_trimmed = trim_bitmap (lock_icon, TRANSPARENT_COLOR);
-  unlock_icon = load_icon (UNLOCK_ICON);
-  sel_set_icon = load_icon (SEL_SET_ICON);
-  sel_set_add_icon = load_icon (SEL_SET_ADD_ICON);
-  sel_set_sub_icon = load_icon (SEL_SET_SUB_ICON);
-  sel_set_undo_icon = load_icon (SEL_SET_UNDO_ICON);
-  sel_set_redo_icon = load_icon (SEL_SET_REDO_ICON);
-  sel_set_clear_icon = load_icon (SEL_SET_CLEAR_ICON);
-  sel_set_set_icon = load_icon (SEL_SET_SET_ICON);
-  sel_set_prev_icon = load_icon (SEL_SET_PREV_ICON);
-  sel_set_next_icon = load_icon (SEL_SET_NEXT_ICON);
-  sel_set_new_icon = load_icon (SEL_SET_NEW_ICON);
-  sel_set_del_icon = load_icon (SEL_SET_DEL_ICON);
+  place_sel_lock_icon = load_icon (PLACE_SEL_LOCK_ICON);
+  /* place_sel_lock_icon_trimmed = */
+  /*   trim_bitmap (place_sel_lock_icon, TRANSPARENT_COLOR); */
+  place_sel_last_icon = load_icon (PLACE_SEL_LAST_ICON);
+  place_sel_unlock_icon = load_icon (PLACE_SEL_UNLOCK_ICON);
+  sel_ring_icon = load_icon (SEL_RING_ICON);
+  sel_ring_add_icon = load_icon (SEL_RING_ADD_ICON);
+  sel_ring_sub_icon = load_icon (SEL_RING_SUB_ICON);
+  sel_ring_inv_icon = load_icon (SEL_RING_INV_ICON);
+  sel_ring_undo_icon = load_icon (SEL_RING_UNDO_ICON);
+  sel_ring_redo_icon = load_icon (SEL_RING_REDO_ICON);
+  sel_ring_clear_icon = load_icon (SEL_RING_CLEAR_ICON);
+  sel_ring_set_icon = load_icon (SEL_RING_SET_ICON);
+  sel_ring_prev_icon = load_icon (SEL_RING_PREV_ICON);
+  sel_ring_next_icon = load_icon (SEL_RING_NEXT_ICON);
+  sel_ring_new_icon = load_icon (SEL_RING_NEW_ICON);
+  sel_ring_del_icon = load_icon (SEL_RING_DEL_ICON);
+  view_ring_icon = load_icon (VIEW_RING_ICON);
+  view_ring_prev_icon = load_icon (VIEW_RING_PREV_ICON);
+  view_ring_next_icon = load_icon (VIEW_RING_NEXT_ICON);
+  view_ring_new_icon = load_icon (VIEW_RING_NEW_ICON);
+  view_ring_del_icon = load_icon (VIEW_RING_DEL_ICON);
 }
 
 void
@@ -612,7 +631,6 @@ unload_icons (void)
   al_destroy_bitmap (heading_icon);
   al_destroy_bitmap (zoom_icon);
   al_destroy_bitmap (navigation_icon);
-  al_destroy_bitmap (room_icon);
   al_destroy_bitmap (cell_icon);
   al_destroy_bitmap (page_icon);
   al_destroy_bitmap (l_icon);
@@ -659,20 +677,27 @@ unload_icons (void)
   al_destroy_bitmap (heart_icon);
   al_destroy_bitmap (plus_icon);
   al_destroy_bitmap (minus_icon);
-  al_destroy_bitmap (lock_icon);
-  al_destroy_bitmap (lock_icon_trimmed);
-  al_destroy_bitmap (unlock_icon);
-  al_destroy_bitmap (sel_set_icon);
-  al_destroy_bitmap (sel_set_add_icon);
-  al_destroy_bitmap (sel_set_sub_icon);
-  al_destroy_bitmap (sel_set_undo_icon);
-  al_destroy_bitmap (sel_set_redo_icon);
-  al_destroy_bitmap (sel_set_clear_icon);
-  al_destroy_bitmap (sel_set_set_icon);
-  al_destroy_bitmap (sel_set_prev_icon);
-  al_destroy_bitmap (sel_set_next_icon);
-  al_destroy_bitmap (sel_set_new_icon);
-  al_destroy_bitmap (sel_set_del_icon);
+  al_destroy_bitmap (place_sel_lock_icon);
+  /* al_destroy_bitmap (place_sel_lock_icon_trimmed); */
+  al_destroy_bitmap (place_sel_last_icon);
+  al_destroy_bitmap (place_sel_unlock_icon);
+  al_destroy_bitmap (sel_ring_icon);
+  al_destroy_bitmap (sel_ring_add_icon);
+  al_destroy_bitmap (sel_ring_sub_icon);
+  al_destroy_bitmap (sel_ring_inv_icon);
+  al_destroy_bitmap (sel_ring_undo_icon);
+  al_destroy_bitmap (sel_ring_redo_icon);
+  al_destroy_bitmap (sel_ring_clear_icon);
+  al_destroy_bitmap (sel_ring_set_icon);
+  al_destroy_bitmap (sel_ring_prev_icon);
+  al_destroy_bitmap (sel_ring_next_icon);
+  al_destroy_bitmap (sel_ring_new_icon);
+  al_destroy_bitmap (sel_ring_del_icon);
+  al_destroy_bitmap (view_ring_icon);
+  al_destroy_bitmap (view_ring_prev_icon);
+  al_destroy_bitmap (view_ring_next_icon);
+  al_destroy_bitmap (view_ring_new_icon);
+  al_destroy_bitmap (view_ring_del_icon);
 }
 
 
@@ -1017,7 +1042,7 @@ main_menu (void)
 /*   if (edit != EDIT_NONE) */
 /*     item.main.unlock_selection = */
 /*       menu_sitem (main_menu_enabled && selection_locked, */
-/*                   lock_icon_trimmed, "%s", ""); */
+/*                   place_sel_lock_icon_trimmed, "%s", ""); */
 /* #endif */
 
   end_menu ();
@@ -1243,8 +1268,8 @@ navigation_menu (intptr_t index)
   item.main.view.nav.current_room =
     menu_hitem (true, "ROOM %i", global_mr.room);
 
-  menu_sub (&menu.main.view.nav.select.m, true, room_icon,
-            nav_room_menu, 0, "Room &Selection");
+  menu_sub (&menu.main.view.nav.select.m, true, view_ring_icon,
+            nav_room_menu, 0, "MR &origin");
 
   menu_sub (&menu.main.view.nav.cell.m, true, cell_icon,
             nav_cell_menu, 0, "Scroll &row");
@@ -1851,83 +1876,136 @@ aux_menu (void)
 
   item.aux.lock_selection =
     menu_sitem (is_valid_pos (&aux_pos),
-                lock_icon, selection_locked
+                place_sel_lock_icon, selection_locked
                 ? "Re&lock place selection"
                 : "&Lock place selection");
 
   item.aux.unlock_selection =
-    menu_sitem (selection_locked, unlock_icon, "&Unlock place selection");
+    menu_sitem (selection_locked || is_valid_pos (&last_selection_pos),
+                selection_locked
+                ? place_sel_unlock_icon : place_sel_last_icon,
+                selection_locked ? "&Unlock place selection"
+                : "&Last place selection");
 
-  menu_sub (&menu.aux.sel_set.m,
+  menu_sub (&menu.aux.sel_ring.m,
             is_valid_pos (&aux_pos)
-            || sel_set_hist_can_undo (&global_sel_set_hist, -1)
-            || sel_set_hist_can_undo (&global_sel_set_hist, +1)
-            || sel_set_hist_can_go_next (&global_sel_set_hist, -1)
-            || sel_set_hist_can_go_next (&global_sel_set_hist, +1)
-            || sel_set_hist_ss_nmemb (&global_sel_set_hist) > 0,
-            sel_set_icon, sel_set_menu, 0, "Selection &set");
+            || sel_ring_can_undo (&global_sel_ring, -1)
+            || sel_ring_can_undo (&global_sel_ring, +1)
+            || sel_ring_can_go_next (&global_sel_ring, -1)
+            || sel_ring_can_go_next (&global_sel_ring, +1)
+            || sel_ring_ss_nmemb (&global_sel_ring) > 0,
+            sel_ring_icon, sel_ring_menu, 0, "&Selection ring");
 
-  item.aux.select_room =
-    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
-                room_icon, "Set room as &MR origin");
+  menu_sub (&menu.aux.view_ring.m,
+            true, view_ring_icon, view_ring_menu, 0, "&View ring");
 
   end_menu ();
 }
 
 void
-sel_set_menu (intptr_t index)
+sel_ring_menu (intptr_t index)
 {
   menu_hitem (false, "%zu/%zu - %zu/%zu",
-              global_sel_set_hist.c_nmemb,
-              global_sel_set_hist.nmemb,
-              sel_set_hist_ss_c_nmemb (&global_sel_set_hist),
-              sel_set_hist_ss_nmemb (&global_sel_set_hist));
+              global_sel_ring.c_nmemb,
+              global_sel_ring.nmemb,
+              sel_ring_ss_c_nmemb (&global_sel_ring),
+              sel_ring_ss_nmemb (&global_sel_ring));
 
-  item.aux.sel_set.add =
-    menu_sitem (is_valid_pos (&aux_pos), sel_set_add_icon,
+  menu_sep (NULL);
+
+  item.aux.sel_ring.add =
+    menu_sitem (is_valid_pos (&aux_pos), sel_ring_add_icon,
                 "&Add");
 
-  item.aux.sel_set.sub =
+  item.aux.sel_ring.sub =
     menu_sitem (is_valid_pos (&aux_pos)
-                && sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0,
-                sel_set_sub_icon, "&Sub");
+                && sel_ring_ss_c_nmemb (&global_sel_ring) > 0,
+                sel_ring_sub_icon, "&Sub");
+
+  item.aux.sel_ring.inv =
+    menu_sitem (sel_ring_ss_c_nmemb (&global_sel_ring) > 0,
+                sel_ring_inv_icon, "&Invert");
 
   menu_sep (NULL);
 
-  item.aux.sel_set.undo =
-    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, -1),
-                sel_set_undo_icon, "&Undo");
+  item.aux.sel_ring.undo =
+    menu_sitem (sel_ring_can_undo (&global_sel_ring, -1),
+                sel_ring_undo_icon, "&Undo");
 
-  item.aux.sel_set.redo =
-    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, +1),
-                sel_set_redo_icon, "&Redo");
-
-  item.aux.sel_set.clear =
-    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, -1),
-                sel_set_clear_icon, "&Clear");
-
-  item.aux.sel_set.set =
-    menu_sitem (sel_set_hist_can_undo (&global_sel_set_hist, +1),
-                sel_set_set_icon, "Se&t");
+  item.aux.sel_ring.redo =
+    menu_sitem (sel_ring_can_undo (&global_sel_ring, +1),
+                sel_ring_redo_icon, "&Redo");
 
   menu_sep (NULL);
 
-  item.aux.sel_set.prev =
-    menu_sitem (sel_set_hist_can_go_next (&global_sel_set_hist, -1),
-                sel_set_prev_icon, "&Previous");
+  item.aux.sel_ring.clear =
+    menu_sitem (sel_ring_can_undo (&global_sel_ring, -1),
+                sel_ring_clear_icon, "&Clear");
 
-  item.aux.sel_set.next =
-    menu_sitem (sel_set_hist_can_go_next (&global_sel_set_hist, +1),
-                sel_set_next_icon, "&Next");
+  item.aux.sel_ring.set =
+    menu_sitem (sel_ring_can_undo (&global_sel_ring, +1),
+                sel_ring_set_icon, "Se&t");
 
-  item.aux.sel_set.new =
-    menu_sitem (sel_set_hist_ss_nmemb (&global_sel_set_hist) > 0,
-                sel_set_new_icon, "Ne&w");
+  menu_sep (NULL);
 
-  item.aux.sel_set.del =
-    menu_sitem (global_sel_set_hist.nmemb > 0,
-                sel_set_del_icon, "&Delete");
+  item.aux.sel_ring.prev =
+    menu_sitem (sel_ring_can_go_next (&global_sel_ring, -1),
+                sel_ring_prev_icon,
+                global_sel_ring.c_nmemb > 1
+                ? "&Previous" : "&Last");
 
+  item.aux.sel_ring.next =
+    menu_sitem (sel_ring_can_go_next (&global_sel_ring, +1),
+                sel_ring_next_icon,
+                global_sel_ring.c_nmemb < global_sel_ring.nmemb
+                ? "&Next" : "&First");
+
+  menu_sep (NULL);
+
+  item.aux.sel_ring.new =
+    menu_sitem (sel_ring_ss_nmemb (&global_sel_ring) > 0,
+                sel_ring_new_icon, "Ne&w");
+
+  item.aux.sel_ring.del =
+    menu_sitem (global_sel_ring.nmemb > 0,
+                sel_ring_del_icon, "&Delete");
+
+}
+
+void
+view_ring_menu (intptr_t index)
+{
+  menu_hitem (false, "%zu/%zu", global_view_ring.c_nmemb,
+              global_view_ring.nmemb);
+
+  menu_sep (NULL);
+
+  item.aux.view_ring.set_mr_origin =
+    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
+                view_ring_icon, "Set &origin");
+
+  menu_sep (NULL);
+
+  item.aux.view_ring.prev =
+    menu_sitem (view_ring_can_go_next (&global_view_ring, -1),
+                view_ring_prev_icon,
+                global_view_ring.c_nmemb > 1
+                ? "&Previous" : "&Last");
+
+  item.aux.view_ring.next =
+    menu_sitem (view_ring_can_go_next (&global_view_ring, +1),
+                view_ring_next_icon,
+                global_view_ring.c_nmemb < global_view_ring.nmemb
+                ? "&Next" : "&First");
+
+  menu_sep (NULL);
+
+  item.aux.view_ring.new =
+    menu_sitem (true, view_ring_new_icon, "Ne&w");
+
+  item.aux.view_ring.del =
+    menu_sitem (global_view_ring.nmemb > 1,
+                view_ring_del_icon, "&Delete");
 }
 
 void
@@ -2005,7 +2083,7 @@ process_main_menu_event (ALLEGRO_EVENT *event)
     ui_screenshot ();
   else if (id == item.main.view.zoom.reset) {
     ui_zoom_fit (&global_mr, MR_FIT_NONE);
-    ui_mr_set_dim (&global_mr, 1 - global_mr.w, 1 - global_mr.h, false);
+    ui_mr_set_dim (&global_mr, 1, 1, false);
   } else if (id == item.main.view.zoom.fit.none)
     ui_zoom_fit (&global_mr, MR_FIT_NONE);
   else if (id == item.main.view.zoom.fit.stretch)
@@ -2013,17 +2091,17 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.view.zoom.fit.ratio)
     ui_zoom_fit (&global_mr, MR_FIT_RATIO);
   else if (id == item.main.view.zoom.in.both)
-    ui_mr_set_dim (&global_mr, -1, -1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h - 1, false);
   else if (id == item.main.view.zoom.in.vertical)
-    ui_mr_set_dim (&global_mr, +0, -1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h - 1, false);
   else if (id == item.main.view.zoom.in.horizontal)
-    ui_mr_set_dim (&global_mr, -1, +0, false);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h + 0, false);
   else if (id == item.main.view.zoom.out.both)
-    ui_mr_set_dim (&global_mr, +1, +1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 1, false);
   else if (id == item.main.view.zoom.out.vertical)
-    ui_mr_set_dim (&global_mr, +0, +1, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h + 1, false);
   else if (id == item.main.view.zoom.out.horizontal)
-    ui_mr_set_dim (&global_mr, +1, +0, false);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 0, false);
   else if (id == item.main.view.nav.current_room)
     global_mr.select_cycles = SELECT_CYCLES;
   else if (id == item.main.view.nav.home)
@@ -2124,8 +2202,8 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.cheat.kcd.add) ui_change_kcd (+10);
   else if (id == item.main.cheat.kcd.sub) ui_change_kcd (-10);
   else if (id == item.main.help.about) ui_about_screen (true);
-  else if (id == item.main.unlock_selection)
-    selection_locked = false;
+  /* else if (id == item.main.unlock_selection) */
+  /*   selection_locked = false; */
   else if (m == menu.main.play.jump_to_level.m)
     ui_jump_to_level_menu (id - item.main.play.jump_to_level._id,
                            jump_to_level_menu_lower);
@@ -2150,37 +2228,52 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   if (id == item.aux.lock_selection)
     select_pos (&global_mr, &aux_pos);
   else if (id == item.aux.unlock_selection)
-    selection_locked = ! selection_locked;
-  else if (id == item.aux.select_room)
-    mr_focus_room (&global_mr, aux_pos.room);
-  else if (id == item.aux.sel_set.add
-           || id == item.aux.sel_set.sub) {
+    unlock_relock_place_selection ();
+
+
+  else if (id == item.aux.sel_ring.add
+           || id == item.aux.sel_ring.sub) {
     struct pos *p =
       (selection_locked && is_valid_pos (&selection_pos))
       ? &selection_pos : &aux_pos;
     enum rect_sel_type type =
-      id == item.aux.sel_set.add ? RECT_SEL_ADD : RECT_SEL_SUB;
+      id == item.aux.sel_ring.add ? RECT_SEL_ADD : RECT_SEL_SUB;
 
-    bool success = add_rect_sel_to_sel_set_hist
-      (&global_mr, &global_sel_set_hist, type, &aux_pos, p);
+    bool success = add_rect_sel_to_sel_ring
+      (&global_mr, &global_sel_ring, type, &aux_pos, p);
 
     if (success && p == &selection_pos) selection_pos = aux_pos;
     else if (! success) ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
 
-  } else if (id == item.aux.sel_set.undo)
-    sel_set_hist_undo_pass (&global_sel_set_hist, -1);
-  else if (id == item.aux.sel_set.redo)
-    sel_set_hist_undo_pass (&global_sel_set_hist, +1);
-  else if (id == item.aux.sel_set.clear)
-    while (sel_set_hist_undo_pass (&global_sel_set_hist, -1));
-  else if (id == item.aux.sel_set.set)
-    while (sel_set_hist_undo_pass (&global_sel_set_hist, +1));
-  else if (id == item.aux.sel_set.new)
-    new_sel_set_hist_entry (&global_sel_set_hist);
-  else if (id == item.aux.sel_set.del)
-    del_sel_set_hist_entry (&global_sel_set_hist);
-  else if (id == item.aux.sel_set.prev)
-    sel_set_hist_go_next (&global_sel_set_hist, -1);
-  else if (id == item.aux.sel_set.next)
-    sel_set_hist_go_next (&global_sel_set_hist, +1);
+  } else if (id == item.aux.sel_ring.inv) {
+    add_rect_sel_to_sel_ring
+      (NULL, &global_sel_ring, RECT_SEL_INV, &mouse_pos, &mouse_pos);
+  } else if (id == item.aux.sel_ring.undo)
+    sel_ring_undo_pass (&global_sel_ring, -1);
+  else if (id == item.aux.sel_ring.redo)
+    sel_ring_undo_pass (&global_sel_ring, +1);
+  else if (id == item.aux.sel_ring.clear)
+    while (sel_ring_undo_pass (&global_sel_ring, -1));
+  else if (id == item.aux.sel_ring.set)
+    while (sel_ring_undo_pass (&global_sel_ring, +1));
+  else if (id == item.aux.sel_ring.prev)
+    sel_ring_go_next (&global_sel_ring, -1);
+  else if (id == item.aux.sel_ring.next)
+    sel_ring_go_next (&global_sel_ring, +1);
+  else if (id == item.aux.sel_ring.new)
+    new_sel_ring_entry (&global_sel_ring);
+  else if (id == item.aux.sel_ring.del)
+    del_sel_ring_entry (&global_sel_ring);
+
+
+  else if (id == item.aux.view_ring.set_mr_origin)
+    mr_focus_room (&global_mr, aux_pos.room);
+  else if (id == item.aux.view_ring.prev)
+    view_ring_go_next (&global_mr, &global_view_ring, -1);
+  else if (id == item.aux.view_ring.next)
+    view_ring_go_next (&global_mr, &global_view_ring, +1);
+  else if (id == item.aux.view_ring.new)
+    view_ring_add (&global_mr, &global_view_ring);
+  else if (id == item.aux.view_ring.del)
+    view_ring_delete (&global_mr, &global_view_ring);
 }

@@ -527,7 +527,7 @@ for i = 1, 9 do
 end
 
 function video.BOX.selection_palette (c)
-   if c == C ("white") then return C (0, 255, 0) end
+   if c == C ("white") then return C (0, 0, 255) end
    return c
 end
 

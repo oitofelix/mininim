@@ -192,7 +192,6 @@ mr_create_bitmaps (struct mr *mr)
 }
 
 void
-/* set_multi_room */
 mr_set_dim (struct mr *mr, int w, int h)
 {
   if (w < 1 || h < 1) return;
@@ -211,7 +210,7 @@ mr_get_resolution (struct mr *mr, int *ret_w, int *ret_h)
 }
 
 void
-clear_multi_room_cells (struct mr *mr)
+mr_clear_cells (struct mr *mr)
 {
   int x, y;
   for (x = 0; x < mr->w; x++)
@@ -222,7 +221,7 @@ clear_multi_room_cells (struct mr *mr)
 }
 
 bool
-next_multi_room_cell (struct mr *mr, int *rx, int *ry)
+mr_next_cell (struct mr *mr, int *rx, int *ry)
 {
   int x, y;
   for (x = 0; x < mr->w; x++)
@@ -401,9 +400,9 @@ mr_set_origin (struct mr *mr, int room, int rx, int ry)
   mr->y = ry;
 
   int x, y;
-  clear_multi_room_cells (mr);
+  mr_clear_cells (mr);
   mr_map_room (mr, mr->room, mr->x, mr->y);
-  while (next_multi_room_cell (mr, &x, &y))
+  while (mr_next_cell (mr, &x, &y))
     mr_map_room (mr, mr->cell[x][y].room, x, y);
   for (x = 0; x < mr->w; x++)
     for (y = 0; y < mr->h; y++) {
@@ -661,8 +660,8 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
         int part = 0;
         bool s1 = peq (&mouse_pos, &p);
         bool s2 = peq (&selection_pos, &p) && selection_locked;
-        bool s3 = sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0
-          && is_pos_in_sel_set_hist (&global_sel_set_hist, &p);
+        bool s3 = sel_ring_ss_c_nmemb (&global_sel_ring) > 0
+          && is_pos_in_sel_ring (&global_sel_ring, &p);
 
         if (s1 && s2 && s3) part = anim_tick % 3 + 1;
         else if (s1 && s2) part = anim_tick % 2 ? 1 : 2;
@@ -795,7 +794,7 @@ mr_busy (struct mr *mr)
 }
 
 void
-draw_multi_rooms (struct mr *mr)
+mr_draw (struct mr *mr)
 {
   int x, y;
 
@@ -1023,7 +1022,7 @@ mr_count_uniq_rooms (struct mr *mr)
 }
 
 void
-multi_room_fit_stretch (struct mr *mr)
+mr_fit_stretch (struct mr *mr)
 {
   int w = 1;
   int h = 1;
@@ -1062,9 +1061,9 @@ multi_room_fit_stretch (struct mr *mr)
 }
 
 void
-multi_room_fit_ratio (struct mr *mr)
+mr_fit_ratio (struct mr *mr)
 {
-  multi_room_fit_stretch (mr);
+  mr_fit_stretch (mr);
   if (mr->w < mr->h) mr_redim (mr, mr->h, mr->h);
   else if (mr->w > mr->h) mr_redim (mr, mr->w, mr->w);
 }
@@ -1093,12 +1092,12 @@ apply_mr_fit_mode (struct mr *mr)
     h = mr->fit_h;
     break;
   case MR_FIT_STRETCH:
-    multi_room_fit_stretch (mr);
+    mr_fit_stretch (mr);
     w = mr->w;
     h = mr->h;
     break;
   case MR_FIT_RATIO:
-    multi_room_fit_ratio (mr);
+    mr_fit_ratio (mr);
     w = mr->w;
     h = mr->h;
     break;

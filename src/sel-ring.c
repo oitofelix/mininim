@@ -1,5 +1,5 @@
 /*
-  sel-set.c -- selection set module;
+  sel-ring.c -- selection ring module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-struct sel_set_hist global_sel_set_hist;
+struct sel_ring global_sel_ring;
 
 
 /**********************************************************************
@@ -32,6 +32,11 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
               enum rect_sel_type type,
               struct pos *a, struct pos *b)
 {
+  rs->type = type;
+  rs->level = a->l;
+
+  if (type == RECT_SEL_INV) return rs;
+
   struct pos na;
   npos (a, &na);
 
@@ -42,7 +47,7 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   memset (&nmr, 0, sizeof (nmr));
   nmr.room = mr->room;
 
-  multi_room_fit_stretch (&nmr);
+  mr_fit_stretch (&nmr);
 
   int ax, ay;
   bool a_visible = mr_coord (&nmr, na.room, -1, &ax, &ay);
@@ -63,9 +68,6 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
 
   int blx = tlx;
   int bly = bry;
-
-  rs->type = type;
-  rs->level = na.l;
 
   /* allocate */
   int w = brx - tlx - 1;
@@ -160,11 +162,13 @@ is_valid_rect_sel (struct rect_sel *rs)
 void
 destroy_rect_sel (struct rect_sel *rs)
 {
-  destroy_array ((void **) &rs->t, &rs->w_nmemb);
-  destroy_array ((void **) &rs->b, &rs->w_nmemb);
-  destroy_array ((void **) &rs->l, &rs->h_nmemb);
-  destroy_array ((void **) &rs->r, &rs->h_nmemb);
-  destroy_array ((void **) &rs->c, &rs->c_nmemb);
+  if (rs->type != RECT_SEL_INV) {
+    destroy_array ((void **) &rs->t, &rs->w_nmemb);
+    destroy_array ((void **) &rs->b, &rs->w_nmemb);
+    destroy_array ((void **) &rs->l, &rs->h_nmemb);
+    destroy_array ((void **) &rs->r, &rs->h_nmemb);
+    destroy_array ((void **) &rs->c, &rs->c_nmemb);
+  }
   memset (rs, 0, sizeof (*rs));
 }
 
@@ -174,6 +178,8 @@ is_room_in_rect_sel (struct rect_sel *rs, int _room)
   int room = room_val (rs->level, _room);
 
   if (! room) return false;
+
+  if (rs->type == RECT_SEL_INV) return false;
 
   if (rs->tl == room || rs->tr == room
       || rs->bl == room || rs->br == room)
@@ -259,13 +265,18 @@ is_pos_in_sel_set (struct sel_set *ss, struct pos *p)
   if (! is_valid_sel_set (ss)) return false;
   struct pos np; npos (p, &np);
 
+  /* optimization */
   if (! is_room_possibly_in_sel_set (ss, np.room))
     return false;
 
   bool r = false;
-  for (size_t i = 0; i < ss->c_nmemb; i++)
-    if (is_pos_in_rect_sel (&ss->rs[i], &np))
+  for (size_t i = 0; i < ss->c_nmemb; i++) {
+    if (ss->rs[i].type == RECT_SEL_INV)
+      r = ! r;
+    else if (is_pos_in_rect_sel (&ss->rs[i], &np))
       r = ss->rs[i].type == RECT_SEL_ADD;
+  }
+
   return r;
 }
 
@@ -275,6 +286,7 @@ is_room_in_sel_set (struct sel_set *ss, int _room)
   if (! is_valid_sel_set (ss)) return false;
   int room = room_val (ss->rs[0].level, _room);
 
+  /* optimization */
   if (! is_room_possibly_in_sel_set (ss, room))
     return false;
 
@@ -346,10 +358,7 @@ is_rect_sel_helpful_for_sel_set (struct rect_sel *a, struct sel_set *ss)
     return ! is_rect_sel_subset_of_sel_set (a, ss);
   else if (a->type == RECT_SEL_SUB)
     return ! is_rect_sel_and_sel_set_inter_empty (a, ss);
-  else {
-    assert (false);
-    return false;
-  }
+  else return true;
 }
 
 bool
@@ -374,60 +383,60 @@ sel_set_undo_pass (struct sel_set *ss, int dir)
 
 
 /**********************************************************************
- * Selection Set History
+ * Selection Ring
  **********************************************************************/
 
 bool
-is_valid_sel_set_hist (struct sel_set_hist *sh)
+is_valid_sel_ring (struct sel_ring *sr)
 {
-  return sh && sh->ss && sh->nmemb;
+  return sr && sr->ss && sr->nmemb;
 }
 
 void
-destroy_sel_set_hist (struct sel_set_hist *sh)
+destroy_sel_ring (struct sel_ring *sr)
 {
-  if (! is_valid_sel_set_hist (sh)) return;
-  for (size_t i = 0; i < sh->nmemb; i++) destroy_sel_set (&sh->ss[i]);
-  destroy_array ((void **) &sh->ss, &sh->nmemb);
-  sh->c_nmemb = 0;
+  if (! is_valid_sel_ring (sr)) return;
+  for (size_t i = 0; i < sr->nmemb; i++) destroy_sel_set (&sr->ss[i]);
+  destroy_array ((void **) &sr->ss, &sr->nmemb);
+  sr->c_nmemb = 0;
 }
 
 bool
-is_room_in_sel_set_hist (struct sel_set_hist *sh, int room)
+is_room_in_sel_ring (struct sel_ring *sr, int room)
 {
-  if (! is_valid_sel_set_hist (sh)) return false;
-  return is_room_in_sel_set (&sh->ss[sh->c_nmemb - 1], room);
+  if (! is_valid_sel_ring (sr)) return false;
+  return is_room_in_sel_set (&sr->ss[sr->c_nmemb - 1], room);
 }
 
 bool
-is_pos_in_sel_set_hist (struct sel_set_hist *sh, struct pos *p)
+is_pos_in_sel_ring (struct sel_ring *sr, struct pos *p)
 {
-  if (! is_valid_sel_set_hist (sh)) return false;
-  return is_pos_in_sel_set (&sh->ss[sh->c_nmemb - 1], p);
+  if (! is_valid_sel_ring (sr)) return false;
+  return is_pos_in_sel_set (&sr->ss[sr->c_nmemb - 1], p);
 }
 
 bool
-sel_set_hist_can_undo (struct sel_set_hist *sh, int dir)
+sel_ring_can_undo (struct sel_ring *sr, int dir)
 {
-  if (! is_valid_sel_set_hist (sh)) return false;
-  return sel_set_can_undo (&sh->ss[sh->c_nmemb - 1], dir);
+  if (! is_valid_sel_ring (sr)) return false;
+  return sel_set_can_undo (&sr->ss[sr->c_nmemb - 1], dir);
 }
 
 bool
-sel_set_hist_undo_pass (struct sel_set_hist *sh, int dir)
+sel_ring_undo_pass (struct sel_ring *sr, int dir)
 {
-  if (! is_valid_sel_set_hist (sh)) return false;
-  return sel_set_undo_pass (&sh->ss[sh->c_nmemb - 1], dir);
+  if (! is_valid_sel_ring (sr)) return false;
+  return sel_set_undo_pass (&sr->ss[sr->c_nmemb - 1], dir);
 }
 
 bool
-add_rect_sel_to_sel_set_hist (struct mr *mr, struct sel_set_hist *sh,
+add_rect_sel_to_sel_ring (struct mr *mr, struct sel_ring *sr,
                               enum rect_sel_type type,
                               struct pos *a, struct pos *b)
 {
-  if (! is_valid_sel_set_hist (sh)) new_sel_set_hist_entry (sh);
+  if (! is_valid_sel_ring (sr)) new_sel_ring_entry (sr);
 
-  struct sel_set *ss = &sh->ss[sh->c_nmemb - 1];
+  struct sel_set *ss = &sr->ss[sr->c_nmemb - 1];
   struct rect_sel rs;
   bool success = new_rect_sel (mr, &rs, type, a, b);
   if (! success) return false;
@@ -437,63 +446,71 @@ add_rect_sel_to_sel_set_hist (struct mr *mr, struct sel_set_hist *sh,
     return true;
   }
 
-  destroy_sel_set_tail (ss);
+ if (type == RECT_SEL_INV && ss->c_nmemb > 0
+      && ss->rs[ss->c_nmemb - 1].type == RECT_SEL_INV)
+   sel_set_undo_pass (ss, -1);
+ else {
+   destroy_sel_set_tail (ss);
 
-  ss->rs = add_to_array
-    (&rs, 1, ss->rs, &ss->nmemb, ss->nmemb, sizeof (*ss->rs));
-  ss->c_nmemb = ss->nmemb;
+   ss->rs = add_to_array
+     (&rs, 1, ss->rs, &ss->nmemb, ss->nmemb, sizeof (*ss->rs));
+   ss->c_nmemb = ss->nmemb;
+ }
 
   return true;
 }
 
 void
-new_sel_set_hist_entry (struct sel_set_hist *sh)
+new_sel_ring_entry (struct sel_ring *sr)
 {
   struct sel_set ss;
   memset (&ss, 0, sizeof (ss));
-  sh->ss = add_to_array
-    (&ss, 1, sh->ss, &sh->nmemb, sh->c_nmemb, sizeof (*sh->ss));
-  sh->c_nmemb++;
+  sr->ss = add_to_array
+    (&ss, 1, sr->ss, &sr->nmemb, sr->c_nmemb, sizeof (*sr->ss));
+  sr->c_nmemb++;
 }
 
 void
-del_sel_set_hist_entry (struct sel_set_hist *sh)
+del_sel_ring_entry (struct sel_ring *sr)
 {
-  destroy_sel_set (&sh->ss[sh->c_nmemb - 1]);
-  sh->ss = remove_from_array
-    (sh->ss, &sh->nmemb, sh->c_nmemb - 1, 1, sizeof (*sh->ss));
-  sh->c_nmemb = max_int (sh->nmemb ? 1 : 0, sh->c_nmemb - 1);
+  destroy_sel_set (&sr->ss[sr->c_nmemb - 1]);
+  sr->ss = remove_from_array
+    (sr->ss, &sr->nmemb, sr->c_nmemb - 1, 1, sizeof (*sr->ss));
+  sr->c_nmemb = max_int (sr->nmemb ? 1 : 0, sr->c_nmemb - 1);
 }
 
 bool
-sel_set_hist_can_go_next (struct sel_set_hist *sh, int dir)
+sel_ring_can_go_next (struct sel_ring *sr, int dir)
 {
-  return (sh->c_nmemb > 1 || dir >= 0)
-    && (sh->c_nmemb < sh->nmemb || dir < 0)
-    && is_valid_sel_set_hist (sh);
+  return sr->nmemb > 1 && is_valid_sel_ring (sr);
 }
 
 bool
-sel_set_hist_go_next (struct sel_set_hist *sh, int dir)
+sel_ring_go_next (struct sel_ring *sr, int dir)
 {
-  if (! sel_set_hist_can_go_next (sh, dir)) return false;
+  if (! sel_ring_can_go_next (sr, dir)) return false;
 
-  if (dir >= 0) sh->c_nmemb++;
-  else sh->c_nmemb--;
+  if (dir >= 0) {
+    if (sr->c_nmemb == sr->nmemb) sr->c_nmemb = 1;
+    else sr->c_nmemb++;
+  } else {
+    if (sr->c_nmemb == 1) sr->c_nmemb = sr->nmemb;
+    else sr->c_nmemb--;
+  }
 
   return true;
 }
 
 size_t
-sel_set_hist_ss_c_nmemb (struct sel_set_hist *sh)
+sel_ring_ss_c_nmemb (struct sel_ring *sr)
 {
-  if (! is_valid_sel_set_hist (sh)) return 0;
-  return sh->ss[sh->c_nmemb - 1].c_nmemb;
+  if (! is_valid_sel_ring (sr)) return 0;
+  return sr->ss[sr->c_nmemb - 1].c_nmemb;
 }
 
 size_t
-sel_set_hist_ss_nmemb (struct sel_set_hist *sh)
+sel_ring_ss_nmemb (struct sel_ring *sr)
 {
-  if (! is_valid_sel_set_hist (sh)) return 0;
-  return sh->ss[sh->c_nmemb - 1].nmemb;
+  if (! is_valid_sel_ring (sr)) return 0;
+  return sr->ss[sr->c_nmemb - 1].nmemb;
 }

@@ -29,7 +29,7 @@ gui_create_room_control (char *norm_group)
 {
   Ihandle *ih = IupSetCallbacks
     (gui_create_directional_control
-     ("Room", "ROOM_ICON", button_action_cb, norm_group),
+     ("MR origin", "VIEW_RING_ICON", button_action_cb, norm_group),
      "_UPDATE_CB", _update_cb,
      NULL);
 

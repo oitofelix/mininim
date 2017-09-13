@@ -1006,14 +1006,14 @@ apply_to_place (struct pos *p, pos_trans f, void *data, char *desc)
 }
 
 void
-apply_to_place_sel_set_hist
-(struct sel_set_hist *sh, pos_trans f, void *data, char *desc)
+apply_to_place_sel_ring
+(struct sel_ring *sr, pos_trans f, void *data, char *desc)
 {
-  for (size_t room = 1; room < sh->ss[0].rs[0].level->room_nmemb; room++) {
-    struct pos p; new_pos (&p, sh->ss[0].rs[0].level, room, -1, -1);
+  for (size_t room = 1; room < sr->ss[0].rs[0].level->room_nmemb; room++) {
+    struct pos p; new_pos (&p, sr->ss[0].rs[0].level, room, -1, -1);
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (is_pos_in_sel_set_hist (sh, &p))
+        if (is_pos_in_sel_ring (sr, &p))
           apply_to_place (&p, f, data, NULL);
   }
   end_undo_set (&undo, desc);
@@ -1032,13 +1032,13 @@ apply_to_room (struct level *l, int room, pos_trans f,
 }
 
 void
-apply_to_room_sel_set_hist
-(struct sel_set_hist *sh, pos_trans f, void *data, char *desc)
+apply_to_room_sel_ring
+(struct sel_ring *sr, pos_trans f, void *data, char *desc)
 {
   for (size_t room = 1;
-       room < sh->ss[0].rs[0].level->room_nmemb; room++) {
-    if (! is_room_in_sel_set_hist (sh, room)) continue;
-    apply_to_room (sh->ss[0].rs[0].level, room, f, data, NULL);
+       room < sr->ss[0].rs[0].level->room_nmemb; room++) {
+    if (! is_room_in_sel_ring (sr, room)) continue;
+    apply_to_room (sr->ss[0].rs[0].level, room, f, data, NULL);
   }
   end_undo_set (&undo, desc);
 }
@@ -1051,7 +1051,7 @@ apply_to_level (struct level *l, pos_trans f, void *data, char *desc)
 }
 
 void
-apply_to_scope (struct pos *p, struct sel_set_hist *sh, pos_trans f,
+apply_to_scope (struct pos *p, struct sel_ring *sr, pos_trans f,
                 void *data, char *base_desc, enum scope scope)
 {
   char *desc;
@@ -1060,17 +1060,17 @@ apply_to_scope (struct pos *p, struct sel_set_hist *sh, pos_trans f,
     desc = xasprintf ("%s (PLACE)", base_desc);
     apply_to_place (p, f, data, desc);
     break;
-  case PLACE_SEL_SET_HIST_SCOPE:
+  case PLACE_SEL_RING_SCOPE:
     desc = xasprintf ("%s (PLACE RECT. SEL.)", base_desc);
-    apply_to_place_sel_set_hist (sh, f, data, desc);
+    apply_to_place_sel_ring (sr, f, data, desc);
     break;
   case ROOM_SCOPE:
     desc = xasprintf ("%s (ROOM)", base_desc);
     apply_to_room (p->l, p->room, f, data, desc);
     break;
-  case ROOM_SEL_SET_HIST_SCOPE:
+  case ROOM_SEL_RING_SCOPE:
     desc = xasprintf ("%s (ROOM RECT. SEL.)", base_desc);
-    apply_to_room_sel_set_hist (sh, f, data, desc);
+    apply_to_room_sel_ring (sr, f, data, desc);
     break;
   case LEVEL_SCOPE:
     desc = xasprintf ("%s (LEVEL)", base_desc);

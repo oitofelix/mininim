@@ -263,37 +263,37 @@ level_hotkeys_cb (Ihandle *ih, int c)
   else if ((was_key_pressed (0, ALLEGRO_KEY_OPENBRACE)
             || c == K_bracketleft)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, -1, -1, true);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h - 1, true);
 
   /* ]: increase multi-room resolution */
   else if ((was_key_pressed (0, ALLEGRO_KEY_CLOSEBRACE)
             || c == K_bracketright)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, +1, +1, true);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 1, true);
 
   /* CTRL+[: decrease multi-room width resolution */
   else if ((was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_OPENBRACE)
             || c == K_cBracketleft)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, -1, +0, true);
+    ui_mr_set_dim (&global_mr, global_mr.w - 1, global_mr.h + 0, true);
 
   /* CTRL+]: increase multi-room width resolution */
   else if ((was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_CLOSEBRACE)
             || c == K_cBracketright)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, +1, +0, true);
+    ui_mr_set_dim (&global_mr, global_mr.w + 1, global_mr.h + 0, true);
 
   /* ALT+[: decrease multi-room height resolution */
   else if ((was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_OPENBRACE)
             || c == K_mBracketleft)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, +0, -1, true);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h - 1, true);
 
   /* ALT+]: increase multi-room height resolution */
   else if ((was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_CLOSEBRACE)
             || c == K_mBracketright)
            && ! cutscene)
-    ui_mr_set_dim (&global_mr, +0, +1, true);
+    ui_mr_set_dim (&global_mr, global_mr.w + 0, global_mr.h + 1, true);
 
   /* H: select room at left (J if flipped horizontally) */
   else if ((! flip_gamepad_horizontal

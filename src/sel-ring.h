@@ -1,5 +1,5 @@
 /*
-  sel-set.h -- selection set module;
+  sel-ring.h -- selection ring module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,11 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_SEL_SET_H
-#define MININIM_SEL_SET_H
+#ifndef MININIM_SEL_RING_H
+#define MININIM_SEL_RING_H
 
 /* variables */
-extern struct sel_set_hist global_sel_set_hist;
+extern struct sel_ring global_sel_ring;
 
 /* Rectangular Selection */
 struct rect_sel *new_rect_sel
@@ -52,21 +52,21 @@ bool is_rect_sel_helpful_for_sel_set
 bool sel_set_can_undo (struct sel_set *s, int dir);
 bool sel_set_undo_pass (struct sel_set *s, int dir);
 
-/* Selection Set History */
-bool is_valid_sel_set_hist (struct sel_set_hist *sh);
-void destroy_sel_set_hist (struct sel_set_hist *sh);
-bool is_room_in_sel_set_hist (struct sel_set_hist *sh, int room);
-bool is_pos_in_sel_set_hist (struct sel_set_hist *sh, struct pos *p);
-bool sel_set_hist_can_undo (struct sel_set_hist *sh, int dir);
-bool sel_set_hist_undo_pass (struct sel_set_hist *sh, int dir);
-bool add_rect_sel_to_sel_set_hist
-(struct mr *mr, struct sel_set_hist *sh, enum rect_sel_type type,
+/* Selection Ring */
+bool is_valid_sel_ring (struct sel_ring *sr);
+void destroy_sel_ring (struct sel_ring *sr);
+bool is_room_in_sel_ring (struct sel_ring *sr, int room);
+bool is_pos_in_sel_ring (struct sel_ring *sr, struct pos *p);
+bool sel_ring_can_undo (struct sel_ring *sr, int dir);
+bool sel_ring_undo_pass (struct sel_ring *sr, int dir);
+bool add_rect_sel_to_sel_ring
+(struct mr *mr, struct sel_ring *sr, enum rect_sel_type type,
  struct pos *a, struct pos *b);
-void new_sel_set_hist_entry (struct sel_set_hist *sh);
-void del_sel_set_hist_entry (struct sel_set_hist *sh);
-bool sel_set_hist_can_go_next (struct sel_set_hist *sh, int dir);
-bool sel_set_hist_go_next (struct sel_set_hist *sh, int dir);
-size_t sel_set_hist_ss_c_nmemb (struct sel_set_hist *sh);
-size_t sel_set_hist_ss_nmemb (struct sel_set_hist *sh);
+void new_sel_ring_entry (struct sel_ring *sr);
+void del_sel_ring_entry (struct sel_ring *sr);
+bool sel_ring_can_go_next (struct sel_ring *sr, int dir);
+bool sel_ring_go_next (struct sel_ring *sr, int dir);
+size_t sel_ring_ss_c_nmemb (struct sel_ring *sr);
+size_t sel_ring_ss_nmemb (struct sel_ring *sr);
 
-#endif	/* MININIM_SEL_SET_H */
+#endif	/* MININIM_SEL_RING_H */

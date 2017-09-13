@@ -889,7 +889,7 @@ process_death (void)
 void
 draw_level (void)
 {
-  draw_multi_rooms (&global_mr);
+  mr_draw (&global_mr);
 
   draw_hp (uscreen, get_actor_by_id (current_kid_id));
 

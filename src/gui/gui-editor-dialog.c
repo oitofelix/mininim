@@ -182,13 +182,13 @@ gui_create_editor_dialog (void)
 
              IupSetAttributes
              (gui_create_tile_clipboard_control
-              (&selection_pos, &global_sel_set_hist,
+              (&selection_pos, &global_sel_ring,
                "TILE_PART_NORM"),
               "NAME = TILE_CLIPBOARD_CONTROL"),
 
              IupSetAttributes
              (gui_create_tile_transform_control
-              (&selection_pos, &global_sel_set_hist,
+              (&selection_pos, &global_sel_ring,
                "TILE_PART_NORM"),
               "NAME = TILE_TRANSFORM_CONTROL"),
 

@@ -22,7 +22,7 @@
 
 ALLEGRO_MOUSE_STATE mouse_state;
 struct pos mouse_pos;
-struct pos selection_pos;
+struct pos selection_pos, last_selection_pos;
 
 void
 init_mouse (void)

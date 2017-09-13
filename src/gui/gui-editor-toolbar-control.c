@@ -39,7 +39,7 @@ gui_create_editor_toolbar_control (char *norm_group)
        lock_button = IupSetCallbacks
        (IupSetAttributes
         (IupButton (NULL, NULL),
-         "IMAGE = UNLOCK_ICON,"
+         "IMAGE = PLACE_SEL_UNLOCK_ICON,"
          "FLAT = YES,"
          "CANFOCUS = NO,"),
         "ACTION", button_action_cb,
@@ -48,7 +48,7 @@ gui_create_editor_toolbar_control (char *norm_group)
        sel_set_clear_button = IupSetCallbacks
        (IupSetAttributes
         (IupButton (NULL, NULL),
-         "IMAGE = SEL_SET_CLEAR_ICON,"
+         "IMAGE = SEL_RING_CLEAR_ICON,"
          "FLAT = YES,"
          "CANFOCUS = NO,"),
         "ACTION", button_action_cb,
@@ -93,7 +93,7 @@ gui_create_editor_toolbar_control (char *norm_group)
   IupSetAttribute (ih, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_LOCK_BUTTON", (void *) lock_button);
-  IupSetAttribute (ih, "_SEL_SET_CLEAR_BUTTON", (void *) sel_set_clear_button);
+  IupSetAttribute (ih, "_SEL_RING_CLEAR_BUTTON", (void *) sel_set_clear_button);
   IupSetAttribute (ih, "_PAUSE_BUTTON", (void *) pause_button);
   IupSetAttribute (ih, "_FULL_SCREEN_BUTTON", (void *) full_screen_button);
   IupSetAttribute (ih, "_HOME_BUTTON", (void *) home_button);
@@ -108,7 +108,7 @@ _update_cb (Ihandle *ih)
 
   Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
   Ihandle *sel_set_clear_button =
-    (void *) IupGetAttribute (ih, "_SEL_SET_CLEAR_BUTTON");
+    (void *) IupGetAttribute (ih, "_SEL_RING_CLEAR_BUTTON");
   Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
   Ihandle *full_screen_button =
     (void *) IupGetAttribute (ih, "_FULL_SCREEN_BUTTON");
@@ -116,23 +116,26 @@ _update_cb (Ihandle *ih)
 
   /* Lock */
   gui_set_stock_image (lock_button, selection_locked
-                       ? "UNLOCK_ICON" : "LOCK_ICON");
+                       ? "PLACE_SEL_UNLOCK_ICON" : "PLACE_SEL_LAST_ICON");
 
   gui_control_attribute (lock_button, "TIP", selection_locked
                          ? "Unlock place selection"
-                         : "Lock place selection");
+                         : "Last place selection");
+
+  gui_control_active (lock_button, selection_locked
+                      || is_valid_pos (&last_selection_pos));
 
   /* Selection set */
   gui_set_stock_image (sel_set_clear_button,
-                       sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0
-                       ? "SEL_SET_CLEAR_ICON" : "SEL_SET_SET_ICON");
+                       sel_ring_ss_c_nmemb (&global_sel_ring) > 0
+                       ? "SEL_RING_CLEAR_ICON" : "SEL_RING_SET_ICON");
 
   gui_control_attribute (sel_set_clear_button, "TIP",
-                         sel_set_hist_ss_c_nmemb (&global_sel_set_hist) > 0
+                         sel_ring_ss_c_nmemb (&global_sel_ring) > 0
                          ? "Clear selection set" : "Set selection set");
 
   gui_control_active (sel_set_clear_button,
-                      sel_set_hist_ss_nmemb (&global_sel_set_hist) > 0);
+                      sel_ring_ss_nmemb (&global_sel_ring) > 0);
 
   /* Pause */
   gui_set_stock_image (pause_button, is_game_paused ()
@@ -161,20 +164,18 @@ button_action_cb (Ihandle *ih)
 {
   Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
   Ihandle *sel_set_clear_button =
-    (void *) IupGetAttribute (ih, "_SEL_SET_CLEAR_BUTTON");
+    (void *) IupGetAttribute (ih, "_SEL_RING_CLEAR_BUTTON");
   Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
   Ihandle *full_screen_button =
     (void *) IupGetAttribute (ih, "_FULL_SCREEN_BUTTON");
   Ihandle *home_button = (void *) IupGetAttribute (ih, "_HOME_BUTTON");
 
-  if (ih == lock_button) {
-    if (! selection_locked)
-      new_pos (&selection_pos, &global_level, global_mr.room, 1,  4);
-    selection_locked = ! selection_locked;
-  } else if (ih == sel_set_clear_button) {
-    if (sel_set_hist_can_undo (&global_sel_set_hist, -1))
-      while (sel_set_hist_undo_pass (&global_sel_set_hist, -1));
-    else while (sel_set_hist_undo_pass (&global_sel_set_hist, +1));
+  if (ih == lock_button)
+    unlock_relock_place_selection ();
+  else if (ih == sel_set_clear_button) {
+    if (sel_ring_can_undo (&global_sel_ring, -1))
+      while (sel_ring_undo_pass (&global_sel_ring, -1));
+    else while (sel_ring_undo_pass (&global_sel_ring, +1));
   } else if (ih == pause_button) ui_toggle_pause_game ();
   else if (ih == full_screen_button) ui_full_screen ();
   else if (ih == home_button) ui_home ();

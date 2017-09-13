@@ -1,5 +1,5 @@
 /*
-  pointer.h -- pointer module;
+  view-ring.h -- view ring module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,20 +18,20 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_POINTER_H
-#define MININIM_POINTER_H
+#ifndef MININIM_VIEW_RING_H
+#define MININIM_VIEW_RING_H
 
 /* variables */
-extern struct pos mouse_pos;
-extern struct pos selection_pos, last_selection_pos;
+extern struct view_ring global_view_ring;
 
 /* functions */
-void init_mouse (void);
-void finalize_mouse (void);
-struct mouse_coord *get_mouse_coord (struct mr *mr, struct mouse_coord *m);
-struct pos *get_mouse_pos (struct mr *mr, struct pos *p);
-void set_mouse_coord (struct mr *mr, struct mouse_coord *m);
-void set_mouse_pos (struct mr *mr, struct pos *p);
-void set_mouse_room (struct mr *mr, int room);
+bool is_valid_view_ring (struct view_ring *vr);
+void destroy_view_ring (struct view_ring *vr);
+void view_ring_add (struct mr *mr, struct view_ring *vr);
+void view_ring_update (struct mr *mr, struct view_ring *vr);
+bool view_ring_delete (struct mr *mr, struct view_ring *vr);
+bool view_ring_can_go_next (struct view_ring *vr, int dir);
+bool view_ring_go_next (struct mr *mr, struct view_ring *vr, int dir);
+void view_ring_restore (struct mr *mr, struct view_ring *vr);
 
-#endif	/* MININIM_POINTER_H */
+#endif	/* MININIM_VIEW_RING_H */

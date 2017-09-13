@@ -90,8 +90,11 @@ play_anim (anim_callback_t draw_callback,
 
   invalid_pos (&mouse_pos);
   invalid_pos (&selection_pos);
+  invalid_pos (&last_selection_pos);
   selection_locked = false;
-  destroy_sel_set_hist (&global_sel_set_hist);
+  destroy_sel_ring (&global_sel_ring);
+  destroy_view_ring (&global_view_ring);
+  view_ring_add (&global_mr, &global_view_ring);
 
   while (! quit_anim) {
     L_gc (main_L);
@@ -168,8 +171,9 @@ play_anim (anim_callback_t draw_callback,
         /* update selection position */
         if (! cutscene) {
           get_mouse_pos (&global_mr, &mouse_pos);
-          if (! selection_locked)
-            get_mouse_pos (&global_mr, &selection_pos);
+          if (selection_locked)
+            last_selection_pos = selection_pos;
+          else get_mouse_pos (&global_mr, &selection_pos);
         }
 
         /* message box */

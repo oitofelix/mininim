@@ -43,16 +43,16 @@ struct level *paste_room (struct level *l, int room,
                            struct room_copy *rc, char *desc);
 
 void apply_to_place (struct pos *p, pos_trans f, void *data, char *desc);
-void apply_to_place_sel_set_hist
-(struct sel_set_hist *s, pos_trans f, void *data, char *desc);
+void apply_to_place_sel_ring
+(struct sel_ring *sr, pos_trans f, void *data, char *desc);
 void apply_to_room (struct level *l, int room, pos_trans f, void *data,
                     char *desc);
-void apply_to_room_sel_set_hist
-(struct sel_set_hist *s, pos_trans f, void *data, char *desc);
+void apply_to_room_sel_ring
+(struct sel_ring *sr, pos_trans f, void *data, char *desc);
 
 
 void apply_to_level (struct level *l, pos_trans f, void *data, char *desc);
-void apply_to_scope (struct pos *p, struct sel_set_hist *sh, pos_trans f,
+void apply_to_scope (struct pos *p, struct sel_ring *sr, pos_trans f,
                      void *data, char *base_desc, enum scope scope);
 
 enum tile_bg bg_tile (struct tile *t);

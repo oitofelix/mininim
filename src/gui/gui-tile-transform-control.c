@@ -26,7 +26,7 @@ static int button_action_cb (Ihandle *ih);
 
 Ihandle *
 gui_create_tile_transform_control
-(struct pos *p, struct sel_set_hist *sh, char *norm_group)
+(struct pos *p, struct sel_ring *sr, char *norm_group)
 {
   Ihandle *ih, *vbox;
 
@@ -142,7 +142,7 @@ gui_create_tile_transform_control
   IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
 
   IupSetAttribute (ih, "_POS", (void *) p);
-  IupSetAttribute (ih, "_SEL_SET_HIST", (void *) sh);
+  IupSetAttribute (ih, "_SEL_RING", (void *) sr);
 
   return ih;
 }
@@ -153,9 +153,9 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  struct sel_set_hist *sh = (void *) IupGetAttribute (ih, "_SEL_SET_HIST");
+  struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
   gui_control_active
-    (ih, is_valid_pos (p) || sel_set_hist_ss_c_nmemb (sh) > 0);
+    (ih, is_valid_pos (p) || sel_ring_ss_c_nmemb (sr) > 0);
 
   Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
   Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
@@ -174,8 +174,10 @@ int
 button_action_cb (Ihandle *ih)
 {
   Ihandle *clear_button = (void *) IupGetAttribute (ih, "_CLEAR_BUTTON");
-  Ihandle *randomize_button = (void *) IupGetAttribute (ih, "_RANDOMIZE_BUTTON");
-  Ihandle *decorate_button = (void *) IupGetAttribute (ih, "_DECORATE_BUTTON");
+  Ihandle *randomize_button =
+    (void *) IupGetAttribute (ih, "_RANDOMIZE_BUTTON");
+  Ihandle *decorate_button =
+    (void *) IupGetAttribute (ih, "_DECORATE_BUTTON");
   Ihandle *fix_button = (void *) IupGetAttribute (ih, "_FIX_BUTTON");
   Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
   Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
@@ -187,15 +189,15 @@ button_action_cb (Ihandle *ih)
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  struct sel_set_hist *sh = (void *) IupGetAttribute (ih, "_SEL_SET_HIST");
+  struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
 
   enum scope scope;
   if (selected == place_toggle)
-    scope = sel_set_hist_ss_c_nmemb (sh) > 0
-      ? PLACE_SEL_SET_HIST_SCOPE : PLACE_SCOPE;
+    scope = sel_ring_ss_c_nmemb (sr) > 0
+      ? PLACE_SEL_RING_SCOPE : PLACE_SCOPE;
   else if (selected == room_toggle)
-    scope = sel_set_hist_ss_c_nmemb (sh) > 0
-      ? ROOM_SEL_SET_HIST_SCOPE : ROOM_SCOPE;
+    scope = sel_ring_ss_c_nmemb (sr) > 0
+      ? ROOM_SEL_RING_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);
 
@@ -221,7 +223,7 @@ button_action_cb (Ihandle *ih)
     desc = "FG<->FAKE";
   } else assert (false);
 
-  apply_to_scope (p, sh, trans, NULL, desc, scope);
+  apply_to_scope (p, sr, trans, NULL, desc, scope);
 
   return IUP_DEFAULT;
 }
