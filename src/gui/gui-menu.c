@@ -1877,8 +1877,8 @@ aux_menu (void)
   item.aux.lock_selection =
     menu_sitem (is_valid_pos (&aux_pos),
                 place_sel_lock_icon, selection_locked
-                ? "Re&lock place selection"
-                : "&Lock place selection");
+                ? "Re&lock place selection (M1)"
+                : "&Lock place selection (M1)");
 
   item.aux.unlock_selection =
     menu_sitem (selection_locked || is_valid_pos (&last_selection_pos),
@@ -1915,12 +1915,12 @@ sel_ring_menu (intptr_t index)
 
   item.aux.sel_ring.add =
     menu_sitem (is_valid_pos (&aux_pos), sel_ring_add_icon,
-                "&Add");
+                "&Add (Shift+M1)");
 
   item.aux.sel_ring.sub =
     menu_sitem (is_valid_pos (&aux_pos)
                 && sel_ring_ss_c_nmemb (&global_sel_ring) > 0,
-                sel_ring_sub_icon, "&Sub");
+                sel_ring_sub_icon, "&Sub (Ctrl+M1)");
 
   item.aux.sel_ring.inv =
     menu_sitem (sel_ring_ss_c_nmemb (&global_sel_ring) > 0,
@@ -1982,7 +1982,7 @@ view_ring_menu (intptr_t index)
 
   item.aux.view_ring.set_mr_origin =
     menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
-                view_ring_icon, "Set &origin");
+                view_ring_icon, "Set &origin (Super+M1)");
 
   menu_sep (NULL);
 
@@ -2231,21 +2231,11 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     unlock_relock_place_selection ();
 
 
-  else if (id == item.aux.sel_ring.add
-           || id == item.aux.sel_ring.sub) {
-    struct pos *p =
-      (selection_locked && is_valid_pos (&selection_pos))
-      ? &selection_pos : &aux_pos;
-    enum rect_sel_type type =
-      id == item.aux.sel_ring.add ? RECT_SEL_ADD : RECT_SEL_SUB;
-
-    bool success = add_rect_sel_to_sel_ring
-      (&global_mr, &global_sel_ring, type, &aux_pos, p);
-
-    if (success && p == &selection_pos) selection_pos = aux_pos;
-    else if (! success) ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
-
-  } else if (id == item.aux.sel_ring.inv) {
+  else if (id == item.aux.sel_ring.add)
+    ui_add_rect_sel_to_sel_ring (RECT_SEL_ADD, &aux_pos);
+  else if (id == item.aux.sel_ring.sub)
+    ui_add_rect_sel_to_sel_ring (RECT_SEL_SUB, &aux_pos);
+  else if (id == item.aux.sel_ring.inv) {
     add_rect_sel_to_sel_ring
       (NULL, &global_sel_ring, RECT_SEL_INV, &mouse_pos, &mouse_pos);
   } else if (id == item.aux.sel_ring.undo)

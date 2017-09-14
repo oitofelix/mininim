@@ -24,9 +24,22 @@ static int _update_cb (Ihandle *ih);
 static int toggle_action_cb (Ihandle *ih, int state);
 static int button_action_cb (Ihandle *ih);
 
+static void apply_to_sel_ring (void (*f) (struct pos *, char *),
+                               struct sel_ring *sr, char *desc);
+static void vh_room_tiles_links (struct pos *p, char *desc);
+static void vh_room_tiles (struct pos *p, char *desc);
+static void vh_room_links (struct pos *p, char *desc);
+static void v_room_tiles_links (struct pos *p, char *desc);
+static void v_room_tiles (struct pos *p, char *desc);
+static void v_room_links (struct pos *p, char *desc);
+static void h_room_tiles_links (struct pos *p, char *desc);
+static void h_room_tiles (struct pos *p, char *desc);
+static void h_room_links (struct pos *p, char *desc);
+
 
 Ihandle *
-gui_create_tile_mirror_control (struct pos *p, char *norm_group)
+gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
+                                char *norm_group)
 {
   Ihandle *ih, *vbox, *radio, *tiles_toggle, *links_toggle,
     *place_toggle, *room_toggle, *level_toggle;
@@ -151,6 +164,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_TILES_TOGGLE", (void *) tiles_toggle);
   IupSetAttribute (ih, "_LINKS_TOGGLE", (void *) links_toggle);
   IupSetAttribute (ih, "_POS", (void *) p);
+  IupSetAttribute (ih, "_SEL_RING", (void *) sr);
 
   return ih;
 }
@@ -160,8 +174,14 @@ _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
+  Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
+  Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
+  Ihandle *scope = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
+
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  gui_control_active (ih, is_valid_pos (p));
+  struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
+  gui_control_active (ih, is_valid_pos (p)
+                      || (scope == room_toggle && sel_ring_ss_c_nmemb (sr)));
 
   return IUP_DEFAULT;
 }
@@ -185,6 +205,110 @@ toggle_action_cb (Ihandle *ih, int state)
 
   return IUP_DEFAULT;
 }
+
+void
+apply_to_sel_ring (void (*f) (struct pos *, char *),
+                        struct sel_ring *sr, char *desc)
+{
+  struct pos p; new_pos (&p, sr->ss[0].rs[0].level, -1, 0, 0);
+  for (p.room = 1; p.room < p.l->room_nmemb; p.room++) {
+    if (! is_room_in_sel_ring (sr, p.room)) continue;
+    f (&p, NULL);
+  }
+  end_undo_set (&undo, desc);
+}
+
+void
+vh_room_tiles_links (struct pos *p, char *desc)
+{
+  register_h_room_mirror_tile_undo
+    (&undo, p->room, NULL);
+  register_v_room_mirror_tile_undo
+    (&undo, p->room, NULL);
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, LEFT, RIGHT);
+  editor_mirror_link (p->room, ABOVE, BELOW);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
+void
+vh_room_tiles (struct pos *p, char *desc)
+{
+  register_h_room_mirror_tile_undo
+    (&undo, p->room, NULL);
+  register_v_room_mirror_tile_undo
+    (&undo, p->room, desc);
+}
+
+void
+vh_room_links (struct pos *p, char *desc)
+{
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, LEFT, RIGHT);
+  editor_mirror_link (p->room, ABOVE, BELOW);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
+void
+v_room_tiles_links (struct pos *p, char *desc)
+{
+  register_v_room_mirror_tile_undo (&undo, p->room, NULL);
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, ABOVE, BELOW);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
+void
+v_room_tiles (struct pos *p, char *desc)
+{
+  register_v_room_mirror_tile_undo
+    (&undo, p->room, desc);
+}
+
+void
+v_room_links (struct pos *p, char *desc)
+{
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, ABOVE, BELOW);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
+void
+h_room_tiles_links (struct pos *p, char *desc)
+{
+  register_h_room_mirror_tile_undo (&undo, p->room, NULL);
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, LEFT, RIGHT);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
+void
+h_room_tiles (struct pos *p, char *desc)
+{
+  register_h_room_mirror_tile_undo
+    (&undo, p->room, "ROOM MIRROR TILES H.");
+}
+
+void
+h_room_links (struct pos *p, char *desc)
+{
+  struct room_linking *l =
+    copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
+  editor_mirror_link (p->room, LEFT, RIGHT);
+  register_link_undo (&undo, l, desc);
+  destroy_array ((void **) &l, NULL);
+}
+
 
 int
 button_action_cb (Ihandle *ih)
@@ -215,6 +339,8 @@ button_action_cb (Ihandle *ih)
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   struct pos p0;
 
+  struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
+
   if (v && h) {
     if (place) {
       reflect_pos_h (p, &p0);
@@ -222,28 +348,20 @@ button_action_cb (Ihandle *ih)
       register_mirror_pos_undo (&undo, p, &p0, true, "MIRROR TILE H+V.");
     } else if (room) {
       if (tiles && links) {
-        register_h_room_mirror_tile_undo
-          (&undo, p->room, NULL);
-        register_v_room_mirror_tile_undo
-          (&undo, p->room, NULL);
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, LEFT, RIGHT);
-        editor_mirror_link (p->room, ABOVE, BELOW);
-        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H+V.");
-        destroy_array ((void **) &l, NULL);
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (vh_room_tiles_links, sr, "ROOM MIRROR TILES+LINKS H+V. (SEL. RING)");
+        else vh_room_tiles_links (p, "ROOM MIRROR TILES+LINKS H+V.");
       } else if (tiles) {
-        register_h_room_mirror_tile_undo
-          (&undo, p->room, NULL);
-        register_v_room_mirror_tile_undo
-          (&undo, p->room, "ROOM MIRROR TILES H+V.");
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (vh_room_tiles, sr, "ROOM MIRROR TILES H+V. (SEL. RING)");
+        else vh_room_tiles (p, "ROOM MIRROR TILES H+V.");
       } else if (links) {
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, LEFT, RIGHT);
-        editor_mirror_link (p->room, ABOVE, BELOW);
-        register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
-        destroy_array ((void **) &l, NULL);
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (vh_room_links, sr, "ROOM MIRROR LINKS H+V. (SEL. RING)");
+        else vh_room_links (p, "ROOM MIRROR LINKS H+V.");
       }
     } else if (level) {
       if (tiles && links) {
@@ -282,21 +400,20 @@ button_action_cb (Ihandle *ih)
       register_mirror_pos_undo (&undo, p, &p0, false, "MIRROR TILE V.");
     } else if (room) {
       if (tiles && links) {
-        register_v_room_mirror_tile_undo (&undo, p->room, NULL);
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, ABOVE, BELOW);
-        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS V.");
-        destroy_array ((void **) &l, NULL);
-      } else if (tiles)
-        register_v_room_mirror_tile_undo
-          (&undo, p->room, "ROOM MIRROR TILES V.");
-      else if (links) {
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, ABOVE, BELOW);
-        register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
-        destroy_array ((void **) &l, NULL);
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (v_room_tiles_links, sr, "ROOM MIRROR TILES+LINKS V. (SEL. RING)");
+        else v_room_tiles_links (p, "ROOM MIRROR TILES+LINKS V.");
+      } else if (tiles) {
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (v_room_tiles, sr, "ROOM MIRROR TILES V. (SEL. RING)");
+        else v_room_tiles (p, "ROOM MIRROR TILES V.");
+      } else if (links) {
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (v_room_links, sr, "ROOM MIRROR LINKS V. (SEL. RING)");
+        else v_room_links (p, "ROOM MIRROR LINKS V.");
       }
     } else if (level) {
       if (tiles && links) {
@@ -330,21 +447,20 @@ button_action_cb (Ihandle *ih)
       register_mirror_pos_undo (&undo, p, &p0, true, "MIRROR TILE H.");
     } else if (room) {
       if (tiles && links) {
-        register_h_room_mirror_tile_undo (&undo, p->room, NULL);
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, LEFT, RIGHT);
-        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H.");
-        destroy_array ((void **) &l, NULL);
-      } else if (tiles)
-        register_h_room_mirror_tile_undo
-          (&undo, p->room, "ROOM MIRROR TILES H.");
-      else if (links) {
-        struct room_linking *l =
-          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
-        editor_mirror_link (p->room, LEFT, RIGHT);
-        register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
-        destroy_array ((void **) &l, NULL);
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (h_room_tiles_links, sr, "ROOM MIRROR TILES+LINKS H. (SEL. RING)");
+        else h_room_tiles_links (p, "ROOM MIRROR TILES+LINKS H.");
+      } else if (tiles) {
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (h_room_tiles, sr, "ROOM MIRROR TILES H. (SEL. RING)");
+        else h_room_tiles (p, "ROOM MIRROR TILES H.");
+      } else if (links) {
+        if (sel_ring_ss_c_nmemb (sr))
+          apply_to_sel_ring
+            (h_room_links, sr, "ROOM MIRROR LINKS H. (SEL. RING)");
+        else h_room_links (p, "ROOM MIRROR LINKS H.");
       }
     } else if (level) {
       if (tiles && links) {

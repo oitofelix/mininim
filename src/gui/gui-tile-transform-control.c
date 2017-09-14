@@ -155,7 +155,7 @@ _update_cb (Ihandle *ih)
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
   gui_control_active
-    (ih, is_valid_pos (p) || sel_ring_ss_c_nmemb (sr) > 0);
+    (ih, is_valid_pos (p) || sel_ring_ss_c_nmemb (sr));
 
   Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
   Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
@@ -193,10 +193,10 @@ button_action_cb (Ihandle *ih)
 
   enum scope scope;
   if (selected == place_toggle)
-    scope = sel_ring_ss_c_nmemb (sr) > 0
+    scope = sel_ring_ss_c_nmemb (sr)
       ? PLACE_SEL_RING_SCOPE : PLACE_SCOPE;
   else if (selected == room_toggle)
-    scope = sel_ring_ss_c_nmemb (sr) > 0
+    scope = sel_ring_ss_c_nmemb (sr)
       ? ROOM_SEL_RING_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);

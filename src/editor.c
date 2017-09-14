@@ -79,6 +79,8 @@ change_tile_bg (struct pos *p, enum tile_bg b)
 void
 select_pos (struct mr *mr, struct pos *p)
 {
+  if (! is_valid_pos (p)) return;
+
   struct pos np;
   npos (p, &np);
 

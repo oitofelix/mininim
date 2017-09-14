@@ -296,7 +296,32 @@ play_anim (anim_callback_t draw_callback,
       if (pause_anim) break;
 
       switch (event.mouse.button) {
-      case 1: ui_editor (); break;
+      case 1: {
+        if (edit == EDIT_NONE) break;
+        if (! is_valid_pos (&mouse_pos)) break;
+
+        ALLEGRO_KEYBOARD_STATE keyboard_state;
+        al_get_keyboard_state (&keyboard_state);
+
+        bool shift = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
+          || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT);
+        bool ctrl = al_key_down (&keyboard_state, ALLEGRO_KEY_LCTRL)
+          || al_key_down (&keyboard_state, ALLEGRO_KEY_RCTRL);
+        bool super = al_key_down (&keyboard_state, ALLEGRO_KEY_LWIN)
+          || al_key_down (&keyboard_state, ALLEGRO_KEY_RWIN);
+
+        if (shift)
+          ui_add_rect_sel_to_sel_ring (RECT_SEL_ADD, &mouse_pos);
+        else if (ctrl)
+          ui_add_rect_sel_to_sel_ring (RECT_SEL_SUB, &mouse_pos);
+        else if (super) {
+          struct pos np;
+          npos (&mouse_pos, &np);
+          mr_focus_room (&global_mr, np.room);
+        } else select_pos (&global_mr, &mouse_pos);
+
+        break;
+      }
       case 3: {
         struct pos p; get_mouse_pos (&global_mr, &p);
         ui_place_kid (get_actor_by_id (current_kid_id), &p);

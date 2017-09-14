@@ -1061,7 +1061,7 @@ apply_to_scope (struct pos *p, struct sel_ring *sr, pos_trans f,
     apply_to_place (p, f, data, desc);
     break;
   case PLACE_SEL_RING_SCOPE:
-    desc = xasprintf ("%s (PLACE RECT. SEL.)", base_desc);
+    desc = xasprintf ("%s (PLACE SEL. RING)", base_desc);
     apply_to_place_sel_ring (sr, f, data, desc);
     break;
   case ROOM_SCOPE:
@@ -1069,7 +1069,7 @@ apply_to_scope (struct pos *p, struct sel_ring *sr, pos_trans f,
     apply_to_room (p->l, p->room, f, data, desc);
     break;
   case ROOM_SEL_RING_SCOPE:
-    desc = xasprintf ("%s (ROOM RECT. SEL.)", base_desc);
+    desc = xasprintf ("%s (ROOM SEL. RING)", base_desc);
     apply_to_room_sel_ring (sr, f, data, desc);
     break;
   case LEVEL_SCOPE:

@@ -194,7 +194,8 @@ gui_create_editor_dialog (void)
 
              IupSetAttributes
              (gui_create_tile_mirror_control
-              (&selection_pos, "TILE_PART_NORM"),
+              (&selection_pos, &global_sel_ring,
+               "TILE_PART_NORM"),
               "NAME = TILE_MIRROR_CONTROL"),
 
              IupSetAttributes

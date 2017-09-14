@@ -22,6 +22,6 @@
 #define MININIM_GUI_TILE_MIRROR_CONTROL_H
 
 Ihandle *gui_create_tile_mirror_control
-(struct pos *p, char *norm_group);
+(struct pos *p, struct sel_ring *sr, char *norm_group);
 
 #endif	/* MININIM_GUI_TILE_MIRROR_CONTROL */

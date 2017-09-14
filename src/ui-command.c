@@ -1199,3 +1199,17 @@ unlock_relock_place_selection (void)
     selection_pos = last_selection_pos;
   selection_locked = ! selection_locked;
 }
+
+void
+ui_add_rect_sel_to_sel_ring (enum rect_sel_type type, struct pos *dest_pos)
+{
+  struct pos *p =
+    (selection_locked && is_valid_pos (&selection_pos))
+    ? &selection_pos : dest_pos;
+
+  bool success = add_rect_sel_to_sel_ring
+    (&global_mr, &global_sel_ring, type, dest_pos, p);
+
+  if (success && p == &selection_pos) selection_pos = *dest_pos;
+  else if (! success) ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
+}

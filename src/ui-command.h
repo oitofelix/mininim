@@ -97,5 +97,6 @@ void ui_next_frame (void);
 
 void ui_move_locked_place_selection (struct mr *mr, enum dir d);
 void unlock_relock_place_selection (void);
+void ui_add_rect_sel_to_sel_ring (enum rect_sel_type type, struct pos *dest_pos);
 
 #endif	/* MININIM_UI_COMMAND_H */

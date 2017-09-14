@@ -125,7 +125,10 @@ finalize_script (void)
 {
   al_set_thread_should_stop (repl_thread);
   unlock_lua ();
-  al_join_thread (repl_thread, NULL);
+
+  /* al_join_thread (repl_thread, NULL); */
+  al_rest (0.1);
+
   al_destroy_thread (repl_thread);
   al_destroy_mutex (L_mutex);
   al_destroy_cond (repl_cond);
