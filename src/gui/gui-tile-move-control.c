@@ -31,7 +31,7 @@ gui_create_tile_move_control (struct pos *p, char *norm_group)
 
   ih = IupSetCallbacks
     (gui_create_directional_control
-     ("Move", "PLACE_ICON", button_action_cb, norm_group),
+     ("Move", "PLACE_SEL_LOCK_ICON", button_action_cb, norm_group),
      "_UPDATE_CB", _update_cb,
      NULL);
 

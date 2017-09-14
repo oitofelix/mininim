@@ -50,6 +50,7 @@ int gui_empty_value_to_0 (Ihandle *ih);
 
 int gui_run_callback_IFn (const char *name, Ihandle *ih);
 int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
+int gui_run_callback_IFns (const char *name, Ihandle *ih, char *s);
 
 void dialog_fit_natural_size (Ihandle *ih);
 
@@ -58,5 +59,6 @@ int gui_destroy_image_cb (Ihandle *ih);
 
 /* variables */
 extern Ihandle *tile_icon[TILE_FGS];
+extern Ihandle *gui_editor_dialog;
 
 #endif	/* MININIM_GUI_H */

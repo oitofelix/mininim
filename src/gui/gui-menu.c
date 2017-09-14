@@ -355,7 +355,8 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection;
+    uint16_t lock_selection, unlock_selection, select_event_target,
+      select_event_source, add_event;
     struct {
       uint16_t add, sub, inv, undo, redo, clear, set, prev, next, new, del;
     } sel_ring;
@@ -404,7 +405,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *sel_ring_clear_icon, *sel_ring_set_icon, *sel_ring_prev_icon,
   *sel_ring_next_icon, *sel_ring_new_icon, *sel_ring_del_icon,
   *view_ring_icon, *view_ring_prev_icon, *view_ring_next_icon,
-  *view_ring_new_icon, *view_ring_del_icon;
+  *view_ring_new_icon, *view_ring_del_icon,
+  *event_target_icon, *event_source_icon, *event_add_icon;
 
 struct pos aux_pos;
 
@@ -569,6 +571,9 @@ load_icons (void)
   view_ring_next_icon = load_icon (VIEW_RING_NEXT_ICON);
   view_ring_new_icon = load_icon (VIEW_RING_NEW_ICON);
   view_ring_del_icon = load_icon (VIEW_RING_DEL_ICON);
+  event_target_icon = load_icon (EVENT_TARGET_ICON);
+  event_source_icon = load_icon (EVENT_SOURCE_ICON);
+  event_add_icon = load_icon (EVENT_ADD_ICON);
 }
 
 void
@@ -698,6 +703,9 @@ unload_icons (void)
   al_destroy_bitmap (view_ring_next_icon);
   al_destroy_bitmap (view_ring_new_icon);
   al_destroy_bitmap (view_ring_del_icon);
+  al_destroy_bitmap (event_target_icon);
+  al_destroy_bitmap (event_source_icon);
+  al_destroy_bitmap (event_add_icon);
 }
 
 
@@ -1877,15 +1885,17 @@ aux_menu (void)
   item.aux.lock_selection =
     menu_sitem (is_valid_pos (&aux_pos),
                 place_sel_lock_icon, selection_locked
-                ? "Re&lock place selection (M1)"
-                : "&Lock place selection (M1)");
+                ? "Re&lock selection (M1)"
+                : "&Lock selection (M1)");
 
   item.aux.unlock_selection =
     menu_sitem (selection_locked || is_valid_pos (&last_selection_pos),
                 selection_locked
                 ? place_sel_unlock_icon : place_sel_last_icon,
-                selection_locked ? "&Unlock place selection"
-                : "&Last place selection");
+                selection_locked ? "&Unlock selection"
+                : "&Last selection");
+
+  menu_sep (NULL);
 
   menu_sub (&menu.aux.sel_ring.m,
             is_valid_pos (&aux_pos)
@@ -1898,6 +1908,19 @@ aux_menu (void)
 
   menu_sub (&menu.aux.view_ring.m,
             true, view_ring_icon, view_ring_menu, 0, "&View ring");
+
+  menu_sep (NULL);
+
+  menu_ditem (is_valid_pos (&aux_pos) && target_event (&aux_pos) >= 0,
+              &item.aux.select_event_target, &item.aux.add_event,
+              is_valid_pos (&aux_pos), is_valid_pos (&aux_pos),
+              event_target_icon, event_add_icon,
+              "Select as event &target", "Add as event &target");
+
+  item.aux.select_event_source =
+    menu_sitem (is_valid_pos (&aux_pos)
+                && is_event_fg (&aux_pos), event_source_icon,
+                "Select as event sour&ce");
 
   end_menu ();
 }
@@ -2266,4 +2289,18 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     view_ring_add (&global_mr, &global_view_ring);
   else if (id == item.aux.view_ring.del)
     view_ring_delete (&global_mr, &global_view_ring);
+
+  else if (id == item.aux.select_event_target) {
+    Ihandle *events =
+      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+    gui_run_callback_IFns ("_SELECT_TARGET_CB", events, (void *) &aux_pos);
+  } else if (id == item.aux.select_event_source) {
+    Ihandle *events =
+      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+    gui_run_callback_IFns ("_SELECT_SOURCE_CB", events, (void *) &aux_pos);
+  } else if (id == item.aux.add_event) {
+    Ihandle *events =
+      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+    gui_run_callback_IFns ("_ADD_EVENT_CB", events, (void *) &aux_pos);
+  }
 }

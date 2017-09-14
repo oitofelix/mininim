@@ -24,4 +24,6 @@
 Ihandle *gui_create_editor_events_control
 (char *norm_group, struct level *level);
 
+int target_event (struct pos *p);
+
 #endif	/* MININIM_GUI_EDITOR_EVENTS_CONTROL */

@@ -1353,6 +1353,16 @@ free_argv (size_t *cargc, char ***cargv)
 int
 main (int _argc, char **_argv)
 {
+  /* CRITICAL SECTION START: TERMINATION SIGNALS BLOCKED */
+  sigset_t intmask;
+  sigemptyset (&intmask);
+  sigaddset (&intmask, SIGINT);
+#ifdef SIGHUP
+  sigaddset (&intmask, SIGHUP);
+#endif
+  sigaddset (&intmask, SIGTERM);
+  sigprocmask (SIG_BLOCK, &intmask, NULL);
+
   /* Init global level structure */
   new_level (&global_level, 1, 1, 1);
 
@@ -1457,14 +1467,6 @@ main (int _argc, char **_argv)
   load_callback = process_display_events;
   show ();
 
-  /* register exit cleanup function */
-  atexit (quit_game);
-  signal (SIGINT, quit_game_sighandler);
-#ifdef SIGHUP
-  signal (SIGHUP, quit_game_sighandler);
-#endif
-  signal (SIGTERM, quit_game_sighandler);
-
   /* initialize scripting environment */
   init_script ();
 
@@ -1499,6 +1501,17 @@ main (int _argc, char **_argv)
 
   /* Initialize GUI */
   init_gui (_argc, _argv);
+
+  /* register exit cleanup function */
+  atexit (quit_game);
+  signal (SIGINT, quit_game_sighandler);
+#ifdef SIGHUP
+  signal (SIGHUP, quit_game_sighandler);
+#endif
+  signal (SIGTERM, quit_game_sighandler);
+
+  /* CRITICAL SECTION END: TERMINATION SIGNALS UNBLOCKED */
+  sigprocmask (SIG_UNBLOCK, &intmask, NULL);
 
   if (skip_title) goto play_game;
 

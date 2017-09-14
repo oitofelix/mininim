@@ -706,10 +706,10 @@ bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1)
 bool
 color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1)
 {
-  unsigned char r0, g0, b0, r1, g1, b1;
-  al_unmap_rgb (c0, &r0, &g0, &b0);
-  al_unmap_rgb (c1, &r1, &g1, &b1);
-  return r0 == r1 && g0 == g1 && b0 == b1;
+  unsigned char r0, g0, b0, a0, r1, g1, b1, a1;
+  al_unmap_rgba (c0, &r0, &g0, &b0, &a0);
+  al_unmap_rgba (c1, &r1, &g1, &b1, &a1);
+  return r0 == r1 && g0 == g1 && b0 == b1 && a0 == a1;
 }
 
 void

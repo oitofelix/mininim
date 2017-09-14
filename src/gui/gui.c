@@ -133,13 +133,14 @@ load_icons (void)
   LOAD_ICON (WINDOWS_ICON);
   LOAD_ICON (HOME_ICON);
   LOAD_ICON (EVENT_ICON);
+  LOAD_ICON (EVENT_SOURCE_ICON);
+  LOAD_ICON (EVENT_TARGET_ICON);
+  LOAD_ICON (EVENT_ADD_ICON);
   LOAD_ICON (TOP_ICON);
   LOAD_ICON (BOTTOM_ICON);
   LOAD_ICON (RELOAD_ICON);
   LOAD_ICON (NEXT_ICON);
   LOAD_ICON (PREVIOUS_ICON);
-  LOAD_ICON (EVENT_SOURCE_ICON);
-  LOAD_ICON (EVENT_TARGET_ICON);
   LOAD_ICON (SEL_RING_CLEAR_ICON);
   LOAD_ICON (SEL_RING_SET_ICON);
   LOAD_ICON (PLACE_SEL_LOCK_ICON);
@@ -187,13 +188,14 @@ unload_icons (void)
   UNLOAD_ICON (WINDOWS_ICON);
   UNLOAD_ICON (HOME_ICON);
   UNLOAD_ICON (EVENT_ICON);
+  UNLOAD_ICON (EVENT_SOURCE_ICON);
+  UNLOAD_ICON (EVENT_TARGET_ICON);
+  UNLOAD_ICON (EVENT_ADD_ICON);
   UNLOAD_ICON (TOP_ICON);
   UNLOAD_ICON (BOTTOM_ICON);
   UNLOAD_ICON (RELOAD_ICON);
   UNLOAD_ICON (NEXT_ICON);
   UNLOAD_ICON (PREVIOUS_ICON);
-  UNLOAD_ICON (EVENT_SOURCE_ICON);
-  UNLOAD_ICON (EVENT_TARGET_ICON);
   UNLOAD_ICON (SEL_RING_CLEAR_ICON);
   UNLOAD_ICON (SEL_RING_SET_ICON);
   UNLOAD_ICON (PLACE_SEL_LOCK_ICON);
@@ -443,6 +445,15 @@ gui_run_callback_IFni (const char *name, Ihandle *ih, int i)
   if (! ih) return IUP_DEFAULT;
   IFni cb = (IFni) IupGetCallback (ih, name);
   if (cb) return cb (ih, i);
+  else return IUP_DEFAULT;
+}
+
+int
+gui_run_callback_IFns (const char *name, Ihandle *ih, char *s)
+{
+  if (! ih) return IUP_DEFAULT;
+  IFns cb = (IFns) IupGetCallback (ih, name);
+  if (cb) return cb (ih, s);
   else return IUP_DEFAULT;
 }
 

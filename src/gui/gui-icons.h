@@ -139,8 +139,11 @@
 #define EVENT_ICON "data/icons/event.png"
 #define TOP_ICON "data/icons/top.png"
 #define BOTTOM_ICON "data/icons/bottom.png"
+
 #define EVENT_SOURCE_ICON "data/icons/event-source.png"
 #define EVENT_TARGET_ICON "data/icons/event-target.png"
+#define EVENT_ADD_ICON "data/icons/event-add.png"
+
 #define PLACE_SEL_LOCK_ICON "data/icons/place-sel-lock.png"
 #define PLACE_SEL_UNLOCK_ICON "data/icons/place-sel-unlock.png"
 #define PLACE_SEL_LAST_ICON "data/icons/place-sel-last.png"

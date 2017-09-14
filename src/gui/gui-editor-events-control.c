@@ -40,15 +40,15 @@ static struct level_event *selected_event (Ihandle *tree);
 
 static int _update_cb (Ihandle *ih);
 
-static bool is_event_active (struct level *l, int e);
-static void add_nodes (Ihandle *tree, bool remove_inactive);
-
 static void select_node_by_id (Ihandle *tree, int id);
 static void select_node_by_title (Ihandle *tree, char *title, int depth);
 
 static int get_event_node_id (Ihandle *tree, int e);
-/* static */ int get_source_node_id (Ihandle *tree, struct pos *p);
+static int get_source_node_id (Ihandle *tree, struct pos *p);
 
+/* tree build */
+static bool is_event_active (struct level *l, int e);
+static void add_nodes (Ihandle *tree, bool remove_inactive);
 static int _update_tree_cb (Ihandle *ih);
 static void update_target_icons (Ihandle *ih);
 
@@ -57,19 +57,30 @@ static int last_node_id (Ihandle *tree, int parent_id);
 static int get_target (Ihandle *tree, struct pos *p);
 static int add_target (Ihandle *tree, struct pos *p);
 
+/* restricted to target_id branch */
 static int get_event (Ihandle *tree, int target_id, int e);
 static int add_event (Ihandle *tree, int target_id, int e);
 
+/* restricted to event_id branch */
 static int get_source (Ihandle *tree, int event_id, struct pos *p);
 static int add_source (Ihandle *tree, int event_id, struct pos *p);
 
+/* auxiliary */
+int new_event (Ihandle *ih, struct pos *p, bool next);
+
+/* callbacks */
 static int next_toggle_cb (Ihandle *toggle, int state);
 static int next_button_cb (Ihandle *button);
 
 static int source_button_cb (Ihandle *button);
 static int target_button_cb (Ihandle *button);
+static int add_button_cb (Ihandle *button);
 
 static int selection_cb (Ihandle *ih, int id, int status);
+
+static int _select_target_cb (Ihandle *ih, struct pos *p);
+static int _select_source_cb (Ihandle *ih, struct pos *p);
+static int _add_event_cb (Ihandle *ih, struct pos *p);
 
 
 Ihandle *
@@ -81,7 +92,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 
   Ihandle *next_frame, *next_toggle, *prev_button, *next_button;
 
-  Ihandle *selection_frame, *source_button, *target_button;
+  Ihandle *selection_frame, *source_button, *target_button, *add_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -98,88 +109,131 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
        (IupVbox
         (IupSetAttributes
          (IupFrame
-          (IupSetAttributes
-           (IupHbox
-            (all_toggle = IupSetCallbacks
-             (IupSetAttributes
-              (IupToggle ("All", NULL),
-               "VALUE = NO,"
-               "TIP = \"Show inactive events\","),
-              "ACTION", _update_tree_cb,
-              NULL),
+          (IupVbox
+           (IupFill (),
 
-             refresh_button =
-             IupSetCallbacks
-             (IupSetAttributes
-              (IupButton (NULL, NULL),
-               "IMAGE = RELOAD_ICON,"
-               "TIP = \"Refresh\","),
-              "ACTION", _update_tree_cb,
-              NULL),
+            IupSetAttributes
+            (IupHbox
+             (all_toggle = IupSetCallbacks
+              (IupSetAttributes
+               (IupToggle ("All", NULL),
+                "VALUE = NO,"
+                "TIP = \"Show inactive events\","),
+               "ACTION", _update_tree_cb,
+               NULL),
 
-             NULL),
-            "ALIGNMENT = ACENTER")),
-          "TITLE = View,"),
+              IupFill (),
+
+              refresh_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = RELOAD_ICON,"
+                "TIP = \"Refresh\","),
+               "ACTION", _update_tree_cb,
+               NULL),
+
+              NULL),
+             "ALIGNMENT = ACENTER,"
+             "NORMALIZERGROUP = EVENTS_NORM,"),
+
+            IupFill (),
+
+            NULL)),
+          "TITLE = View,"
+          "NORMALIZERGROUP = EVENTS_NORM,"),
 
          next_frame = IupSetAttributes
          (IupFrame
-          (IupSetAttributes
-           (IupHbox
-            (next_toggle = IupSetCallbacks
-             (IupSetAttributes
-              (IupToggle (NULL, NULL),
-               "TIP = \"Activate next event\","),
-              "ACTION", (Icallback) next_toggle_cb,
-              NULL),
+          (IupVbox
+           (IupFill (),
 
-             prev_button =
-             IupSetCallbacks
-             (IupSetAttributes
-              (IupButton (NULL, NULL),
-               "IMAGE = PREVIOUS_ICON,"
-               "TIP = \"Select previous event\","),
-              "ACTION", next_button_cb,
-              NULL),
+            IupSetAttributes
+            (IupHbox
+             (next_toggle = IupSetCallbacks
+              (IupSetAttributes
+               (IupToggle (NULL, NULL),
+                "TIP = \"Activate next event\","),
+               "ACTION", (Icallback) next_toggle_cb,
+               NULL),
 
-             next_button =
-             IupSetCallbacks
-             (IupSetAttributes
-              (IupButton (NULL, NULL),
-               "IMAGE = NEXT_ICON,"
-               "TIP = \"Select next event\","),
-              "ACTION", next_button_cb,
-              NULL),
+              IupFill (),
 
-             NULL),
-            "ALIGNMENT = ACENTER,")),
-          "TITLE = Next,"),
+              prev_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = PREVIOUS_ICON,"
+                "TIP = \"Select previous event\","),
+               "ACTION", next_button_cb,
+               NULL),
+
+              IupFill (),
+
+              next_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = NEXT_ICON,"
+                "TIP = \"Select next event\","),
+               "ACTION", next_button_cb,
+               NULL),
+
+              NULL),
+             "ALIGNMENT = ACENTER,"
+             "NORMALIZERGROUP = EVENTS_NORM,"),
+
+            IupFill (),
+
+            NULL)),
+          "TITLE = Next,"
+          "NORMALIZERGROUP = EVENTS_NORM,"),
 
          selection_frame = IupSetAttributes
          (IupFrame
-          (IupSetAttributes
-           (IupHbox
-            (source_button =
-             IupSetCallbacks
-             (IupSetAttributes
-              (IupButton (NULL, NULL),
-               "IMAGE = EVENT_SOURCE_ICON,"
-               "TIP = \"Set place selection as source\","),
-              "ACTION", source_button_cb,
+          (IupVbox
+           (IupFill (),
+
+            IupSetAttributes
+            (IupHbox
+             (source_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = EVENT_SOURCE_ICON,"
+                "TIP = \"Set selection as source\","),
+               "ACTION", source_button_cb,
+               NULL),
+
+              IupFill (),
+
+              target_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = EVENT_TARGET_ICON,"
+                "TIP = \"Set selection as target\","),
+               "ACTION", target_button_cb,
+               NULL),
+
+              IupFill (),
+
+              add_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = EVENT_ADD_ICON,"
+                "TIP = \"Add selection as target\","),
+               "ACTION", add_button_cb,
+               NULL),
+
               NULL),
+             "ALIGNMENT = ACENTER,"
+             "NORMALIZERGROUP = EVENTS_NORM,"),
 
-             IupFill (),
+            IupFill (),
 
-             target_button =
-             IupSetCallbacks
-             (IupSetAttributes
-              (IupButton (NULL, NULL),
-               "IMAGE = EVENT_TARGET_ICON,"
-               "TIP = \"Set place selection as target\","),
-              "ACTION", target_button_cb,
-              NULL),
-
-             NULL),
-            "ALIGNMENT = ACENTER,")),
+            NULL)),
           "TITLE = Selection,"),
 
          NULL),
@@ -191,6 +245,9 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
      "SHOW_CB", (Icallback) show_cb,
      "_UPDATE_CB", _update_cb,
      "_UPDATE_TREE_CB", _update_tree_cb,
+     "_SELECT_TARGET_CB", (Icallback) _select_target_cb,
+     "_SELECT_SOURCE_CB", (Icallback) _select_source_cb,
+     "_ADD_EVENT_CB", (Icallback) _add_event_cb,
      NULL);
 
   IupSetAttribute (tree, "IMAGELEAF", "EVENT_ICON");
@@ -214,10 +271,14 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_SELECTION_FRAME", (void *) selection_frame);
   IupSetAttribute (ih, "_SOURCE_BUTTON", (void *) source_button);
   IupSetAttribute (ih, "_TARGET_BUTTON", (void *) target_button);
+  IupSetAttribute (ih, "_ADD_BUTTON", (void *) add_button);
 
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
   IupSetAttribute (ih, "_LAST", (void *) last);
+
+  Ihandle *norm = IupGetHandle ("EVENTS_NORM");
+  IupSetAttribute (norm, "NORMALIZE", "BOTH");
 
   update_target_icons (ih);
 
@@ -310,11 +371,14 @@ _update_cb (Ihandle *ih)
   }
 
   Ihandle *selection_frame = (void *) IupGetAttribute (ih, "_SELECTION_FRAME");
-  gui_control_active (selection_frame, e);
-  if (e) {
+  gui_control_active (selection_frame, is_valid_pos (&selection_pos));
+
+  if (is_valid_pos (&selection_pos)) {
     Ihandle *source_button = (void *) IupGetAttribute (ih, "_SOURCE_BUTTON");
-    gui_control_active (source_button, is_valid_pos (&selection_pos)
-                        && is_event_fg (&selection_pos));
+    gui_control_active (source_button, e && is_event_fg (&selection_pos));
+
+    Ihandle *target_button = (void *) IupGetAttribute (ih, "_TARGET_BUTTON");
+    gui_control_active (target_button, e);
   }
 
   if ((last->video_mode && strcmp (video_mode, last->video_mode))
@@ -405,7 +469,10 @@ _update_tree_cb (Ihandle *ih)
   IupSetAttribute (tree, "AUTOREDRAW", "NO");
 
   destroy_userdata (ih);
-  IupSetAttribute (tree, "DELNODE0", "ALL");
+  IupUnmap (tree);
+  IupSetAttribute (tree, "DELNODE", "ALL");
+  IupMap (tree);
+  IupRefresh (tree);
 
   Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
   bool all_toggle_value = IupGetInt (all_toggle, "VALUE");
@@ -453,6 +520,15 @@ select_node_by_title (Ihandle *tree, char *s_title, int s_depth)
   }
 
   if (! selected) IupSetAttribute (tree, "VALUE", "FIRST");
+}
+
+int
+target_event (struct pos *p)
+{
+  if (cutscene) return -1;
+  for (size_t e = 0; e < p->l->event_nmemb; e++)
+    if (peq (p, &p->l->event[e].p)) return e;
+  return -1;
 }
 
 int
@@ -672,6 +748,43 @@ target_button_cb (Ihandle *button)
 }
 
 int
+new_event (Ihandle *ih, struct pos *p, bool next)
+{
+  struct level_event event;
+  event.p = *p;
+  event.next = next;
+
+  p->l->event =
+    add_to_array (&event, 1, p->l->event, &p->l->event_nmemb,
+                  p->l->event_nmemb, sizeof (*p->l->event));
+
+  int e = p->l->event_nmemb - 1;
+
+  if (! is_event_active (p->l, e)) {
+    Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
+    IupSetInt (all_toggle, "VALUE", true);
+  }
+
+  _update_tree_cb (ih);
+
+  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+
+  int id = get_event_node_id (tree, e);
+  select_node_by_id (tree, id);
+  select_pos (&global_mr, p);
+
+  return e;
+}
+
+int
+add_button_cb (Ihandle *button)
+{
+  if (! is_valid_pos (&selection_pos)) return IUP_DEFAULT;
+  new_event (button, &selection_pos, false);
+  return IUP_DEFAULT;
+}
+
+int
 selection_cb (Ihandle *tree, int id, int status)
 {
   if (! status) return IUP_DEFAULT;
@@ -682,5 +795,58 @@ selection_cb (Ihandle *tree, int id, int status)
     select_pos (&global_mr, p);
   }
 
+  return IUP_DEFAULT;
+}
+
+int
+_select_target_cb (Ihandle *ih, struct pos *p)
+{
+  int e = target_event (p);
+  if (e < 0) return IUP_DEFAULT;
+
+  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
+
+  if (! is_event_active (p->l, e)) {
+    Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
+    IupSetInt (all_toggle, "VALUE", true);
+  }
+
+  _update_tree_cb (ih);
+
+  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+
+  int id = get_target (tree, p);
+  select_node_by_id (tree, id);
+  select_pos (&global_mr, p);
+
+  return IUP_DEFAULT;
+}
+
+int
+_select_source_cb (Ihandle *ih, struct pos *p)
+{
+  if (! is_event_fg (p)) return IUP_DEFAULT;
+
+  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
+
+  _update_tree_cb (ih);
+
+  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+
+  int id = get_source_node_id (tree, p);
+  select_node_by_id (tree, id);
+  select_pos (&global_mr, p);
+
+  return IUP_DEFAULT;
+}
+
+int
+_add_event_cb (Ihandle *ih, struct pos *p)
+{
+  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
+  new_event (ih, p, false);
   return IUP_DEFAULT;
 }

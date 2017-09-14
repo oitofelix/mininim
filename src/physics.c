@@ -562,6 +562,7 @@ event_fg_cs (enum tile_fg t)
 bool
 is_event_fg (struct pos *p)
 {
+  if (cutscene) return false;
   return event_fg_cs (fg (p));
 }
 

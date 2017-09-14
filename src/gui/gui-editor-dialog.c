@@ -222,6 +222,7 @@ gui_create_editor_dialog (void)
            IupVbox (NULL),
            IupVbox (NULL),
            NULL),
+          "NAME = TABS_CONTROL,"
           "TABTITLE0 = Tile,"
           "TABTITLE1 = Event,"
           "TABTITLE2 = Room,"
