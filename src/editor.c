@@ -94,12 +94,14 @@ select_pos (struct mr *mr, struct pos *p)
 void
 change_tile_ext (struct pos *p, int e)
 {
+  int ne = ext_val (p->l, fg (p), e);
+
   char *str;
-  if (is_item_fg (p)) str = xasprintf ("%s", tile_item_str[e]);
-  else if (is_fall_fg (p)) str = xasprintf ("FALL EXT %i", e);
-  else if (is_event_fg (p)) str = xasprintf ("EVENT EXT %i", e);
-  else if (is_step_fg (p)) str = xasprintf ("STEP EXT %i", e);
-  else if (is_design_fg (p)) str = xasprintf ("DESIGN EXT %i", e);
+  if (is_item_fg (p)) str = xasprintf ("%s", tile_item_str[ne]);
+  else if (is_fall_fg (p)) str = xasprintf ("FALL EXT %i", ne);
+  else if (is_event_fg (p)) str = xasprintf ("EVENT EXT %i", ne);
+  else if (is_step_fg (p)) str = xasprintf ("STEP EXT %i", ne);
+  else if (is_design_fg (p)) str = xasprintf ("DESIGN EXT %i", ne);
   else {
     assert (false);
     return;

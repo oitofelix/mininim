@@ -27,7 +27,7 @@ struct tile *tile_rel (struct pos *p, int floor, int place);
 
 enum tile_bg bg_val (int b);
 enum tile_fg fg_val (int f);
-int ext_val (int f, int e);
+int ext_val (struct level *l, int f, int e);
 union tile_state *clear_tile (struct pos *p, void *data);
 union tile_state *random_tile (struct pos *p, void *data);
 union tile_state *decorate_tile (struct pos *p, void *data);
@@ -61,7 +61,7 @@ enum tile_fg fg_tile (struct tile *t);
 enum tile_fg fg (struct pos *p);
 enum tile_fg fake_tile (struct tile *t);
 enum tile_fg fake (struct pos *p);
-int ext_tile (struct tile *t);
+int ext_tile (struct level *l, struct tile *t);
 int ext (struct pos *p);
 int fake_ext (struct pos *p);
 
@@ -139,7 +139,7 @@ void exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_actor_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void invert_tile_dir (struct pos *p);
 void mirror_pos (struct pos *p0, struct pos *p1, bool invert_dir);
-enum tile_diff tile_diff (struct tile *c0, struct tile *c1);
+enum tile_diff tile_diff (struct level *l, struct tile *c0, struct tile *c1);
 struct level *mirror_room_h (struct level *l, int room);
 struct level *mirror_level_h (struct level *l);
 

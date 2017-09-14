@@ -144,7 +144,7 @@ register_tile_undo (struct undo *u, struct pos *p,
 
   c.fg = (f != MIGNORE) ? fg_val (f) : fg (p);
   c.bg = (b != MIGNORE) ? bg_val (b) : bg (p);
-  c.ext = (e != MIGNORE) ? ext_val (c.fg, e) : ext (p);
+  c.ext = (e != MIGNORE) ? ext_val (p->l, c.fg, e) : ext (p);
 
   if (ff != MIGNORE && ff != NO_FAKE) c.fake = fg_val (ff);
   else if (ff == NO_FAKE) c.fake = ff;

@@ -53,7 +53,7 @@ struct level *normalize_level (struct level *l);
 void replace_playing_level (struct level *l);
 void play_level (struct level *level);
 void *tile_struct_at_pos (struct pos *p);
-bool should_init (struct tile *c0, struct tile *c1);
+bool should_init (struct level *l, struct tile *c0, struct tile *c1);
 void init_tile_at_pos (struct pos *p);
 void copy_to_tile_state (union tile_state *to, struct pos *from_pos);
 void copy_from_tile_state (struct pos *to_pos, union tile_state *from);
@@ -76,7 +76,7 @@ bool room_linking_eq (struct room_linking *rl0,
 bool level_event_eq (struct level_event *le0,
                      struct level_event *le1);
 bool guard_eq (struct guard *g0, struct guard *g1);
-bool tile_eq (struct tile *c0, struct tile *c1);
+bool tile_eq (struct level *l, struct tile *c0, struct tile *c1);
 bool level_eq (struct level *l0, struct level *l1);
 
 #endif	/* MININIM_LEVEL_H */

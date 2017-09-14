@@ -76,6 +76,9 @@ static int source_button_cb (Ihandle *button);
 static int target_button_cb (Ihandle *button);
 static int add_button_cb (Ihandle *button);
 
+static int defrag_button_cb (Ihandle *button);
+static int clean_button_cb (Ihandle *button);
+
 static int selection_cb (Ihandle *ih, int id, int status);
 
 static int _select_target_cb (Ihandle *ih, struct pos *p);
@@ -93,6 +96,9 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   Ihandle *next_frame, *next_toggle, *prev_button, *next_button;
 
   Ihandle *selection_frame, *source_button, *target_button, *add_button;
+
+  Ihandle *optimization_frame, *defrag_button, *clean_button,
+    *total_label, *inactive_label, *fragmented_label;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -236,6 +242,92 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
             NULL)),
           "TITLE = Selection,"),
 
+         optimization_frame = IupSetAttributes
+         (IupFrame
+          (IupVbox
+           (IupFill (),
+
+            IupSetAttributes
+             (IupGridBox
+              (
+               IupSetAttributes
+               (IupLabel ("Total: "),
+                "TIP = \"Total number of events\","
+                "ALIGNMENT = ARIGHT"),
+
+               total_label = IupSetAttributes
+               (IupLabel ("255"),
+                "ALIGNMENT = ARIGHT"),
+
+               IupSetAttributes
+               (IupLabel ("Inactive: "),
+                "TIP = \"Number of inactive events\","
+                "ALIGNMENT = ARIGHT"),
+
+               inactive_label = IupSetAttributes
+               (IupLabel ("128"),
+                "ALIGNMENT = ARIGHT"),
+
+               IupSetAttributes
+               (IupLabel ("Fragmented: "),
+                "TIP = \"Number of fragmented events\","
+                "ALIGNMENT = ARIGHT"),
+
+               fragmented_label = IupSetAttributes
+               (IupLabel ("64"),
+                "ALIGNMENT = ARIGHT"),
+
+
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 2,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              /* "NORMALIZESIZE = BOTH," */
+              /* "HOMOGENEOUSLIN = YES," */
+              /* "HOMOGENEOUSCOL = YES," */
+              /* "ALIGNMENTLIN = ACENTER," */
+              /* "ALIGNMENTCOL = ACENTER," */
+              /* "FITTOCHILDREN = YES," */
+              ),
+
+            IupFill (),
+
+            IupSetAttributes
+            (IupHbox
+             (IupFill (),
+
+              defrag_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = EVENT_DEFRAG_ICON,"
+                "TIP = \"Defragment events\","),
+               "ACTION", defrag_button_cb,
+               NULL),
+
+              IupFill (),
+
+              clean_button =
+              IupSetCallbacks
+              (IupSetAttributes
+               (IupButton (NULL, NULL),
+                "IMAGE = EVENT_CLEAN_ICON,"
+                "TIP = \"Delete trailing inactive events\","),
+               "ACTION", clean_button_cb,
+               NULL),
+
+              IupFill (),
+
+              NULL),
+             "ALIGNMENT = ACENTER,"
+             "NORMALIZERGROUP = EVENTS_NORM,"),
+
+            IupFill (),
+
+            NULL)),
+          "TITLE = Optimization,"),
+
          NULL),
         "ALIGNMENT = ACENTER"),
 
@@ -273,12 +365,20 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_TARGET_BUTTON", (void *) target_button);
   IupSetAttribute (ih, "_ADD_BUTTON", (void *) add_button);
 
+  IupSetAttribute (ih, "_OPTIMIZATION_FRAME", (void *) optimization_frame);
+  IupSetAttribute (ih, "_DEFRAG_BUTTON", (void *) defrag_button);
+  IupSetAttribute (ih, "_CLEAN_BUTTON", (void *) clean_button);
+
+  IupSetAttribute (ih, "_TOTAL_LABEL", (void *) total_label);
+  IupSetAttribute (ih, "_INACTIVE_LABEL", (void *) inactive_label);
+  IupSetAttribute (ih, "_FRAGMENTED_LABEL", (void *) fragmented_label);
+
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
   IupSetAttribute (ih, "_LAST", (void *) last);
 
   Ihandle *norm = IupGetHandle ("EVENTS_NORM");
-  IupSetAttribute (norm, "NORMALIZE", "BOTH");
+  IupSetAttribute (norm, "NORMALIZE", "HORIZONTAL");
 
   update_target_icons (ih);
 
@@ -781,6 +881,18 @@ add_button_cb (Ihandle *button)
 {
   if (! is_valid_pos (&selection_pos)) return IUP_DEFAULT;
   new_event (button, &selection_pos, false);
+  return IUP_DEFAULT;
+}
+
+int
+defrag_button_cb (Ihandle *button)
+{
+  return IUP_DEFAULT;
+}
+
+int
+clean_button_cb (Ihandle *button)
+{
   return IUP_DEFAULT;
 }
 

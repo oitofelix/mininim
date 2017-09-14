@@ -256,7 +256,7 @@ change_tile_part_from_button_cb (Ihandle *ih)
   struct tile t;
   t = *tile (p);
   change_tile_part (p, i);
-  if (tile_eq (tile (p), &t)) IupHide (IupGetDialog (ih));
+  if (tile_eq (p->l, tile (p), &t)) IupHide (IupGetDialog (ih));
 
   return IUP_DEFAULT;
 }

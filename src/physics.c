@@ -47,7 +47,7 @@ fg_val (int f)
 }
 
 int
-ext_val (int f, int e)
+ext_val (struct level *l, int f, int e)
 {
   switch (fg_val (f)) {
   case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
@@ -63,8 +63,7 @@ ext_val (int f, int e)
 
   case OPENER_FLOOR:
   case CLOSER_FLOOR:
-    return e;
-    /* return typed_int (e, EVENTS, 1, NULL, NULL); */
+    return typed_int (e, l->event_nmemb, 1, NULL, NULL);
 
   case DOOR:
     return typed_int (e, DOOR_STEPS, DOOR_FASES, NULL, NULL);
@@ -163,22 +162,22 @@ fake (struct pos *p)
 }
 
 int
-ext_tile (struct tile *t)
+ext_tile (struct level *l, struct tile *t)
 {
-  return ext_val (t->fg, t->ext);
+  return ext_val (l, t->fg, t->ext);
 }
 
 int
 ext (struct pos *p)
 {
-  return ext_tile (tile (p));
+  return ext_tile (p->l, tile (p));
 }
 
 int
 fake_ext (struct pos *p)
 {
   struct tile *c = tile (p);
-  return ext_val (fake (p), c->ext);
+  return ext_val (p->l, fake (p), c->ext);
 }
 
 enum tile_bg
@@ -205,7 +204,7 @@ int
 set_ext (struct pos *p, int e)
 {
   struct tile *c = tile (p);
-  return c->ext = ext_val (c->fg, e);
+  return c->ext = ext_val (p->l, c->fg, e);
 }
 
 enum tile_bg
@@ -231,7 +230,7 @@ int
 ext_rel (struct pos *p, int floor, int place)
 {
   struct tile *c = tile_rel (p, floor, place);
-  return ext_val (c->fg, c->ext);
+  return ext_val (p->l, c->fg, c->ext);
 }
 
 enum tile_bg
@@ -250,7 +249,7 @@ int
 set_ext_rel (struct pos *p, int floor, int place, int e)
 {
   struct tile *c = tile_rel (p, floor, place);
-  return c->ext = ext_val (c->fg, e);
+  return c->ext = ext_val (p->l, c->fg, e);
 }
 
 struct level_event *
@@ -1083,16 +1082,16 @@ apply_to_scope (struct pos *p, struct sel_ring *sr, pos_trans f,
 }
 
 enum tile_diff
-tile_diff (struct tile *c0, struct tile *c1)
+tile_diff (struct level *l, struct tile *c0, struct tile *c1)
 {
   enum tile_fg fg0 = fg_val (c0->fg);
   enum tile_bg bg0 = bg_val (c0->bg);
-  int ext0 = ext_val (fg0, c0->ext);
+  int ext0 = ext_val (l, fg0, c0->ext);
   int fake0 = c0->fake;
 
   enum tile_fg fg1 = fg_val (c1->fg);
   enum tile_bg bg1 = bg_val (c1->bg);
-  int ext1 = ext_val (fg1, c1->ext);
+  int ext1 = ext_val (l, fg1, c1->ext);
   int fake1 = c1->fake;
 
   if (fg0 == fg1 && bg0 == bg1 && ext0 == ext1 && fake0 == fake1)

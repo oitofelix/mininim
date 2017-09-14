@@ -169,11 +169,11 @@ guard_eq (struct guard *g0, struct guard *g1)
 }
 
 bool
-tile_eq (struct tile *c0, struct tile *c1)
+tile_eq (struct level *l, struct tile *c0, struct tile *c1)
 {
   return fg_tile (c0) == fg_tile (c1)
     && bg_tile (c0) == bg_tile (c1)
-    && ext_tile (c0) == ext_tile (c1)
+    && ext_tile (l, c0) == ext_tile (l, c1)
     && fake_tile (c0) == fake_tile (c1);
 }
 
@@ -211,7 +211,7 @@ level_eq (struct level *l0, struct level *l1)
   for (p.room = 0; p.room < l0->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (! tile_eq (&l0->tile[p.room][p.floor][p.place],
+        if (! tile_eq (l0, &l0->tile[p.room][p.floor][p.place],
                       &l1->tile[p.room][p.floor][p.place]))
           return false;
 
@@ -458,10 +458,10 @@ tile_struct_at_pos (struct pos *p)
 }
 
 bool
-should_init (struct tile *c0, struct tile *c1)
+should_init (struct level *l, struct tile *c0, struct tile *c1)
 {
   return fg_val (c0->fg) == fg_val (c1->fg)
-    && ext_val (c0->fg, c0->ext) != ext_val (c1->fg, c1->ext);
+    && ext_val (l, c0->fg, c0->ext) != ext_val (l, c1->fg, c1->ext);
 }
 
 void

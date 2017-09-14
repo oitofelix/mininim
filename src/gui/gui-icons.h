@@ -143,6 +143,8 @@
 #define EVENT_SOURCE_ICON "data/icons/event-source.png"
 #define EVENT_TARGET_ICON "data/icons/event-target.png"
 #define EVENT_ADD_ICON "data/icons/event-add.png"
+#define EVENT_DEFRAG_ICON "data/icons/event-defrag.png"
+#define EVENT_CLEAN_ICON "data/icons/event-clean.png"
 
 #define PLACE_SEL_LOCK_ICON "data/icons/place-sel-lock.png"
 #define PLACE_SEL_UNLOCK_ICON "data/icons/place-sel-unlock.png"

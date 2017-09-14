@@ -43,6 +43,7 @@ static int change_tile_part_from_spin_cb (Ihandle *ih);
 static int change_tile_part_from_val_cb (Ihandle *ih);
 static int toggle_action_cb (Ihandle *ih, int state);
 static int fall_toggle_action_cb (Ihandle *ih, int state);
+static int view_button_action_cb (Ihandle *ih);
 
 
 Ihandle *
@@ -50,7 +51,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
                               char *norm_group)
 {
   Ihandle *ih, *button = NULL, *val = NULL, *toggle = NULL,
-    *fall_toggle = NULL, *list = NULL, *spin = NULL,
+    *fall_toggle = NULL, *list = NULL, *spin = NULL, *view_button = NULL,
     *insertion_point;
 
   char **tile_part_str;
@@ -233,6 +234,15 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
        "KILLFOCUS_CB", gui_empty_value_to_0,
        NULL);
     IupInsert (vbox, insertion_point, spin);
+
+    view_button = IupSetCallbacks
+      (IupSetAttributes
+       (IupButton ("View", NULL),
+        "TIP = \"View in event tab\","
+        "PADDING = 16,"),
+       "ACTION", view_button_action_cb,
+       NULL);
+    IupInsert (vbox, insertion_point, view_button);
     break;
   case TILE_EXT_FALL:
     fall_toggle = IupSetCallbacks
@@ -259,6 +269,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
   IupSetAttribute (ih, "_FALL_TOGGLE", (void *) fall_toggle);
   IupSetAttribute (ih, "_LIST", (void *) list);
   IupSetAttribute (ih, "_SPIN", (void *) spin);
+  IupSetAttribute (ih, "_VIEW_BUTTON", (void *) view_button);
 
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
@@ -332,6 +343,16 @@ button_action_cb (Ihandle *ih)
 }
 
 int
+view_button_action_cb (Ihandle *ih)
+{
+  Ihandle *events =
+    IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+  gui_run_callback_IFns
+    ("_SELECT_SOURCE_CB", events, (void *) &selection_pos);
+  return IUP_DEFAULT;
+}
+
+int
 _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
@@ -366,7 +387,7 @@ _update_cb (Ihandle *ih)
            && tile_part != TILE_EXT_STEP_CHOMPER
            && tile_part != TILE_EXT_DESIGN)
           || (fg_tile (&last->tile) == fg_tile (t)
-              && ext_tile (&last->tile) == ext_tile (t)))
+              && ext_tile (p->l, &last->tile) == ext_tile (p->l, t)))
       && (tile_part != TILE_EXT_EVENT
           || (fg_tile (&last->tile) == fg_tile (t)
               && last->tile.ext == t->ext))
@@ -396,6 +417,8 @@ update (Ihandle *ih, struct tile *t)
     al_destroy_bitmap (b);
   }
 
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+
   int i;
   switch (tile_part) {
   case TILE_FG: i = fg_tile (t); break;
@@ -407,7 +430,7 @@ update (Ihandle *ih, struct tile *t)
   case TILE_EXT_STEP_LEVEL_DOOR:
   case TILE_EXT_STEP_CHOMPER:
   case TILE_EXT_DESIGN:
-    i = ext_tile (t);
+    i = ext_tile (p->l, t);
     break;
   case TILE_EXT_EVENT:
     i = t->ext;
