@@ -55,10 +55,11 @@ void level_exchange_undo (int *d, int dir);
 
 
 /* EVENT */
-void
-register_event_undo (struct undo *u, int e, struct pos *p, bool next,
-                     char *desc);
+void register_event_undo
+(struct undo *u, struct level_event *event, size_t event_nmemb, char *desc);
 void event_undo (struct event_undo *d, int dir);
+void destroy_event_undo (struct event_undo *d);
+
 
 /* HORIZONTAL ROOM CONS MIRROR */
 void register_h_room_mirror_tile_undo (struct undo *u, int _room, char *desc);
@@ -129,5 +130,13 @@ void level_environment_undo (struct int_undo *d, int dir);
 
 /* LEVEL HUE UNDO */
 void level_hue_undo (struct int_undo *d, int dir);
+
+
+
+/* GUI controls update */
+
+struct undo_update *should_undo_update
+(struct undo_update *uc, struct undo *u, int dir);
+void undo_updates (struct undo_update *uc);
 
 #endif	/* MININIM_UNDO_H */

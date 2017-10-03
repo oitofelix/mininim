@@ -2209,9 +2209,9 @@ process_main_menu_event (ALLEGRO_EVENT *event)
            || id == item.main.editor.play_mode)
     ui_editor ();
   else if (id == item.main.editor.undo)
-    ui_undo_pass (&undo, -1, NULL);
+    gui_undo_pass (-1);
   else if (id == item.main.editor.redo)
-    ui_undo_pass (&undo, +1, NULL);
+    gui_undo_pass (+1);
   else if (id == item.main.cheat.kill_enemy) ui_kill_enemy ();
   else if (id == item.main.cheat.resurrect) ui_resurrect ();
   else if (id == item.main.cheat.immortal) ui_immortal (! immortal_mode);

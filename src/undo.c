@@ -21,6 +21,7 @@
 #include "mininim.h"
 
 static bool tile_undo_ignore_state;
+static bool should_undo_update_event_tree (struct undo *u, int dir);
 
 void
 register_undo (struct undo *u, void *data, undo_f f,
@@ -43,6 +44,13 @@ register_undo (struct undo *u, void *data, undo_f f,
   u->pass[u->current].df = df;
   if (desc) u->pass[u->current].desc = xasprintf ("%s", desc);
   else u->pass[u->current].desc = NULL;
+
+  if (desc) {
+    struct undo_update uc;
+    memset (&uc, 0, sizeof (uc));
+    should_undo_update (&uc, u, -1);
+    undo_updates (&uc);
+  }
 
   if (editor_register && desc) editor_msg (desc, editor_register);
 }
@@ -307,25 +315,41 @@ level_exchange_undo (int *d, int dir)
 /*********/
 
 void
-register_event_undo (struct undo *u, int e, struct pos *p, bool next,
-                     char *desc)
+register_event_undo (struct undo *u, struct level_event *event,
+                     size_t event_nmemb, char *desc)
 {
-  struct level_event *le = event (p->l, e);
-  if (peq (&le->p, p) && le->next == next) return;
+  if (event_nmemb == global_level.event_nmemb
+      && ! memcmp (event, global_level.event, event_nmemb
+                   * sizeof (*event))) return;
 
   struct event_undo *d = xmalloc (sizeof (struct event_undo));
-  d->e = e;
-  d->b = *event (p->l, e);
-  d->f.p = *p;
-  d->f.next = next;
-  register_undo (u, d, (undo_f) event_undo, NULL, desc);
+  d->f_event = copy_array (event, event_nmemb, &d->f_event_nmemb,
+                           sizeof (*d->f_event));
+  d->b_event = copy_array (global_level.event, global_level.event_nmemb,
+                           &d->b_event_nmemb, sizeof (*d->b_event));
+  register_undo (u, d, (undo_f) event_undo,
+                 (destroy_undo_f) destroy_event_undo, desc);
   event_undo (d, +1);
 }
 
 void
 event_undo (struct event_undo *d, int dir)
 {
-  *event (d->f.p.l, d->e) = (dir >= 0) ? d->f : d->b;
+  destroy_array ((void **) &global_level.event, &global_level.event_nmemb);
+
+  struct level_event *event = (dir >= 0) ? d->f_event : d->b_event;
+  size_t event_nmemb = (dir >= 0) ? d->f_event_nmemb : d->b_event_nmemb;
+
+  global_level.event =
+    copy_array (event, event_nmemb, &global_level.event_nmemb,
+                sizeof (*global_level.event));
+}
+
+void
+destroy_event_undo (struct event_undo *d)
+{
+  destroy_array ((void **) &d->b_event, &d->b_event_nmemb);
+  destroy_array ((void **) &d->f_event, &d->f_event_nmemb);
 }
 
 /*******************************/
@@ -705,4 +729,47 @@ level_hue_undo (struct int_undo *d, int dir)
 {
   int_undo (d, dir);
   hue = global_level.hue;
+}
+
+
+
+/***********************/
+/* GUI controls update */
+/***********************/
+
+struct undo_update *
+should_undo_update (struct undo_update *uc,
+                    struct undo *u, int dir)
+{
+  uc->event_tree =
+    uc->event_tree || should_undo_update_event_tree (u, dir);
+  return uc;
+}
+
+void
+undo_updates (struct undo_update *uc)
+{
+  if (uc->event_tree) {
+    Ihandle *events_control =
+      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+    gui_run_callback_IFn ("_UPDATE_TREE_CB", events_control);
+  }
+}
+
+bool
+should_undo_update_event_tree (struct undo *u, int dir)
+{
+  if (! can_undo (u, dir)) return false;
+
+  struct undo_pass *pass =
+    &u->pass[u->current + (dir >= 0 ? 1 : 0)];
+
+  if (pass->f == (undo_f) event_undo) return true;
+  else if (pass->f == (undo_f) tile_undo) {
+    struct tile_undo *d = pass->data;
+    return event_fg_cs (d->f.fg) || event_fg_cs (d->b.fg)
+      || target_event (&d->p) > 0;
+  }
+
+  return false;
 }

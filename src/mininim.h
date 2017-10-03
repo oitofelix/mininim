@@ -106,6 +106,7 @@
 #include "dialog.h"
 #include "xconfig.h"
 #include "diff.h"
+#include "tree.h"
 
 #include "anim.h"
 #include "actor.h"

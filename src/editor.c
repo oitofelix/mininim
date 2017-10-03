@@ -1107,7 +1107,9 @@ editor (void)
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
       case 1:
-        register_event_undo (&undo, s, &p, bb ? true : false, "EVENT");
+        /* WARNING: Old interface commented out!  This code will
+           vanish soon... */
+        /* register_event_undo (&undo, s, &p, bb ? true : false, "EVENT"); */
         last_event = s;
         edit = EDIT_EVENT;
         break;

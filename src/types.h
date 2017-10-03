@@ -789,6 +789,10 @@ struct undo {
   int current;
 };
 
+struct undo_update {
+  bool event_tree;
+};
+
 union tile_state {
   struct closer_floor closer_floor;
   struct opener_floor opener_floor;
@@ -816,8 +820,8 @@ struct level_undo {
 };
 
 struct event_undo {
-  int e;
-  struct level_event b, f;
+  struct level_event *b_event, *f_event;
+  size_t b_event_nmemb, f_event_nmemb;
 };
 
 struct random_room_mirror_tile_undo {

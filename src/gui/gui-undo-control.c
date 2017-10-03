@@ -38,6 +38,9 @@ static void update (Ihandle *ih);
 static int button_action_cb (Ihandle *ih);
 static int valuechanged_cb (Ihandle *ih);
 
+static void ui_undo_pass (struct undo *u, int dir, char *prefix);
+
+
 
 Ihandle *
 gui_create_undo_control (struct undo *undo, char *norm_group)
@@ -172,6 +175,36 @@ update (Ihandle *ih)
   IupUpdate (list);
 }
 
+void
+ui_undo_pass (struct undo *u, int dir, char *prefix)
+{
+  if (replay_mode != NO_REPLAY) {
+    print_replay_mode (0);
+    return;
+  }
+
+  char *text;
+  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
+  static char *undo_msg = NULL;
+
+  bool b = can_undo (u, dir);
+
+  al_free (undo_msg);
+
+  if (! b) {
+    if (prefix) undo_msg = xasprintf ("NO FURTHER %s %s", prefix, dir_str);
+    else undo_msg = xasprintf ("NO FURTHER %s", dir_str);
+    editor_msg (undo_msg, EDITOR_CYCLES_3);
+    return;
+  }
+
+  undo_pass (u, dir, &text);
+
+  if (prefix) undo_msg = xasprintf ("%s %s: %s", prefix, dir_str, text);
+  else undo_msg = xasprintf ("%s: %s", dir_str, text);
+  editor_msg (undo_msg, EDITOR_CYCLES_3);
+}
+
 int
 button_action_cb (Ihandle *ih)
 {
@@ -180,8 +213,17 @@ button_action_cb (Ihandle *ih)
   Ihandle *undo_button = (void *) IupGetAttribute (ih, "_UNDO_BUTTON");
   Ihandle *redo_button = (void *) IupGetAttribute (ih, "_REDO_BUTTON");
 
-  if (ih == undo_button) ui_undo_pass (undo, -1, NULL);
-  else if (ih == redo_button) ui_undo_pass (undo, +1, NULL);
+  int dir;
+  if (ih == undo_button) dir = -1;
+  else if (ih == redo_button) dir = +1;
+
+  struct undo_update uc;
+  memset (&uc, 0, sizeof (uc));
+  should_undo_update (&uc, undo, dir);
+
+  ui_undo_pass (undo, dir, NULL);
+
+  undo_updates (&uc);
 
   return IUP_DEFAULT;
 }
@@ -196,8 +238,33 @@ valuechanged_cb (Ihandle *ih)
   int current = current_macro_undo (undo) + 2;
   int new = IupGetInt (list, "VALUE");
 
-  for (; new < current; current--) ui_undo_pass (undo, -1, NULL);
-  for (; new > current; current++) ui_undo_pass (undo, +1, NULL);
+  struct undo_update uc;
+  memset (&uc, 0, sizeof (uc));
+
+  for (; new < current; current--) {
+    should_undo_update (&uc, undo, -1);
+    ui_undo_pass (undo, -1, NULL);
+  }
+  for (; new > current; current++) {
+    should_undo_update (&uc, undo, +1);
+    ui_undo_pass (undo, +1, NULL);
+  }
+
+  undo_updates (&uc);
 
   return IUP_DEFAULT;
+}
+
+void
+gui_undo_pass (int dir)
+{
+  Ihandle *uc =
+    IupGetDialogChild (gui_editor_dialog, "UNDO_CONTROL");
+
+  Ihandle *undo_button = (void *) IupGetAttribute (uc, "_UNDO_BUTTON");
+  Ihandle *redo_button = (void *) IupGetAttribute (uc, "_REDO_BUTTON");
+
+  Ihandle *button = (dir >= 0) ? redo_button : undo_button;
+
+  gui_run_callback_IFn ("ACTION", button);
 }

@@ -68,6 +68,12 @@ cint (int *x, int *y)
   return *x - *y;
 }
 
+bool
+int_eq (int *a, int *b)
+{
+  return *a == *b;
+}
+
 unsigned char
 add_char (unsigned char a, signed char b)
 {

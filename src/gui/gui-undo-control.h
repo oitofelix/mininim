@@ -22,5 +22,6 @@
 #define MININIM_GUI_UNDO_CONTROL_H
 
 Ihandle *gui_create_undo_control (struct undo *undo, char *norm_group);
+void gui_undo_pass (int dir);
 
 #endif	/* MININIM_GUI_UNDO_CONTROL */

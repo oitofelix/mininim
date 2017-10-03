@@ -654,38 +654,6 @@ print_game_paused (int priority)
   ui_msg (priority, "%s", text);
 }
 
-void
-ui_undo_pass (struct undo *u, int dir, char *prefix)
-{
-  if (replay_mode != NO_REPLAY) {
-    print_replay_mode (0);
-    return;
-  }
-
-  char *text;
-  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
-  static char *undo_msg = NULL;
-
-  bool b = can_undo (u, dir);
-
-  al_free (undo_msg);
-
-  if (! b) {
-    if (prefix) undo_msg = xasprintf ("NO FURTHER %s %s", prefix, dir_str);
-    else undo_msg = xasprintf ("NO FURTHER %s", dir_str);
-    editor_msg (undo_msg, EDITOR_CYCLES_3);
-    return;
-  }
-
-  undo_pass (u, dir, &text);
-
-  if (prefix) undo_msg = xasprintf ("%s %s: %s", prefix, dir_str, text);
-  else undo_msg = xasprintf ("%s: %s", dir_str, text);
-  editor_msg (undo_msg, EDITOR_CYCLES_3);
-}
-
-
-
 
 
 

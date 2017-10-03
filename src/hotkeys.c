@@ -242,12 +242,12 @@ level_hotkeys_cb (Ihandle *ih, int c)
   /* CTRL+Z: undo */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z)
            || c == K_cZ)
-    ui_undo_pass (&undo, -1, NULL);
+    gui_undo_pass (-1);
 
   /* CTRL+Y: redo */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Y)
            || c == K_cY)
-    ui_undo_pass (&undo, +1, NULL);
+    gui_undo_pass (+1);
 
   /* M: change multi-room fit mode */
   else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_M))

@@ -20,10 +20,6 @@
 
 #include "mininim.h"
 
-enum {
-  TARGET_DEPTH, EVENT_DEPTH, SOURCE_DEPTH,
-};
-
 struct last {
   char *video_mode;
   enum em em;
@@ -31,39 +27,28 @@ struct last {
   int level_n;
 };
 
-static void destroy_userdata (Ihandle *ih);
+enum {
+  TARGET_DEPTH, EVENT_DEPTH, SOURCE_DEPTH,
+};
+
 static int destroy_cb (Ihandle *ih);
 static int show_cb (Ihandle *ih, int state);
 
-static int selected_event_node_id (Ihandle *tree);
-static struct level_event *selected_event (Ihandle *tree);
+static int selected_event_node_id (Ihandle *tree_ctrl);
+static struct level_event *selected_event (Ihandle *tree_ctrl);
 
 static int _update_cb (Ihandle *ih);
 
-static void select_node_by_id (Ihandle *tree, int id);
-static void select_node_by_title (Ihandle *tree, char *title, int depth);
-
-static int get_event_node_id (Ihandle *tree, int e);
-static int get_source_node_id (Ihandle *tree, struct pos *p);
+static void select_node_by_id (Ihandle *tree_ctrl, int id);
+static void select_node_by_title (Ihandle *tree_ctrl, char *title, int depth);
 
 /* tree build */
 static bool is_event_active (struct level *l, int e);
-static void add_nodes (Ihandle *tree, bool remove_inactive);
 static int _update_tree_cb (Ihandle *ih);
+static void update_tree_ctrl (Ihandle *ih, struct tree *tree);
 static void update_target_icons (Ihandle *ih);
-
-static int last_node_id (Ihandle *tree, int parent_id);
-
-static int get_target (Ihandle *tree, struct pos *p);
-static int add_target (Ihandle *tree, struct pos *p);
-
-/* restricted to target_id branch */
-static int get_event (Ihandle *tree, int target_id, int e);
-static int add_event (Ihandle *tree, int target_id, int e);
-
-/* restricted to event_id branch */
-static int get_source (Ihandle *tree, int event_id, struct pos *p);
-static int add_source (Ihandle *tree, int event_id, struct pos *p);
+static void populate_event_tree (struct level *level, struct tree *tree,
+                                 bool ignore_inactive);
 
 /* auxiliary */
 int new_event (Ihandle *ih, struct pos *p, bool next);
@@ -89,9 +74,9 @@ static int _add_event_cb (Ihandle *ih, struct pos *p);
 Ihandle *
 gui_create_editor_events_control (char *norm_group, struct level *level)
 {
-  Ihandle *ih, *tree;
+  Ihandle *ih, *tree_ctrl;
 
-  Ihandle *refresh_button, *all_toggle;
+  Ihandle *refresh_button, *inactive_toggle;
 
   Ihandle *next_frame, *next_toggle, *prev_button, *next_button;
 
@@ -103,7 +88,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   ih = IupSetCallbacks
     (IupSetAttributes
      (IupHbox
-      (tree = IupSetCallbacks
+      (tree_ctrl = IupSetCallbacks
        (IupSetAttributes
         (IupTree (),
          "ADDROOT = NO,"
@@ -120,9 +105,9 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 
             IupSetAttributes
             (IupHbox
-             (all_toggle = IupSetCallbacks
+             (inactive_toggle = IupSetCallbacks
               (IupSetAttributes
-               (IupToggle ("All", NULL),
+               (IupToggle ("Inactive", NULL),
                 "VALUE = NO,"
                 "TIP = \"Show inactive events\","),
                "ACTION", _update_tree_cb,
@@ -342,17 +327,22 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
      "_ADD_EVENT_CB", (Icallback) _add_event_cb,
      NULL);
 
-  IupSetAttribute (tree, "IMAGELEAF", "EVENT_ICON");
-  IupSetAttribute (tree, "IMAGEBRANCHCOLLAPSED", "EVENT_ICON");
-  IupSetAttribute (tree, "IMAGEBRANCHEXPANDED", "EVENT_ICON");
+  IupSetAttribute (tree_ctrl, "IMAGELEAF", "EVENT_ICON");
+  IupSetAttribute (tree_ctrl, "IMAGEBRANCHCOLLAPSED", "EVENT_ICON");
+  IupSetAttribute (tree_ctrl, "IMAGEBRANCHEXPANDED", "EVENT_ICON");
 
   IupSetAttribute (ih, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_CONTROL", (void *) ih);
 
   IupSetAttribute (ih, "_LEVEL", (void *) level);
+
+  struct tree *tree = xmalloc (sizeof (*tree));
+  memset (tree, 0, sizeof (*tree));
   IupSetAttribute (ih, "_TREE", (void *) tree);
-  IupSetAttribute (ih, "_ALL_TOGGLE", (void *) all_toggle);
+  IupSetAttribute (ih, "_TREE_CTRL", (void *) tree_ctrl);
+
+  IupSetAttribute (ih, "_INACTIVE_TOGGLE", (void *) inactive_toggle);
   IupSetAttribute (ih, "_REFRESH_BUTTON", (void *) refresh_button);
 
   IupSetAttribute (ih, "_NEXT_FRAME", (void *) next_frame);
@@ -385,27 +375,14 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   return ih;
 }
 
-void
-destroy_userdata (Ihandle *ih)
-{
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = 0; id < count ; id++) {
-    void *userdata = IupTreeGetUserId (tree, id);
-    al_free (userdata);
-    IupTreeSetUserId (tree, id, NULL);
-  }
-}
-
 int
 destroy_cb (Ihandle *ih)
 {
-  destroy_userdata (ih);
-
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   al_free (last);
-
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  destroy_tree (tree);
+  al_free (tree);
   return IUP_DEFAULT;
 }
 
@@ -413,24 +390,24 @@ int
 show_cb (Ihandle *ih, int state)
 {
   if (state == IUP_SHOW) {
-    Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-    int count = IupGetInt (tree, "COUNT");
+    Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+    int count = IupGetInt (tree_ctrl, "COUNT");
     if (! count) _update_tree_cb (ih);
   }
   return IUP_DEFAULT;
 }
 
 int
-selected_event_node_id (Ihandle *tree)
+selected_event_node_id (Ihandle *tree_ctrl)
 {
-  int id = IupGetInt (tree, "VALUE");
+  int id = IupGetInt (tree_ctrl, "VALUE");
   if (id < 0) return -1;
 
-  int depth = IupGetIntId (tree, "DEPTH", id);
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
   if (depth < EVENT_DEPTH) return -1;
 
   if (depth == SOURCE_DEPTH) {
-    /* id = IupGetIntId (tree, "PARENT", id); */
+    /* id = IupGetIntId (tree_ctrl, "PARENT", id); */
     return -1;
   }
 
@@ -438,12 +415,13 @@ selected_event_node_id (Ihandle *tree)
 }
 
 struct level_event *
-selected_event (Ihandle *tree)
+selected_event (Ihandle *tree_ctrl)
 {
-  struct level *level = (void *) IupGetAttribute (tree, "_LEVEL");
-  int id = selected_event_node_id (tree);
+  struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
+  int id = selected_event_node_id (tree_ctrl);
   if (id < 0) return NULL;
-  int *e = IupTreeGetUserId (tree, id);
+  struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
+  int *e = tree->node[id].data;
   return event (level, *e);
 }
 
@@ -455,22 +433,35 @@ _update_cb (Ihandle *ih)
   struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-  struct level_event *e = selected_event (tree);
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *inactive_toggle =
+    (void *) IupGetAttribute (ih, "_INACTIVE_TOGGLE");
+  bool inactive_toggle_value = IupGetInt (inactive_toggle, "VALUE");
+  struct tree new_tree;
+  populate_event_tree (level, &new_tree, ! inactive_toggle_value);
+  if (! tree_eq (tree, &new_tree)) update_tree_ctrl (ih, &new_tree);
+  else destroy_tree (&new_tree);
+
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  struct level_event *e = selected_event (tree_ctrl);
   Ihandle *next_frame = (void *) IupGetAttribute (ih, "_NEXT_FRAME");
   gui_control_active (next_frame, e);
   if (e) {
     Ihandle *next_toggle = (void *) IupGetAttribute (ih, "_NEXT_TOGGLE");
     gui_control_int (next_toggle, "VALUE", e->next);
+    gui_control_active
+      (next_toggle, e - level->event < level->event_nmemb - 1);
 
     Ihandle *prev_button = (void *) IupGetAttribute (ih, "_PREV_BUTTON");
     gui_control_active (prev_button, e - level->event > 0);
 
     Ihandle *next_button = (void *) IupGetAttribute (ih, "_NEXT_BUTTON");
-    gui_control_active (next_button, e - level->event < level->event_nmemb - 1);
+    gui_control_active
+      (next_button, e - level->event < level->event_nmemb - 1);
   }
 
-  Ihandle *selection_frame = (void *) IupGetAttribute (ih, "_SELECTION_FRAME");
+  Ihandle *selection_frame =
+    (void *) IupGetAttribute (ih, "_SELECTION_FRAME");
   gui_control_active (selection_frame, is_valid_pos (&selection_pos));
 
   if (is_valid_pos (&selection_pos)) {
@@ -493,7 +484,8 @@ _update_cb (Ihandle *ih)
 void
 update_target_icons (Ihandle *ih)
 {
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
   set_string_var (&last->video_mode, video_mode);
@@ -502,13 +494,12 @@ update_target_icons (Ihandle *ih)
 
   gui_update ();
 
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth != TARGET_DEPTH) continue;
-    struct pos *np = IupTreeGetUserId (tree, id);
-    IupSetAttributeHandleId (tree, "IMAGE", id, tile_icon[fg (np)]);
-    IupSetAttributeHandleId (tree, "IMAGEEXPANDED", id, tile_icon[fg (np)]);
+  for (int id = 0; id < tree->nmemb; id++) {
+    if (tree->node[id].depth != TARGET_DEPTH) continue;
+    struct pos *np = tree->node[id].data;
+    IupSetAttributeHandleId (tree_ctrl, "IMAGE", id, tile_icon[fg (np)]);
+    IupSetAttributeHandleId (tree_ctrl, "IMAGEEXPANDED", id,
+                             tile_icon[fg (np)]);
   }
 }
 
@@ -522,9 +513,11 @@ is_event_active (struct level *l, int e)
 }
 
 void
-add_nodes (Ihandle *tree, bool ignore_inactive)
+populate_event_tree (struct level *level, struct tree *tree,
+                     bool ignore_inactive)
 {
-  struct level *level = (void *) IupGetAttribute (tree, "_LEVEL");
+  tree->node = NULL;
+  tree->nmemb = 0;
 
   for (int e = 0; e < level->event_nmemb; e++) {
     if (ignore_inactive && ! is_event_active (level, e))
@@ -533,93 +526,148 @@ add_nodes (Ihandle *tree, bool ignore_inactive)
     struct pos *p = &event (level, e)->p;
     if (p->room < 0) p->room = 0;
 
-    int target_id = add_target (tree, p);
-    int event_id = add_event (tree, target_id, e);
+    int target_id = get_or_put_tree_branch_child
+      (tree, -1, TREE_NODE_TYPE_BRANCH, p, sizeof (*p),
+       (m_comparison_fn_t) peq);
+    int event_id = get_or_put_tree_branch_child
+      (tree, target_id, TREE_NODE_TYPE_BRANCH, &e, sizeof (e),
+       (m_comparison_fn_t) int_eq);
 
     struct opener_floor *o = NULL;
     do {
       o = opener_floor_by_event (o ? &o->p : NULL, e, +1);
-      if (o) add_source (tree, event_id, &o->p);
+      if (o)
+        get_or_put_tree_branch_child
+          (tree, event_id, TREE_NODE_TYPE_LEAF, &o->p, sizeof (o->p),
+           (m_comparison_fn_t) peq);
     } while (o);
 
     struct closer_floor *c = NULL;
     do {
       c = closer_floor_by_event (c ? &c->p : NULL, e, +1);
-      if (c) add_source (tree, event_id, &c->p);
+      if (c)
+        get_or_put_tree_branch_child
+          (tree, event_id, TREE_NODE_TYPE_LEAF, &c->p, sizeof (c->p),
+           (m_comparison_fn_t) peq);
     } while (c);
+  }
+}
+
+void
+populate_event_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
+{
+  populate_tree_ctrl (tree_ctrl, tree);
+  for (size_t id = 0; id < tree->nmemb; id++) {
+    switch (tree->node[id].depth) {
+    case TARGET_DEPTH: {
+      struct pos *p = tree->node[id].data;
+      IupSetStrfId (tree_ctrl, "TITLE", id, "%s (%i,%i,%i)",
+                    tile_fg_str [fg (p)], p->room, p->floor, p->place);
+      IupSetAttributeHandleId (tree_ctrl, "IMAGE", id, tile_icon[fg (p)]);
+      IupSetAttributeHandleId (tree_ctrl, "IMAGEEXPANDED", id,
+                               tile_icon[fg (p)]);
+      break;
+    }
+    case EVENT_DEPTH: {
+      int *e = tree->node[id].data;
+      IupSetStrfId (tree_ctrl, "TITLE", id, "Event %i", *e);
+      break;
+    }
+    case SOURCE_DEPTH: {
+      struct pos *p = tree->node[id].data;
+      IupSetStrfId (tree_ctrl, "TITLE", id, "%s (%i,%i,%i)",
+                    tile_fg_str [fg (p)],
+                    p->room, p->floor, p->place);
+      IupSetAttributeId (tree_ctrl, "IMAGE", id,
+                         fg (p) == OPENER_FLOOR
+                         ? "TOP_ICON" : "BOTTOM_ICON");
+      break;
+    }
+    default: assert (false);
+    }
   }
 }
 
 int
 _update_tree_cb (Ihandle *ih)
 {
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
+  Ihandle *inactive_toggle =
+    (void *) IupGetAttribute (ih, "_INACTIVE_TOGGLE");
+  bool inactive_toggle_value = IupGetInt (inactive_toggle, "VALUE");
+  struct tree new_tree;
+  populate_event_tree (level, &new_tree, ! inactive_toggle_value);
+  update_tree_ctrl (ih, &new_tree);
+  return IUP_DEFAULT;
+}
+
+void
+update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
+{
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  destroy_tree (tree);
+  *tree = *new_tree;
+
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
 
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   last->level_n = level->n;
 
   /* record current selection */
-  int id = IupGetInt (tree, "VALUE");
-  char *title_buffer = IupGetAttributeId (tree, "TITLE", id);
+  int id = IupGetInt (tree_ctrl, "VALUE");
+  char *title_buffer = IupGetAttributeId (tree_ctrl, "TITLE", id);
   char *selected_title = xasprintf ("%s", title_buffer ? title_buffer : "");
-  int selected_depth = IupGetIntId (tree, "DEPTH", id);
+  int selected_depth = IupGetIntId (tree_ctrl, "DEPTH", id);
 
   /* build tree */
-  IupSetAttribute (tree, "AUTOREDRAW", "NO");
-
-  destroy_userdata (ih);
-  IupUnmap (tree);
-  IupSetAttribute (tree, "DELNODE", "ALL");
-  IupMap (tree);
-  IupRefresh (tree);
-
-  Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
-  bool all_toggle_value = IupGetInt (all_toggle, "VALUE");
-  add_nodes (tree, ! all_toggle_value);
-
-  IupSetAttribute (tree, "AUTOREDRAW", "YES");
+  IupSetAttribute (tree_ctrl, "AUTOREDRAW", "NO");
+  IupUnmap (tree_ctrl);
+  IupSetAttribute (tree_ctrl, "DELNODE", "ALL");
+  IupMap (tree_ctrl);
+  populate_event_tree_ctrl (tree_ctrl, tree);
+  IupRefresh (tree_ctrl);
+  IupRedraw (tree_ctrl, true);
+  IupSetAttribute (tree_ctrl, "AUTOREDRAW", "YES");
 
   /* recall previous "current" selection */
-  select_node_by_title (tree, selected_title, selected_depth);
+  select_node_by_title (tree_ctrl, selected_title, selected_depth);
   al_free (selected_title);
-
-  return IUP_DEFAULT;
 }
 
 void
-select_node_by_id (Ihandle *tree, int id)
+select_node_by_id (Ihandle *tree_ctrl, int id)
 {
-  IupSetInt (tree, "VALUE", id);
+  IupSetInt (tree_ctrl, "VALUE", id);
 
   /* Motif bug workaround */
-  int depth = IupGetIntId (tree, "DEPTH", id);
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
   if (depth > 0) {
-    int parent_id = IupGetIntId (tree, "PARENT", id);
-    IupSetAttributeId (tree, "STATE", parent_id, "COLLAPSED");
-    IupSetAttributeId (tree, "STATE", parent_id, "EXPANDED");
-    IupSetInt (tree, "VALUE", id);
+    int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
+    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "COLLAPSED");
+    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "EXPANDED");
+    IupSetInt (tree_ctrl, "VALUE", id);
   }
 }
 
 void
-select_node_by_title (Ihandle *tree, char *s_title, int s_depth)
+select_node_by_title (Ihandle *tree_ctrl, char *s_title, int s_depth)
 {
   bool selected = false;
 
-  int count = IupGetInt (tree, "COUNT");
+  int count = IupGetInt (tree_ctrl, "COUNT");
   for (int id = 0; id < count; id++) {
-    char *title = IupGetAttributeId (tree, "TITLE", id);
-    int depth = IupGetIntId (tree, "DEPTH", id);
+    char *title = IupGetAttributeId (tree_ctrl, "TITLE", id);
+    int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
     if (s_depth >= 0 && s_depth != depth) continue;
     if (! strcmp (s_title, title)) {
-      select_node_by_id (tree, id);
+      select_node_by_id (tree_ctrl, id);
       selected = true;
       break;
     }
   }
 
-  if (! selected) IupSetAttribute (tree, "VALUE", "FIRST");
+  if (! selected) IupSetAttribute (tree_ctrl, "VALUE", "FIRST");
 }
 
 int
@@ -632,159 +680,47 @@ target_event (struct pos *p)
 }
 
 int
-get_event_node_id (Ihandle *tree, int e)
-{
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth != EVENT_DEPTH) continue;
-    int *ne = IupTreeGetUserId (tree, id);
-    if (e == *ne) return id;
-  }
-  return -1;
-}
-
-int
-get_source_node_id (Ihandle *tree, struct pos *p)
-{
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth != SOURCE_DEPTH) continue;
-    struct pos *np = IupTreeGetUserId (tree, id);
-    if (peq (p, np)) return id;
-  }
-  return -1;
-}
-
-int
-last_node_id (Ihandle *tree, int parent_id)
-{
-  int last_id = -1;
-  int parent_depth = IupGetIntId (tree, "DEPTH", parent_id);
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = parent_id + 1; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth == parent_depth + 1) last_id = id;
-    if (depth <= parent_depth || id == count - 1)
-      return last_id;
-  }
-  return -1;
-}
-
-int
-get_target (Ihandle *tree, struct pos *p)
-{
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth > TARGET_DEPTH) continue;
-    struct pos *np = IupTreeGetUserId (tree, id);
-    if (peq (p, np)) return id;
-  }
-  return -1;
-}
-
-int
-add_target (Ihandle *tree, struct pos *p)
-{
-  int id = get_target (tree, p);
-  if (id >= 0) return id;
-  id = last_node_id (tree, -1);
-  IupSetStrfId (tree, "INSERTBRANCH", id,
-                "%s (%i,%i,%i)",
-                tile_fg_str [fg (p)],
-                p->room, p->floor, p->place);
-  struct pos *np = xmalloc (sizeof (*np));
-  *np = *p;
-  id = IupGetInt (tree, "LASTADDNODE");
-  IupTreeSetUserId (tree, id, np);
-  IupSetAttributeHandleId (tree, "IMAGE", id, tile_icon[fg (p)]);
-  IupSetAttributeHandleId (tree, "IMAGEEXPANDED", id, tile_icon[fg (p)]);
-  return id;
-}
-
-int
-get_event (Ihandle *tree, int target_id, int e)
-{
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = target_id + 1; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth > EVENT_DEPTH) continue;
-    else if (depth < EVENT_DEPTH) break;
-    int *ne = IupTreeGetUserId (tree, id);
-    if (e == *ne) return id;
-  }
-  return -1;
-}
-
-int
-add_event (Ihandle *tree, int target_id, int e)
-{
-  int id = get_event (tree, target_id, e);
-  if (id >= 0) return id;
-  id = last_node_id (tree, target_id);
-  const char *command;
-  if (id < 0) {
-    command = "ADDBRANCH";
-    id = target_id;
-  } else command = "INSERTBRANCH";
-  IupSetStrfId (tree, command, id, "Event %i", e);
-  int *ne = xmalloc (sizeof (*ne));
-  *ne = e;
-  id = IupGetInt (tree, "LASTADDNODE");
-  IupTreeSetUserId (tree, id, ne);
-  return id;
-}
-
-int
-get_source (Ihandle *tree, int event_id, struct pos *p)
-{
-  int count = IupGetInt (tree, "COUNT");
-  for (int id = event_id + 1; id < count; id++) {
-    int depth = IupGetIntId (tree, "DEPTH", id);
-    if (depth < SOURCE_DEPTH) break;
-    struct pos *np = IupTreeGetUserId (tree, id);
-    if (peq (p, np)) return id;
-  }
-  return -1;
-}
-
-int
-add_source (Ihandle *tree, int event_id, struct pos *p)
-{
-  int id = get_source (tree, event_id, p);
-  if (id >= 0) return id;
-  id = last_node_id (tree, event_id);
-  const char *command;
-  if (id < 0) {
-    command = "ADDLEAF";
-    id = event_id;
-  } else command = "INSERTLEAF";
-  IupSetStrfId (tree, command, id,
-                "%s (%i,%i,%i)",
-                tile_fg_str [fg (p)],
-                p->room, p->floor, p->place);
-  struct pos *np = xmalloc (sizeof (*np));
-  *np = *p;
-  id = IupGetInt (tree, "LASTADDNODE");
-  IupTreeSetUserId (tree, id, np);
-  IupSetAttributeId (tree, "IMAGE", id,
-                     fg (p) == OPENER_FLOOR
-                     ? "TOP_ICON" : "BOTTOM_ICON");
-  return id;
-}
-
-int
 next_toggle_cb (Ihandle *toggle, int state)
 {
-  Ihandle *tree = (void *) IupGetAttribute (toggle, "_TREE");
-  struct level_event *e = selected_event (tree);
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (toggle, "_TREE_CTRL");
+  struct level_event *e = selected_event (tree_ctrl);
   if (e) {
     struct level *level = (void *) IupGetAttribute (toggle, "_LEVEL");
     int n = e - level->event;
-    register_event_undo (&undo, n, &e->p, state, "NEXT EVENT");
-    _update_tree_cb (tree);
+
+    /* try to economize on undo registration */
+    bool should_register_undo = true;
+    if (undo.pass[undo.current].f == (undo_f) event_undo) {
+      struct event_undo *d = undo.pass[undo.current].data;
+      if (d->b_event_nmemb == d->f_event_nmemb
+          && d->f_event[n].next != d->b_event[n].next) {
+        bool old_next = d->f_event[n].next;
+        d->f_event[n].next = d->b_event[n].next;
+        if (! memcmp (d->f_event, d->b_event, d->f_event_nmemb
+                      * sizeof (*d->f_event))) {
+          d->f_event[n].next = old_next;
+          undo_pass (&undo, -1, NULL);
+          should_register_undo = false;
+        } else d->f_event[n].next = old_next;
+      }
+    }
+
+    if (should_register_undo) {
+      struct level_event *event;
+      size_t event_nmemb;
+      event = copy_array (level->event, level->event_nmemb,
+                          &event_nmemb, sizeof (*event));
+
+      event[n].p = e->p;
+      event[n].next = state;
+
+      char *desc = xasprintf ("NEXT EVENT %i", n);
+      register_event_undo (&undo, event, event_nmemb, desc);
+      destroy_array ((void **) &event, &event_nmemb);
+      al_free (desc);
+    }
+
+    _update_tree_cb (tree_ctrl);
   }
   else return IUP_DEFAULT;
   return IUP_DEFAULT;
@@ -796,12 +732,14 @@ next_button_cb (Ihandle *button)
   Ihandle *next_button = (void *) IupGetAttribute (button, "_NEXT_BUTTON");
   int d = button == next_button ? +1 : - 1;
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
-  Ihandle *tree = (void *) IupGetAttribute (button, "_TREE");
-  struct level_event *e = selected_event (tree);
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
+  struct level_event *e = selected_event (tree_ctrl);
   int n = e - level->event;
-  int id = get_event_node_id (tree, n + d);
+  struct tree *tree = (void *) IupGetAttribute (button, "_TREE");
+  int next = n + d;
+  int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &next);
   if (id < 0) return IUP_DEFAULT;
-  select_node_by_id (tree, id);
+  select_node_by_id (tree_ctrl, id);
   return IUP_DEFAULT;
 }
 
@@ -812,8 +750,8 @@ source_button_cb (Ihandle *button)
       || ! is_event_fg (&selection_pos)) return IUP_DEFAULT;
 
   /* get event selection */
-  Ihandle *tree = (void *) IupGetAttribute (button, "_TREE");
-  struct level_event *e = selected_event (tree);
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
+  struct level_event *e = selected_event (tree_ctrl);
 
   /* change floor extension */
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
@@ -821,8 +759,8 @@ source_button_cb (Ihandle *button)
   change_tile_ext (&selection_pos, n);
 
   /* update */
-  _update_tree_cb (tree);
-  IupSetAttribute (tree, "STATE", "EXPANDED");
+  _update_tree_cb (tree_ctrl);
+  IupSetAttribute (tree_ctrl, "STATE", "EXPANDED");
 
   return IUP_DEFAULT;
 }
@@ -833,16 +771,28 @@ target_button_cb (Ihandle *button)
   if (! is_valid_pos (&selection_pos)) return IUP_DEFAULT;
 
   /* get event selection */
-  Ihandle *tree = (void *) IupGetAttribute (button, "_TREE");
-  struct level_event *e = selected_event (tree);
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
+  struct level_event *e = selected_event (tree_ctrl);
 
   /* change event target */
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
-  int n = e - level->event;
-  register_event_undo (&undo, n, &selection_pos, e->next, "EVENT TARGET");
 
-  /* update */
-  _update_tree_cb (tree);
+  struct level_event *event;
+  size_t event_nmemb;
+  event = copy_array (level->event, level->event_nmemb,
+                      &event_nmemb, sizeof (*event));
+
+  int n = e - level->event;
+
+  event[n].p = selection_pos;
+  event[n].next = e->next;
+
+  char *desc = xasprintf ("EVENT %i TARGET", n);
+  register_event_undo (&undo, event, event_nmemb, desc);
+  destroy_array ((void **) &event, &event_nmemb);
+  al_free (desc);
+
+  _update_tree_cb (tree_ctrl);
 
   return IUP_DEFAULT;
 }
@@ -850,27 +800,38 @@ target_button_cb (Ihandle *button)
 int
 new_event (Ihandle *ih, struct pos *p, bool next)
 {
-  struct level_event event;
-  event.p = *p;
-  event.next = next;
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
 
-  p->l->event =
-    add_to_array (&event, 1, p->l->event, &p->l->event_nmemb,
-                  p->l->event_nmemb, sizeof (*p->l->event));
+  struct level_event *event;
+  size_t event_nmemb;
+  event = copy_array (level->event, level->event_nmemb,
+                      &event_nmemb, sizeof (*event));
 
-  int e = p->l->event_nmemb - 1;
+  struct level_event event_n;
+  event_n.p = *p;
+  event_n.next = next;
+
+  event = add_to_array (&event_n, 1, event, &event_nmemb,
+                        event_nmemb, sizeof (*event));
+
+  int e = event_nmemb - 1;
+  char *desc = xasprintf ("NEW EVENT %i", e);
+  register_event_undo (&undo, event, event_nmemb, desc);
+  destroy_array ((void **) &event, &event_nmemb);
+  al_free (desc);
 
   if (! is_event_active (p->l, e)) {
-    Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
-    IupSetInt (all_toggle, "VALUE", true);
+    Ihandle *inactive_toggle =
+      (void *) IupGetAttribute (ih, "_INACTIVE_TOGGLE");
+    IupSetInt (inactive_toggle, "VALUE", true);
   }
 
   _update_tree_cb (ih);
 
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-
-  int id = get_event_node_id (tree, e);
-  select_node_by_id (tree, id);
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &e);
+  select_node_by_id (tree_ctrl, id);
   select_pos (&global_mr, p);
 
   return e;
@@ -897,13 +858,14 @@ clean_button_cb (Ihandle *button)
 }
 
 int
-selection_cb (Ihandle *tree, int id, int status)
+selection_cb (Ihandle *tree_ctrl, int id, int status)
 {
   if (! status) return IUP_DEFAULT;
 
-  int depth = IupGetIntId (tree, "DEPTH", id);
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
   if (depth != EVENT_DEPTH) {
-    struct pos *p = IupTreeGetUserId (tree, id);
+    struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
+    struct pos *p = tree->node[id].data;
     select_pos (&global_mr, p);
   }
 
@@ -920,16 +882,17 @@ _select_target_cb (Ihandle *ih, struct pos *p)
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
   if (! is_event_active (p->l, e)) {
-    Ihandle *all_toggle = (void *) IupGetAttribute (ih, "_ALL_TOGGLE");
-    IupSetInt (all_toggle, "VALUE", true);
+    Ihandle *inactive_toggle =
+      (void *) IupGetAttribute (ih, "_INACTIVE_TOGGLE");
+    IupSetInt (inactive_toggle, "VALUE", true);
   }
 
   _update_tree_cb (ih);
 
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-
-  int id = get_target (tree, p);
-  select_node_by_id (tree, id);
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  int id = get_tree_node_id_by_data (tree, TARGET_DEPTH, p);
+  select_node_by_id (tree_ctrl, id);
   select_pos (&global_mr, p);
 
   return IUP_DEFAULT;
@@ -945,10 +908,10 @@ _select_source_cb (Ihandle *ih, struct pos *p)
 
   _update_tree_cb (ih);
 
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
-
-  int id = get_source_node_id (tree, p);
-  select_node_by_id (tree, id);
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  int id = get_tree_node_id_by_data (tree, SOURCE_DEPTH, p);
+  select_node_by_id (tree_ctrl, id);
   select_pos (&global_mr, p);
 
   return IUP_DEFAULT;

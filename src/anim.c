@@ -318,7 +318,11 @@ play_anim (anim_callback_t draw_callback,
           struct pos np;
           npos (&mouse_pos, &np);
           mr_focus_room (&global_mr, np.room);
-        } else select_pos (&global_mr, &mouse_pos);
+        } else {
+          if (selection_locked && peq (&selection_pos, &mouse_pos))
+            selection_locked = false;
+          else select_pos (&global_mr, &mouse_pos);
+        }
 
         break;
       }
