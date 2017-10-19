@@ -843,7 +843,7 @@ value_tostring (lua_State *L, int index)
     else return xasprintf ("false");
   case LUA_TNUMBER: {
     lua_Number n = lua_tonumber (L, index);
-    if (n == (int64_t) n) return xasprintf ("%ji", (int64_t) n);
+    if (n == (int64_t) n) return xasprintf ("%" PRId64, (int64_t) n);
     else return xasprintf ("%f", n);
   }
   case LUA_TSTRING: {

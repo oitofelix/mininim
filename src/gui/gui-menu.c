@@ -1636,7 +1636,7 @@ replay_favorite_menu (intptr_t index)
     replay_favorite[i].mid =
       menu_sub (&replay_favorite[i].m, true, play_icon,
                 replay_favorite_item_menu, i,
-                "%s: %ju", filename, replay_favorite[i].cycle);
+                "%s: %" PRIu64, filename, replay_favorite[i].cycle);
 
     al_free (filename);
   }
@@ -1827,7 +1827,7 @@ void
 pause_menu_widget (void)
 {
   if (is_game_paused ())
-    menu_hitem (false, "CYCLE: %ju", anim_cycle);
+    menu_hitem (false, "CYCLE: %" PRIu64, anim_cycle);
   else menu_sep (NULL);
 
   item.main.play.pause_game =

@@ -130,7 +130,9 @@ finalize_script (void)
 
   /* These sometimes cause trouble */
   /* al_join_thread (repl_thread, NULL); */
+#if ! WINDOWS_PORT
   al_destroy_thread (repl_thread);
+#endif
 
   al_destroy_mutex (L_mutex);
   al_destroy_cond (repl_cond);

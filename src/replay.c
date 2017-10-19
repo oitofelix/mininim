@@ -688,7 +688,7 @@ print_replay_info (struct replay *replay)
           "  --semantics=%s --start-level=%u --start-time=%u --time-limit=%i \\\n"
           "  --total-hp=%u --kca=%u --kcd=%u\n"
           "Random seed: 0x%X\n"
-          "Cycles: %ju\n",
+          "Cycles: %" PRIu64 "\n",
           replay->filename,
           REPLAY_FILE_SIGNATURE,
           replay->version,
@@ -715,7 +715,7 @@ print_replay_results (struct replay *replay)
   printf ("Complete: %s\n"
           "Reason: %s\n"
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
-          "  --semantics=%s --start-level=%u --start-time=%ju"
+          "  --semantics=%s --start-level=%u --start-time=%" PRIu64
           " --time-limit=%i \\\n"
           "  --total-hp=%u --kca=%i --kcd=%i\n",
           replay->complete ? "YES" : "NO",
@@ -836,7 +836,7 @@ print_replay_favorites (void)
       HLINE;
       printf ("Index: %zu\n"
               "File: %s\n"
-              "Cycle: %ju\n",
+              "Cycle: %" PRIu64 "\n",
               i, replay_favorite[i].filename,
               replay_favorite[i].cycle);
     }

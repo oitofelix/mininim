@@ -261,14 +261,14 @@ video_command_error (const char *command, const char *object,
   char *index_str;
   if (index) {
     if (index <= VIDEO_INDEX_MAX)
-      index_str = xasprintf (" %ju", index);
+      index_str = xasprintf (" %zu", index);
     else index_str = xasprintf (" %s", (char *) index);
   } else index_str = xasprintf ("%s", "");
 
   char *part_str;
   if (part) {
     if (part <= VIDEO_INDEX_MAX)
-      part_str = xasprintf (" %ju", part);
+      part_str = xasprintf (" %zu", part);
     else part_str = xasprintf (" %s", (char *) part);
   } else part_str = xasprintf ("%s", "");
 

@@ -476,7 +476,7 @@ _update_cb (Ihandle *ih)
 
   Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL");
   if (gui_control_attribute_strf
-      (total_label, "TITLE", "%ji", level->event_nmemb))
+      (total_label, "TITLE", "%zu", level->event_nmemb))
     IupRefresh (total_label);
 
   Ihandle *inactive_label = (void *) IupGetAttribute (ih, "_INACTIVE_LABEL");
@@ -957,7 +957,7 @@ clean_button_cb (Ihandle *button)
   event = copy_array (level->event, e + 1,
                       &event_nmemb, sizeof (*event));
 
-  char *desc = xasprintf ("DELETE %ji INACTIVE EVENTS",
+  char *desc = xasprintf ("DELETE %zi INACTIVE EVENTS",
                           level->event_nmemb - e - 1);
   register_event_undo (&undo, event, event_nmemb, desc);
   destroy_array ((void **) &event, &event_nmemb);

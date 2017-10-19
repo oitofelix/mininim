@@ -180,7 +180,7 @@ report (const char *fmt)
   size_t i;
   for (i = 0; i < profiler_stats_nmemb; i++) {
     struct profiler_stats *s = &profiler_stats[i];
-    char *count = xasprintf ("%ju", s->count);
+    char *count = xasprintf ("%" PRIu64, s->count);
     char *total_time = xasprintf ("%.4f", s->total_time);
     char *old_report = report;
     report = fmt_row (fmt, old_report,

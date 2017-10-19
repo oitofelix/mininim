@@ -118,7 +118,7 @@ bool
 tree_eq (struct tree *a, struct tree *b)
 {
   /* if (a->nmemb != b->nmemb) */
-  /*   fprintf (stderr, "a->nmemb: %ji, b->nmemb: %ji\n", a->nmemb, b->nmemb); */
+  /*   fprintf (stderr, "a->nmemb: %zu, b->nmemb: %zu\n", a->nmemb, b->nmemb); */
 
   if (a->nmemb != b->nmemb) return false;
 

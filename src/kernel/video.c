@@ -625,7 +625,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
   }
   /* END: Palette caching guardian */
 
-  /* fprintf (stderr, "%ju: paletted again!!!\n", anim_cycle); */
+  /* fprintf (stderr, "%" PRIu64 ": paletted again!!!\n", anim_cycle); */
 
   /* Apply palette */
   int x, y;

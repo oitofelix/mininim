@@ -865,7 +865,7 @@ ui_save_replay_favorites (void)
     al_free (value);
 
     key = "CYCLE";
-    value = xasprintf ("%ju", replay_favorite[i].cycle);
+    value = xasprintf ("%" PRIu64, replay_favorite[i].cycle);
     ui_save_setting (section, key, value);
     al_free (value);
 
@@ -901,7 +901,7 @@ ui_load_replay_favorites (void)
     }
 
     uint64_t cycle;
-    if (sscanf (cycle_str, "%ju", &cycle) != 1) break;
+    if (sscanf (cycle_str, "%" PRIu64, &cycle) != 1) break;
     add_replay_favorite (file_str, cycle);
 
     al_free (file_str);

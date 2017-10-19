@@ -1839,8 +1839,8 @@ save_game (char *filename, int priority)
     *total_hp_str, *kca_str, *kcd_str;
 
   start_level_str = xasprintf ("%i", global_level.n);
-  start_time_str = xasprintf ("%ju", start_level_time);
-  time_limit_str = xasprintf ("%ju", time_limit);
+  start_time_str = xasprintf ("%" PRIu64, start_level_time);
+  time_limit_str = xasprintf ("%" PRIu64, time_limit);
   total_hp_str = xasprintf ("%i", total_hp);
   kca_str = xasprintf ("%i", skill.counter_attack_prob + 1);
   kcd_str = xasprintf ("%i", skill.counter_defense_prob + 1);
