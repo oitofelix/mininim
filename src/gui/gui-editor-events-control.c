@@ -44,6 +44,8 @@ static void select_node_by_title (Ihandle *tree_ctrl, char *title, int depth);
 
 /* tree build */
 static bool is_event_active (struct level *l, int e);
+static int count_inactive_events (struct level *l);
+static int count_fragmented_events (struct level *l);
 static int _update_tree_cb (Ihandle *ih);
 static void update_tree_ctrl (Ihandle *ih, struct tree *tree);
 static void update_target_icons (Ihandle *ih);
@@ -241,7 +243,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
                 "ALIGNMENT = ARIGHT"),
 
                total_label = IupSetAttributes
-               (IupLabel ("255"),
+               (IupLabel ("000"),
                 "ALIGNMENT = ARIGHT"),
 
                IupSetAttributes
@@ -250,7 +252,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
                 "ALIGNMENT = ARIGHT"),
 
                inactive_label = IupSetAttributes
-               (IupLabel ("128"),
+               (IupLabel ("000"),
                 "ALIGNMENT = ARIGHT"),
 
                IupSetAttributes
@@ -259,7 +261,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
                 "ALIGNMENT = ARIGHT"),
 
                fragmented_label = IupSetAttributes
-               (IupLabel ("64"),
+               (IupLabel ("000"),
                 "ALIGNMENT = ARIGHT"),
 
 
@@ -472,6 +474,21 @@ _update_cb (Ihandle *ih)
     gui_control_active (target_button, e);
   }
 
+  Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL");
+  if (gui_control_attribute_strf
+      (total_label, "TITLE", "%ji", level->event_nmemb))
+    IupRefresh (total_label);
+
+  Ihandle *inactive_label = (void *) IupGetAttribute (ih, "_INACTIVE_LABEL");
+  if (gui_control_attribute_strf
+      (inactive_label, "TITLE", "%i", count_inactive_events (level)))
+    IupRefresh (inactive_label);
+
+  Ihandle *fragmented_label = (void *) IupGetAttribute (ih, "_FRAGMENTED_LABEL");
+  if (gui_control_attribute_strf
+      (fragmented_label, "TITLE", "%i", count_fragmented_events (level)))
+    IupRefresh (fragmented_label);
+
   if ((last->video_mode && strcmp (video_mode, last->video_mode))
       || last->em != em || last->hue != hue)
     update_target_icons (ih);
@@ -510,6 +527,27 @@ is_event_active (struct level *l, int e)
     || closer_floor_by_event (NULL, e, +1)
     || (e > 0 && event (l, e - 1)->next
         && is_event_active (l, e - 1));
+}
+
+int
+count_inactive_events (struct level *l)
+{
+  int count = 0;
+  for (int e = 0; e < l->event_nmemb; e++)
+    if (! is_event_active (l, e)) count++;
+  return count;
+}
+
+int
+count_fragmented_events (struct level *l)
+{
+  int count = 0;
+  bool within = false;
+  for (int e = l->event_nmemb - 1; e >= 0; e--) {
+    if (! within && is_event_active (l, e)) within = true;
+    if (within && ! is_event_active (l, e)) count++;
+  }
+  return count;
 }
 
 void
@@ -828,11 +866,12 @@ new_event (Ihandle *ih, struct pos *p, bool next)
 
   _update_tree_cb (ih);
 
+  select_pos (&global_mr, p);
+
   struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &e);
   select_node_by_id (tree_ctrl, id);
-  select_pos (&global_mr, p);
 
   return e;
 }
@@ -848,12 +887,82 @@ add_button_cb (Ihandle *button)
 int
 defrag_button_cb (Ihandle *button)
 {
+  struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
+
+  int count = count_fragmented_events (level);
+  if (! count) return IUP_DEFAULT;
+
+  char *desc = xasprintf ("DEFRAGMENT %i EVENTS", count);
+
+  struct level_event *event;
+  size_t event_nmemb;
+  event = copy_array (level->event, level->event_nmemb,
+                      &event_nmemb, sizeof (*event));
+
+  int e0, e1;
+
+  for (e0 = 0;
+       e0 < event_nmemb && is_event_active (level, e0);
+       e0++);
+
+  for (e1 = e0 + 1; e1 < event_nmemb; e1++)
+    if (is_event_active (level, e1))
+      do {
+        struct opener_floor *o = NULL;
+        do {
+          o = opener_floor_by_event (o ? &o->p : NULL, e1, +1);
+          if (o)
+            register_tile_undo (&undo, &o->p,
+                                MIGNORE, MIGNORE, e0, MIGNORE,
+                                NULL, (intptr_t) NULL, NULL);
+        } while (o);
+
+        struct closer_floor *c = NULL;
+        do {
+          c = closer_floor_by_event (c ? &c->p : NULL, e1, +1);
+          if (c)
+            register_tile_undo (&undo, &c->p,
+                                MIGNORE, MIGNORE, e0, MIGNORE,
+                                NULL, (intptr_t) NULL, NULL);
+        } while (c);
+
+        struct level_event event_bkp = event[e0];
+        event[e0] = event[e1];
+        event[e1] = event_bkp;
+        e0++;
+      } while (e1 < event_nmemb - 1 && event[e0 - 1].next && e1++);
+
+  register_event_undo (&undo, event, event_nmemb, NULL);
+  end_undo_set (&undo, desc);
+  destroy_array ((void **) &event, &event_nmemb);
+  al_free (desc);
+
+  _update_tree_cb (button);
+
   return IUP_DEFAULT;
 }
 
 int
 clean_button_cb (Ihandle *button)
 {
+  struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
+
+  int e;
+  for (e = level->event_nmemb - 1;
+       e >= 0 && ! is_event_active (level, e);
+       e--);
+
+  struct level_event *event;
+  size_t event_nmemb;
+  event = copy_array (level->event, e + 1,
+                      &event_nmemb, sizeof (*event));
+
+  char *desc = xasprintf ("DELETE %ji INACTIVE EVENTS",
+                          level->event_nmemb - e - 1);
+  register_event_undo (&undo, event, event_nmemb, desc);
+  destroy_array ((void **) &event, &event_nmemb);
+  al_free (desc);
+
   return IUP_DEFAULT;
 }
 

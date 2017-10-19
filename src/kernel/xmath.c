@@ -68,7 +68,7 @@ cint (int *x, int *y)
   return *x - *y;
 }
 
-bool
+int
 int_eq (int *a, int *b)
 {
   return *a == *b;

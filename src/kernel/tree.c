@@ -26,9 +26,9 @@ insert_tree_node (struct tree *tree, int ref_id, enum tree_node_type type,
 {
   int new_id = ref_id + 1;
   if (ref_id >= 0 && tree->node[ref_id].type == TREE_NODE_TYPE_BRANCH) {
-    for (int id = new_id; id < tree->nmemb; id++)
-      if (tree->node[id].depth > tree->node[ref_id].depth)
-        new_id++;
+    while (new_id < tree->nmemb
+           && tree->node[new_id].depth > tree->node[ref_id].depth)
+      new_id++;
   }
   struct tree_node node;
   node.depth = ref_id >= 0 ? tree->node[ref_id].depth : 0;
