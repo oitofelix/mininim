@@ -75,6 +75,8 @@ direction_string (enum dir dir)
   switch (dir) {
   case LEFT: return "LEFT";
   case RIGHT: return "RIGHT";
+  case ABOVE: return "ABOVE";
+  case BELOW: return "BELOW";
   default: assert (0); return NULL;
   }
 }
@@ -84,6 +86,8 @@ direction_enum (const char *dir)
 {
   if (! strcasecmp (dir, "LEFT")) return LEFT;
   else if (! strcasecmp (dir, "RIGHT")) return RIGHT;
+  else if (! strcasecmp (dir, "ABOVE")) return ABOVE;
+  else if (! strcasecmp (dir, "BELOW")) return BELOW;
   else return INVALID;
 }
 

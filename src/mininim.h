@@ -218,6 +218,7 @@
 #include "gui-tile-move-control.h"
 #include "gui-position-control.h"
 #include "gui-editor-events-control.h"
+#include "gui-editor-room-control.h"
 #include "gui-editor-toolbar-control.h"
 #include "gui-directional-control.h"
 #include "gui-coordinates-control.h"

@@ -106,6 +106,7 @@ load_icons (void)
   LOAD_ICON (V_ICON);
   LOAD_ICON (H_ICON);
   LOAD_ICON (VIEW_RING_ICON);
+  LOAD_ICON (VIEW_RING_DEL_ICON);
   LOAD_ICON (ROW_ICON);
   LOAD_ICON (PAGE_ICON);
   LOAD_ICON (L_ICON);
@@ -163,6 +164,7 @@ unload_icons (void)
   UNLOAD_ICON (V_ICON);
   UNLOAD_ICON (H_ICON);
   UNLOAD_ICON (VIEW_RING_ICON);
+  UNLOAD_ICON (VIEW_RING_DEL_ICON);
   UNLOAD_ICON (ROW_ICON);
   UNLOAD_ICON (PAGE_ICON);
   UNLOAD_ICON (L_ICON);
@@ -449,6 +451,15 @@ gui_run_callback_IFni (const char *name, Ihandle *ih, int i)
   if (! ih) return IUP_DEFAULT;
   IFni cb = (IFni) IupGetCallback (ih, name);
   if (cb) return cb (ih, i);
+  else return IUP_DEFAULT;
+}
+
+int
+gui_run_callback_IFnii (const char *name, Ihandle *ih, int i0, int i1)
+{
+  if (! ih) return IUP_DEFAULT;
+  IFnii cb = (IFnii) IupGetCallback (ih, name);
+  if (cb) return cb (ih, i0, i1);
   else return IUP_DEFAULT;
 }
 

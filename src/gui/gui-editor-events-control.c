@@ -39,9 +39,6 @@ static struct level_event *selected_event (Ihandle *tree_ctrl);
 
 static int _update_cb (Ihandle *ih);
 
-static void select_node_by_id (Ihandle *tree_ctrl, int id);
-static void select_node_by_title (Ihandle *tree_ctrl, char *title, int depth);
-
 /* tree build */
 static bool is_event_active (struct level *l, int e);
 static int count_inactive_events (struct level *l);
@@ -84,7 +81,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 
   Ihandle *selection_frame, *source_button, *target_button, *add_button;
 
-  Ihandle *optimization_frame, *defrag_button, *clean_button,
+  Ihandle *sanitation_frame, *defrag_button, *clean_button,
     *total_label, *inactive_label, *fragmented_label;
 
   ih = IupSetCallbacks
@@ -229,7 +226,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
             NULL)),
           "TITLE = Selection,"),
 
-         optimization_frame = IupSetAttributes
+         sanitation_frame = IupSetAttributes
          (IupFrame
           (IupVbox
            (IupFill (),
@@ -289,7 +286,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
               (IupSetAttributes
                (IupButton (NULL, NULL),
                 "IMAGE = EVENT_DEFRAG_ICON,"
-                "TIP = \"Defragment events\","),
+                "TIP = \"Defragment inactive events\","),
                "ACTION", defrag_button_cb,
                NULL),
 
@@ -313,7 +310,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
             IupFill (),
 
             NULL)),
-          "TITLE = Optimization,"),
+          "TITLE = Sanitation,"),
 
          NULL),
         "ALIGNMENT = ACENTER"),
@@ -357,7 +354,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_TARGET_BUTTON", (void *) target_button);
   IupSetAttribute (ih, "_ADD_BUTTON", (void *) add_button);
 
-  IupSetAttribute (ih, "_OPTIMIZATION_FRAME", (void *) optimization_frame);
+  IupSetAttribute (ih, "_SANITATION_FRAME", (void *) sanitation_frame);
   IupSetAttribute (ih, "_DEFRAG_BUTTON", (void *) defrag_button);
   IupSetAttribute (ih, "_CLEAN_BUTTON", (void *) clean_button);
 
@@ -673,41 +670,6 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
   al_free (selected_title);
 }
 
-void
-select_node_by_id (Ihandle *tree_ctrl, int id)
-{
-  IupSetInt (tree_ctrl, "VALUE", id);
-
-  /* Motif bug workaround */
-  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
-  if (depth > 0) {
-    int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
-    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "COLLAPSED");
-    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "EXPANDED");
-    IupSetInt (tree_ctrl, "VALUE", id);
-  }
-}
-
-void
-select_node_by_title (Ihandle *tree_ctrl, char *s_title, int s_depth)
-{
-  bool selected = false;
-
-  int count = IupGetInt (tree_ctrl, "COUNT");
-  for (int id = 0; id < count; id++) {
-    char *title = IupGetAttributeId (tree_ctrl, "TITLE", id);
-    int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
-    if (s_depth >= 0 && s_depth != depth) continue;
-    if (! strcmp (s_title, title)) {
-      select_node_by_id (tree_ctrl, id);
-      selected = true;
-      break;
-    }
-  }
-
-  if (! selected) IupSetAttribute (tree_ctrl, "VALUE", "FIRST");
-}
-
 int
 target_event (struct pos *p)
 {
@@ -892,7 +854,7 @@ defrag_button_cb (Ihandle *button)
   int count = count_fragmented_events (level);
   if (! count) return IUP_DEFAULT;
 
-  char *desc = xasprintf ("DEFRAGMENT %i EVENTS", count);
+  char *desc = xasprintf ("DEFRAGMENT %i INACTIVE EVENTS", count);
 
   struct level_event *event;
   size_t event_nmemb;

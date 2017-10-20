@@ -134,6 +134,21 @@ tree_eq (struct tree *a, struct tree *b)
 }
 
 void
+destroy_tree (struct tree *tree)
+{
+  for (int id = 0; id < tree->nmemb ; id++) {
+    al_free (tree->node[id].data);
+    tree->node[id].data = NULL;
+  }
+  destroy_array ((void **) &tree->node, &tree->nmemb);
+}
+
+
+/**************************************************************************
+ * Tree control
+ **************************************************************************/
+
+void
 populate_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
 {
   for (int id = -1; id < (int) tree->nmemb - 1; id++) {
@@ -158,11 +173,66 @@ populate_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
 }
 
 void
-destroy_tree (struct tree *tree)
+select_node_by_id (Ihandle *tree_ctrl, int id)
 {
-  for (int id = 0; id < tree->nmemb ; id++) {
-    al_free (tree->node[id].data);
-    tree->node[id].data = NULL;
+  IupSetInt (tree_ctrl, "VALUE", id);
+
+  /* Motif bug workaround */
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
+  if (depth > 0) {
+    int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
+    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "COLLAPSED");
+    IupSetAttributeId (tree_ctrl, "STATE", parent_id, "EXPANDED");
+    IupSetInt (tree_ctrl, "VALUE", id);
   }
-  destroy_array ((void **) &tree->node, &tree->nmemb);
+
+  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+}
+
+void
+select_node_by_title (Ihandle *tree_ctrl, char *s_title, int s_depth)
+{
+  bool selected = false;
+
+  int count = IupGetInt (tree_ctrl, "COUNT");
+  for (int id = 0; id < count; id++) {
+    char *title = IupGetAttributeId (tree_ctrl, "TITLE", id);
+    int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
+    if (s_depth >= 0 && s_depth != depth) continue;
+    if (! strcmp (s_title, title)) {
+      select_node_by_id (tree_ctrl, id);
+      selected = true;
+      break;
+    }
+  }
+
+  if (! selected) IupSetAttribute (tree_ctrl, "VALUE", "FIRST");
+}
+
+void
+propagate_children_nodes_color (Ihandle *tree_ctrl)
+{
+  unsigned char dr, dg, db;
+  IupGetRGB (tree_ctrl, "FGCOLOR", &dr, &dg, &db);
+
+  int count = IupGetInt (tree_ctrl, "COUNT");
+  for (int id = 0; id < count; id++) {
+    unsigned char r, g, b;
+    IupGetRGBId (tree_ctrl, "COLOR", id, &r, &g, &b);
+    if ((r != dr || g != dg || b != db)
+        && IupGetIntId (tree_ctrl, "DEPTH", id) > 0) {
+      int parent_id = id;
+      do {
+        /* check depth rather than node id to workaround a bug in IUP
+           that makes all parent chains end at node id 0 instead of -1 */
+        parent_id = IupGetIntId (tree_ctrl, "PARENT", parent_id);
+        unsigned char pr, pg, pb;
+        IupGetRGBId (tree_ctrl, "COLOR", parent_id, &pr, &pg, &pb);
+        pr = max_int (pr, r);
+        pg = max_int (pg, g);
+        pb = max_int (pb, b);
+        IupSetRGBId (tree_ctrl, "COLOR", parent_id, pr, pg, pb);
+      } while (IupGetIntId (tree_ctrl, "DEPTH", parent_id) > 0);
+    }
+  }
 }

@@ -47,7 +47,12 @@ int get_or_put_tree_branch_child (struct tree *tree, int parent_id,
                                   m_comparison_fn_t cmp);
 int get_tree_node_id_by_data (struct tree *tree, int depth, void *data);
 bool tree_eq (struct tree *a, struct tree *b);
-void populate_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree);
 void destroy_tree (struct tree *tree);
+
+/* Tree control */
+void populate_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree);
+void select_node_by_id (Ihandle *tree_ctrl, int id);
+void select_node_by_title (Ihandle *tree_ctrl, char *title, int depth);
+void propagate_children_nodes_color (Ihandle *tree_ctrl);
 
 #endif	/* MININIM_TREE_H */

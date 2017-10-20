@@ -139,6 +139,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui-position-control.h																		\
 	  src/gui/gui-editor-events-control.c																\
 	  src/gui/gui-editor-events-control.h																\
+	  src/gui/gui-editor-room-control.c																	\
+	  src/gui/gui-editor-room-control.h																	\
 	  src/gui/gui-editor-toolbar-control.c															\
 	  src/gui/gui-editor-toolbar-control.h															\
 	  src/gui/gui-directional-control.c																	\
