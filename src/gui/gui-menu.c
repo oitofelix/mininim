@@ -1303,19 +1303,23 @@ void
 nav_room_menu (intptr_t index)
 {
   item.main.view.nav.select.left =
-    menu_sitem (roomd (&global_level, global_mr.room, LEFT),
+    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+                       global_mr.room, LEFT),
                 l_icon, "&Left (H)");
 
   item.main.view.nav.select.above =
-    menu_sitem (roomd (&global_level, global_mr.room, ABOVE),
+    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+                       global_mr.room, ABOVE),
                 a_icon, "&Above (U)");
 
   item.main.view.nav.select.right =
-    menu_sitem (roomd (&global_level, global_mr.room, RIGHT),
+    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+                       global_mr.room, RIGHT),
                 r_icon, "&Right (J)");
 
   item.main.view.nav.select.below =
-    menu_sitem (roomd (&global_level, global_mr.room, BELOW),
+    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+                       global_mr.room, BELOW),
                 b_icon, "&Below (N)");
 }
 

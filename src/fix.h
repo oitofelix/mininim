@@ -25,7 +25,10 @@ union tile_state *fix_tile (struct pos *p, void *data);
 
 /* -------------------------------------- */
 
-void make_links_locally_consistent (struct level *l, int prev_room, int current_room);
+void make_links_locally_consistent (struct room_linking *rlink,
+                                    size_t room_nmemb,
+                                    int prev_room,
+                                    int current_room);
 void fix_room_0 (struct level *l);
 void fix_traversable_above_room_0 (struct level *l);
 
@@ -42,12 +45,19 @@ bool is_there_event_handler (struct level *l, int e);
 
 
 /* room linking */
-void make_reciprocal_link (struct level *l, int room0, int room1, enum dir dir);
-void make_link_locally_unique (struct level *l, int room, enum dir dir);
-void make_link_globally_unique (struct level *l, int room, enum dir dir);
-void make_semi_consistent_link (struct level *l, int room0, int room1, enum dir dir);
-void make_link_adjacency_bound (struct level *l, int room, enum dir dir);
-void exchange_rooms  (struct level *l, int room0, int room1);
-void circular_linking (struct level *lv);
+void
+make_reciprocal_link (struct room_linking *rlink, size_t room_nmemb,
+                      int room0, int room1, enum dir dir);
+void make_link_locally_unique (struct room_linking *rlink, size_t room_nmemb,
+                               int room, enum dir dir);
+void make_link_globally_unique (struct room_linking *rlink, size_t room_nmemb,
+                                int room, enum dir dir);
+void make_semi_consistent_link (struct room_linking *rlink, size_t room_nmemb,
+                                int room0, int room1, enum dir dir);
+void make_link_adjacency_bound (struct room_linking *rlink, size_t room_nmemb,
+                                int room, enum dir dir);
+void exchange_rooms  (struct room_linking *rlink, size_t room_nmemb,
+                      int room0, int room1);
+void circular_linking (struct room_linking *rlink, size_t room_nmemb);
 
 #endif	/* MININIM_FIX_H */

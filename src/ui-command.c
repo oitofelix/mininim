@@ -206,11 +206,14 @@ ui_mr_set_dim (struct mr *mr, int w, int h, bool correct_mouse)
 void
 ui_show_coordinates (void)
 {
+  struct room_linking *rlink = global_level.link;
+  size_t room_nmemb = global_level.room_nmemb;
+
   int s = global_mr.room;
-  int l = roomd (&global_level, s, LEFT);
-  int r = roomd (&global_level, s, RIGHT);
-  int a = roomd (&global_level, s, ABOVE);
-  int b = roomd (&global_level, s, BELOW);
+  int l = roomd (rlink, room_nmemb, s, LEFT);
+  int r = roomd (rlink, room_nmemb, s, RIGHT);
+  int a = roomd (rlink, room_nmemb, s, ABOVE);
+  int b = roomd (rlink, room_nmemb, s, BELOW);
 
   global_mr.select_cycles = SELECT_CYCLES;
 
@@ -220,12 +223,15 @@ ui_show_coordinates (void)
 void
 ui_show_indirect_coordinates (void)
 {
-  int a = roomd (&global_level, global_mr.room, ABOVE);
-  int b = roomd (&global_level, global_mr.room, BELOW);
-  int al = roomd (&global_level, a, LEFT);
-  int ar = roomd (&global_level, a, RIGHT);
-  int bl = roomd (&global_level, b, LEFT);
-  int br = roomd (&global_level, b, RIGHT);
+  struct room_linking *rlink = global_level.link;
+  size_t room_nmemb = global_level.room_nmemb;
+
+  int a = roomd (rlink, room_nmemb, global_mr.room, ABOVE);
+  int b = roomd (rlink, room_nmemb, global_mr.room, BELOW);
+  int al = roomd (rlink, room_nmemb, a, LEFT);
+  int ar = roomd (rlink, room_nmemb, a, RIGHT);
+  int bl = roomd (rlink, room_nmemb, b, LEFT);
+  int br = roomd (rlink, room_nmemb, b, RIGHT);
 
   global_mr.select_cycles = SELECT_CYCLES;
 

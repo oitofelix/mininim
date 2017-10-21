@@ -60,7 +60,8 @@ _update_cb (Ihandle *ih)
   Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
 
   struct link_survey ls;
-  link_survey (&ls, &global_level, global_mr.room);
+  link_survey (&ls, global_level.link, global_level.room_nmemb,
+               global_mr.room);
 
   gui_control_active (l_button, ls.l);
   gui_control_active (r_button, ls.r);

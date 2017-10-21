@@ -25,15 +25,22 @@ extern bool coord_wa;
 
 /* types */
 int typed_int (int i, int n, int f, int *nr, int *nf);
-int room_val (struct level *l, int r);
+int room_val (size_t room_nmemb, int room);
 
-int *roomd_ptr (struct level *l, int room, enum dir dir);
-int roomd (struct level *l, int room, enum dir dir);
-int roomd_n0 (struct level *l, int room, enum dir dir);
-bool is_room_adjacent (struct level *l, int room0, int room1);
-void link_room (struct level *l, int room0, int room1, enum dir dir);
-void mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1);
-int room_dist (struct level *l, int r0, int r1, int max);
+int *roomd_ptr (struct room_linking *rlink, size_t room_nmemb,
+                int room, enum dir dir);
+int roomd (struct room_linking *rlink, size_t room_nmemb, int room,
+           enum dir dir);
+int roomd_n0 (struct room_linking *rlink, size_t room_nmemb,
+              int room, enum dir dir);
+bool is_room_adjacent (struct room_linking *rlink, size_t room_nmemb,
+                       int room0, int room1);
+void link_room (struct room_linking *rlink, size_t room_nmemb,
+                int room0, int room1, enum dir dir);
+void mirror_link (struct room_linking *rlink, size_t room_nmemb,
+                  int room, enum dir dir0, enum dir dir1);
+int room_dist (struct room_linking *rlink, size_t room_nmemb,
+               int r0, int r1, int max);
 int min_room_dist (size_t room_nmemb;
                    struct room_dist room[room_nmemb],
                    size_t room_nmemb, int *dmax);
@@ -119,8 +126,9 @@ void
 surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
 
-struct link_survey *link_survey (struct link_survey *ls, struct level *level,
-                                 int room);
+struct link_survey *link_survey (struct link_survey *ls,
+                                 struct room_linking *rlink,
+                                 size_t room_nmemb, int room);
 struct pos_survey *pos_survey (struct pos_survey *ps, struct pos *p);
 
 bool is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y);

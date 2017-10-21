@@ -37,7 +37,8 @@ static int count_room_broken_links (struct level *l, int room);
 static int count_level_broken_links (struct level *l);
 static int _update_tree_cb (Ihandle *ih);
 static void update_tree_ctrl (Ihandle *ih, struct tree *tree);
-static void populate_room_tree (struct level *level, struct tree *tree);
+static void populate_room_tree (struct room_linking *rlink,
+                                size_t room_nmemb, struct tree *tree);
 
 /* auxiliary */
 int new_room (Ihandle *ih, int l, int r, int a, int b);
@@ -417,11 +418,12 @@ _update_cb (Ihandle *ih)
 }
 
 bool
-is_broken_link (struct level *level, int room, enum dir d)
+is_broken_link (struct room_linking *rlink, size_t room_nmemb,
+                int room, enum dir d)
 {
-  int rd = roomd (level, room, d);
+  int rd = roomd (rlink, room_nmemb, room, d);
   return room != 0 && rd != 0 &&
-    room != roomd (level, rd, opposite_dir (d));
+    room != roomd (rlink, room_nmemb, rd, opposite_dir (d));
 }
 
 int
@@ -437,12 +439,13 @@ count_level_broken_links (struct level *l)
 }
 
 void
-populate_room_tree (struct level *level, struct tree *tree)
+populate_room_tree (struct room_linking *rlink, size_t room_nmemb,
+                    struct tree *tree)
 {
   tree->node = NULL;
   tree->nmemb = 0;
 
-  for (int room = 1; room < level->room_nmemb; room++) {
+  for (int room = 1; room < room_nmemb; room++) {
     int room_id = get_or_put_tree_branch_child
       (tree, -1, TREE_NODE_TYPE_BRANCH, &room, sizeof (room),
        (m_comparison_fn_t) int_eq);
@@ -452,13 +455,13 @@ populate_room_tree (struct level *level, struct tree *tree)
         (tree, room_id, TREE_NODE_TYPE_BRANCH, &d, sizeof (d),
          (m_comparison_fn_t) int_eq);
 
-      int room_out = roomd (level, room, d);
+      int room_out = roomd (rlink, room_nmemb, room, d);
       get_or_put_tree_branch_child
         (tree, dir_id, TREE_NODE_TYPE_LEAF, &room_out, sizeof (room_out),
          (m_comparison_fn_t) int_eq);
 
-      for (int room_in = 1; room_in < level->room_nmemb; room_in++)
-        if (roomd (level, room_in, opposite_dir (d)) == room)
+      for (int room_in = 1; room_in < room_nmemb; room_in++)
+        if (roomd (rlink, room_nmemb, room_in, opposite_dir (d)) == room)
           get_or_put_tree_branch_child
             (tree, dir_id, TREE_NODE_TYPE_LEAF, &room_in, sizeof (room_in),
              (m_comparison_fn_t) int_eq);
@@ -531,7 +534,7 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       IupSetAttributeId
         (tree_ctrl, "IMAGE", id, dir_icon_name (d));
 
-      if (is_broken_link (level, src_room, d))
+      if (is_broken_link (level->link, level->room_nmemb, src_room, d))
         IupSetAttributeId (tree_ctrl, "COLOR", id, first
                            ? "255 0 0"
                            : "180 0 0");
@@ -550,7 +553,7 @@ _update_tree_cb (Ihandle *ih)
 {
   struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct tree new_tree;
-  populate_room_tree (level, &new_tree);
+  populate_room_tree (level->link, level->room_nmemb, &new_tree);
   update_tree_ctrl (ih, &new_tree);
   return IUP_DEFAULT;
 }

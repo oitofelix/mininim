@@ -265,9 +265,9 @@ guard (struct level *l, int g)
 }
 
 struct room_linking *
-llink (struct level *l, int r)
+llink (struct room_linking *rlink, size_t room_nmemb, int room)
 {
-  return &l->link[room_val (l, r)];
+  return &rlink[room_val (room_nmemb, room)];
 }
 
 bool
@@ -1132,7 +1132,7 @@ mirror_level_h (struct level *l)
   int i;
   for (i = 1; i < l->room_nmemb; i++) {
     mirror_room_h (l, i);
-    mirror_link (l, i, LEFT, RIGHT);
+    mirror_link (l->link, l->room_nmemb, i, LEFT, RIGHT);
   }
   return l;
 }

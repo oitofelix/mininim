@@ -38,78 +38,94 @@ typed_int (int i, int n, int f, int *nr, int *nf)
 }
 
 int
-room_val (struct level *l, int r)
+room_val (size_t room_nmemb, int room)
 {
-  return typed_int (r, l->room_nmemb, 1, NULL, NULL);
+  return typed_int (room, room_nmemb, 1, NULL, NULL);
 }
 
 int *
-roomd_ptr (struct level *l, int room, enum dir dir)
+roomd_ptr (struct room_linking *rlink, size_t room_nmemb,
+           int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return &llink (l, room)->l;
-  case RIGHT: return &llink (l, room)->r;
-  case ABOVE: return &llink (l, room)->a;
-  case BELOW: return &llink (l, room)->b;
+  case LEFT: return &llink (rlink, room_nmemb, room)->l;
+  case RIGHT: return &llink (rlink, room_nmemb, room)->r;
+  case ABOVE: return &llink (rlink, room_nmemb, room)->a;
+  case BELOW: return &llink (rlink, room_nmemb, room)->b;
   default: assert (false); return NULL;
   }
 }
 
 int
-roomd (struct level *l, int room, enum dir dir)
+roomd (struct room_linking *rlink, size_t room_nmemb,
+       int room, enum dir dir)
 {
-  return room_val (l, *roomd_ptr (l, room, dir));
+  return room_val
+    (room_nmemb, *roomd_ptr (rlink, room_nmemb, room, dir));
 }
 
 void
-link_room (struct level *l, int room0, int room1, enum dir dir)
+link_room (struct room_linking *rlink, size_t room_nmemb,
+           int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (l, room0, dir) = room_val (l, room1);
+  if (room0)
+    *roomd_ptr (rlink, room_nmemb, room0, dir)
+      = room_val (room_nmemb, room1);
 }
 
 void
-mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1)
+mirror_link (struct room_linking *rlink, size_t room_nmemb,
+             int room, enum dir dir0, enum dir dir1)
 {
-  int r0 = roomd (l, room, dir0);
-  int r1 = roomd (l, room, dir1);
-  link_room (l, room, r0, dir1);
-  link_room (l, room, r1, dir0);
+  int r0 = roomd (rlink, room_nmemb, room, dir0);
+  int r1 = roomd (rlink, room_nmemb, room, dir1);
+  link_room (rlink, room_nmemb, room, r0, dir1);
+  link_room (rlink, room_nmemb, room, r1, dir0);
 }
 
 int
-roomd_n0 (struct level *l, int room, enum dir dir)
+roomd_n0 (struct room_linking *rlink, size_t room_nmemb,
+          int room, enum dir dir)
 {
-  int r = roomd (l, room, dir);
+  int r = roomd (rlink, room_nmemb, room, dir);
   return r ? r : room;
 }
 
 bool
-is_room_adjacent (struct level *l, int room0, int room1)
+is_room_adjacent (struct room_linking *rlink, size_t room_nmemb,
+                  int room0, int room1)
 {
-  return room0 == room1
-    || roomd (l, room0, LEFT) == room1
-    || roomd (l, room0, RIGHT) == room1
-    || roomd (l, room0, ABOVE) == room1
-    || roomd (l, room0, BELOW) == room1;
+  int r0 = room_val (room_nmemb, room0);
+  int r1 = room_val (room_nmemb, room1);
+
+  return r0 == r1
+    || roomd (rlink, room_nmemb, r0, LEFT) == r1
+    || roomd (rlink, room_nmemb, r0, RIGHT) == r1
+    || roomd (rlink, room_nmemb, r0, ABOVE) == r1
+    || roomd (rlink, room_nmemb, r0, BELOW) == r1;
 }
 
 int
-room_dist (struct level *lv, int r0, int r1, int max)
+room_dist (struct room_linking *rlink, size_t room_nmemb,
+           int r0, int r1, int max)
 {
-  struct room_dist room[lv->room_nmemb];
+  struct room_dist room[room_nmemb];
+
+  r0 = room_val (room_nmemb, r0);
+  r1 = room_val (room_nmemb, r1);
 
   /* begin optimization block */
   if (r0 == r1) return 0;
 
-  if (roomd (lv, r0, LEFT) == r1
-      || roomd (lv, r0, RIGHT) == r1
-      || roomd (lv, r0, BELOW) == r1
-      || roomd (lv, r0, ABOVE) == r1)
+  if (roomd (rlink, room_nmemb, r0, LEFT) == r1
+      || roomd (rlink, room_nmemb, r0, RIGHT) == r1
+      || roomd (rlink, room_nmemb, r0, BELOW) == r1
+      || roomd (rlink, room_nmemb, r0, ABOVE) == r1)
     return 1;
   /* end optimization block */
 
   int i;
-  for (i = 0; i < lv->room_nmemb; i++) {
+  for (i = 0; i < room_nmemb; i++) {
     room[i].dist = INT_MAX;
     room[i].visited = false;
   }
@@ -118,15 +134,15 @@ room_dist (struct level *lv, int r0, int r1, int max)
   int dmax = 0;
 
   int u;
-  while ((u = min_room_dist (room, lv->room_nmemb, &dmax)) != -1
+  while ((u = min_room_dist (room, room_nmemb, &dmax)) != -1
          && dmax <= max) {
     if (u == r1) break;
     room[u].visited = true;
 
-    int l = roomd (lv, u, LEFT);
-    int r = roomd (lv, u, RIGHT);
-    int b = roomd (lv, u, BELOW);
-    int a = roomd (lv, u, ABOVE);
+    int l = roomd (rlink, room_nmemb, u, LEFT);
+    int r = roomd (rlink, room_nmemb, u, RIGHT);
+    int b = roomd (rlink, room_nmemb, u, BELOW);
+    int a = roomd (rlink, room_nmemb, u, ABOVE);
 
     room[l].dist = min_int (room[l].dist, room[u].dist + 1);
     room[r].dist = min_int (room[r].dist, room[u].dist + 1);
@@ -220,16 +236,16 @@ ncoord (struct coord *c, struct coord *nc)
     m = allow_weak = allow_zero = false;
 
     int ra, rb, rl, rr;
-    ra = roomd (nc->l, nc->room, ABOVE);
-    rb = roomd (nc->l, nc->room, BELOW);
-    rl = roomd (nc->l, nc->room, LEFT);
-    rr = roomd (nc->l, nc->room, RIGHT);
+    ra = roomd (nc->l->link, nc->l->room_nmemb, nc->room, ABOVE);
+    rb = roomd (nc->l->link, nc->l->room_nmemb, nc->room, BELOW);
+    rl = roomd (nc->l->link, nc->l->room_nmemb, nc->room, LEFT);
+    rr = roomd (nc->l->link, nc->l->room_nmemb, nc->room, RIGHT);
 
     int rab, rba, rlr, rrl;
-    rab = roomd (nc->l, ra, BELOW);
-    rba = roomd (nc->l, rb, ABOVE);
-    rlr = roomd (nc->l, rl, RIGHT);
-    rrl = roomd (nc->l, rr, LEFT);
+    rab = roomd (nc->l->link, nc->l->room_nmemb, ra, BELOW);
+    rba = roomd (nc->l->link, nc->l->room_nmemb, rb, ABOVE);
+    rlr = roomd (nc->l->link, nc->l->room_nmemb, rl, RIGHT);
+    rrl = roomd (nc->l->link, nc->l->room_nmemb, rr, LEFT);
 
   retry:
     if (nl && (rlr == nc->room || allow_weak)
@@ -309,26 +325,26 @@ npos (struct pos *p, struct pos *np)
 
   bool m;
 
-  np->room = room_val (np->l, np->room);
+  np->room = room_val (np->l->room_nmemb, np->room);
 
   do {
     m = false;
 
     if (np->floor < 0) {
       np->floor += FLOORS;
-      np->room = roomd (np->l, np->room, ABOVE);
+      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, ABOVE);
       m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
-      np->room = roomd (np->l, np->room, BELOW);
+      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, BELOW);
       m = true;
     } else if (np->place < 0) {
       np->place += PLACES;
-      np->room = roomd (np->l, np->room, LEFT);
+      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, LEFT);
       m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
-      np->room = roomd (np->l, np->room, RIGHT);
+      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, RIGHT);
       m = true;
     }
   } while (m);
@@ -382,10 +398,10 @@ pos2room (struct pos *p, int room, struct pos *pv)
 
   int ra, rb, rl, rr;
 
-  ra = roomd (pv->l, room, ABOVE);
-  rb = roomd (pv->l, room, BELOW);
-  rl = roomd (pv->l, room, LEFT);
-  rr = roomd (pv->l, room, RIGHT);
+  ra = roomd (pv->l->link, pv->l->room_nmemb, room, ABOVE);
+  rb = roomd (pv->l->link, pv->l->room_nmemb, room, BELOW);
+  rl = roomd (pv->l->link, pv->l->room_nmemb, room, LEFT);
+  rr = roomd (pv->l->link, pv->l->room_nmemb, room, RIGHT);
 
   if (rb == pv->room) {
     pb.floor += FLOORS;
@@ -442,15 +458,15 @@ coord2room (struct coord *c, int room, struct coord *cv)
   int ra, rb, rl, rr;
   int rab, rba, rlr, rrl;
 
-  ra = roomd (cv->l, room, ABOVE);
-  rb = roomd (cv->l, room, BELOW);
-  rl = roomd (cv->l, room, LEFT);
-  rr = roomd (cv->l, room, RIGHT);
+  ra = roomd (cv->l->link, cv->l->room_nmemb, room, ABOVE);
+  rb = roomd (cv->l->link, cv->l->room_nmemb, room, BELOW);
+  rl = roomd (cv->l->link, cv->l->room_nmemb, room, LEFT);
+  rr = roomd (cv->l->link, cv->l->room_nmemb, room, RIGHT);
 
-  rab = roomd (cv->l, ra, BELOW);
-  rba = roomd (cv->l, rb, ABOVE);
-  rlr = roomd (cv->l, rl, RIGHT);
-  rrl = roomd (cv->l, rr, LEFT);
+  rab = roomd (cv->l->link, cv->l->room_nmemb, ra, BELOW);
+  rba = roomd (cv->l->link, cv->l->room_nmemb, rb, ABOVE);
+  rlr = roomd (cv->l->link, cv->l->room_nmemb, rl, RIGHT);
+  rrl = roomd (cv->l->link, cv->l->room_nmemb, rr, LEFT);
 
   if (rb == cv->room
       && rba == room) {
@@ -610,13 +626,14 @@ coord4draw (struct coord *c, int room, struct coord *cv)
   bool m = false;
 
   if (cv->y < 11 &&
-      roomd (cv->l, room, BELOW) == cv->room
+      roomd (cv->l->link, cv->l->room_nmemb, room, BELOW) == cv->room
       && room != cv->room) {
     cv->y += PLACE_HEIGHT * FLOORS;
     cv->room = room;
     m = true;
   } else if (cv->y >= PLACE_HEIGHT * FLOORS
-             && roomd (cv->l, room, ABOVE) == cv->room
+             && roomd (cv->l->link, cv->l->room_nmemb, room, ABOVE)
+             == cv->room
              && room != cv->room) {
     cv->y -= PLACE_HEIGHT * FLOORS;
     cv->room = room;
@@ -1233,29 +1250,30 @@ surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
 }
 
 struct link_survey *
-link_survey (struct link_survey *ls, struct level *level, int room)
+link_survey (struct link_survey *ls, struct room_linking *rlink,
+             size_t room_nmemb, int room)
 {
   ls->s = room;
 
-  ls->l = roomd (level, ls->s, LEFT);
-  ls->r = roomd (level, ls->s, RIGHT);
-  ls->a = roomd (level, ls->s, ABOVE);
-  ls->b = roomd (level, ls->s, BELOW);
+  ls->l = roomd (rlink, room_nmemb, ls->s, LEFT);
+  ls->r = roomd (rlink, room_nmemb, ls->s, RIGHT);
+  ls->a = roomd (rlink, room_nmemb, ls->s, ABOVE);
+  ls->b = roomd (rlink, room_nmemb, ls->s, BELOW);
 
-  ls->lr = roomd (level, ls->l, RIGHT);
-  ls->rl = roomd (level, ls->r, LEFT);
-  ls->ab = roomd (level, ls->a, BELOW);
-  ls->ba = roomd (level, ls->b, ABOVE);
+  ls->lr = roomd (rlink, room_nmemb, ls->l, RIGHT);
+  ls->rl = roomd (rlink, room_nmemb, ls->r, LEFT);
+  ls->ab = roomd (rlink, room_nmemb, ls->a, BELOW);
+  ls->ba = roomd (rlink, room_nmemb, ls->b, ABOVE);
 
-  ls->al = roomd (level, ls->a, LEFT);
-  ls->ar = roomd (level, ls->a, RIGHT);
-  ls->bl = roomd (level, ls->b, LEFT);
-  ls->br = roomd (level, ls->b, RIGHT);
+  ls->al = roomd (rlink, room_nmemb, ls->a, LEFT);
+  ls->ar = roomd (rlink, room_nmemb, ls->a, RIGHT);
+  ls->bl = roomd (rlink, room_nmemb, ls->b, LEFT);
+  ls->br = roomd (rlink, room_nmemb, ls->b, RIGHT);
 
-  ls->la = roomd (level, ls->l, ABOVE);
-  ls->ra = roomd (level, ls->r, ABOVE);
-  ls->lb = roomd (level, ls->l, BELOW);
-  ls->rb = roomd (level, ls->r, BELOW);
+  ls->la = roomd (rlink, room_nmemb, ls->l, ABOVE);
+  ls->ra = roomd (rlink, room_nmemb, ls->r, ABOVE);
+  ls->lb = roomd (rlink, room_nmemb, ls->l, BELOW);
+  ls->rb = roomd (rlink, room_nmemb, ls->r, BELOW);
 
   return ls;
 }

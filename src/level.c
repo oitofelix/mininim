@@ -194,7 +194,8 @@ level_eq (struct level *l0, struct level *l1)
 
   if (l0->room_nmemb != l1->room_nmemb) return false;
   for (size_t i = 0; i < l0->room_nmemb; i++)
-    if (! room_linking_eq (llink (l0, i), llink (l1, i)))
+    if (! room_linking_eq (llink (l0->link, l0->room_nmemb, i),
+                           llink (l1->link, l1->room_nmemb, i)))
       return false;
 
   if (l0->event_nmemb != l1->event_nmemb) return false;
@@ -805,11 +806,14 @@ compute_level (void)
       && camera_follow_kid == k->id
       && (ke = get_reciprocal_enemy (k))
       && ! is_room_visible (&global_mr, ke->f.c.room)) {
-    if (ke->f.c.room == roomd (&global_level, k->f.c.room, LEFT)) {
+    if (ke->f.c.room == roomd (global_level.link, global_level.room_nmemb,
+                               k->f.c.room, LEFT)) {
       mr_row_trans (&global_mr, LEFT);
       mr_focus_room (&global_mr, k->f.c.room);
       global_mr.room_select = ke->f.c.room;
-    } else if (ke->f.c.room == roomd (&global_level, k->f.c.room, RIGHT)) {
+    } else if (ke->f.c.room ==
+               roomd (global_level.link, global_level.room_nmemb,
+                      k->f.c.room, RIGHT)) {
       mr_row_trans (&global_mr, RIGHT);
       mr_focus_room (&global_mr, k->f.c.room);
       global_mr.room_select = ke->f.c.room;

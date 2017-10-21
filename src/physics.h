@@ -84,7 +84,8 @@ int set_ext_rel (struct pos *p, int floor,
 
 struct level_event *event (struct level *l, int e);
 struct guard *guard (struct level *l, int g);
-struct room_linking *llink (struct level *l, int r);
+struct room_linking *llink (struct room_linking *rlink,
+                            size_t room_nmemb, int room);
 
 bool is_traversable (struct pos *p);
 bool is_traversable_fake (struct pos *p);

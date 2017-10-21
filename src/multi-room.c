@@ -348,10 +348,10 @@ mr_simple_center_room (struct mr *mr, int room)
 void
 mr_map_room (struct mr *mr, int r, int x, int y)
 {
-  int rl = roomd (&global_level, r, LEFT);
-  int rr = roomd (&global_level, r, RIGHT);
-  int ra = roomd (&global_level, r, ABOVE);
-  int rb = roomd (&global_level, r, BELOW);
+  int rl = roomd (global_level.link, global_level.room_nmemb, r, LEFT);
+  int rr = roomd (global_level.link, global_level.room_nmemb, r, RIGHT);
+  int ra = roomd (global_level.link, global_level.room_nmemb, r, ABOVE);
+  int rb = roomd (global_level.link, global_level.room_nmemb, r, BELOW);
 
   mr->cell[x][y].room = r;
   mr->cell[x][y].done = true;
@@ -467,7 +467,7 @@ mr_room_trans (struct mr *mr, enum dir d)
   case BELOW: dy = +1; break;
   }
 
-  int r = roomd (&global_level, mr->room, d);
+  int r = roomd (global_level.link, global_level.room_nmemb, mr->room, d);
   if (r) {
     nmr_coord (mr, mr->x + dx, mr->y + dy, &mr->x, &mr->y);
     mr_set_origin (mr, r, mr->x, mr->y);
@@ -486,19 +486,19 @@ mr_row_trans (struct mr *mr, enum dir d)
   switch (d) {
   case RIGHT:
     if (mr->x > 0) dx = -1;
-    r = roomd (&global_level, mr->room, RIGHT);
+    r = roomd (global_level.link, global_level.room_nmemb, mr->room, RIGHT);
     break;
   case LEFT:
     if (mr->x < mr->w - 1) dx = +1;
-    r = roomd (&global_level, mr->room, LEFT);
+    r = roomd (global_level.link, global_level.room_nmemb, mr->room, LEFT);
     break;
   case BELOW:
     if (mr->y > 0) dy = -1;
-    r = roomd (&global_level, mr->room, BELOW);
+    r = roomd (global_level.link, global_level.room_nmemb, mr->room, BELOW);
     break;
   case ABOVE:
     if (mr->y < mr->h - 1) dy = +1;
-    r = roomd (&global_level, mr->room, ABOVE);
+    r = roomd (global_level.link, global_level.room_nmemb, mr->room, ABOVE);
     break;
   }
 

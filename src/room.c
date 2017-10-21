@@ -105,54 +105,54 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 
   push_reset_clipping_rectangle (to);
 
-  if (room == roomd (nc.l, room, LEFT)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, LEFT)
       && x < 0) {
     mc = nc;
     mc.x += PLACE_WIDTH * PLACES;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, RIGHT)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES) {
     mc = nc;
     mc.x -= PLACE_WIDTH * PLACES;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, ABOVE)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, ABOVE)
       && y < 3) {
     mc = nc;
     mc.y += PLACE_HEIGHT * FLOORS;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, BELOW)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     mc = nc;
     mc.y -= PLACE_HEIGHT * FLOORS;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, LEFT) && x < 0
-      && room == roomd (nc.l, room, ABOVE) && y < 3) {
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, LEFT) && x < 0
+      && room == roomd (nc.l->link, nc.l->room_nmemb, room, ABOVE) && y < 3) {
     mc = nc;
     mc.x += PLACE_WIDTH * PLACES;
     mc.y += PLACE_HEIGHT * FLOORS;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, RIGHT)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES
-      && room == roomd (nc.l, room, ABOVE) && y < 3) {
+      && room == roomd (nc.l->link, nc.l->room_nmemb, room, ABOVE) && y < 3) {
     mc = nc;
     mc.x -= PLACE_WIDTH * PLACES;
     mc.y += PLACE_HEIGHT * FLOORS;
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, LEFT)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, LEFT)
       && x < 0
-      && room == roomd (nc.l, room, BELOW)
+      && room == roomd (nc.l->link, nc.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     mc = nc;
     mc.x += PLACE_WIDTH * PLACES;
@@ -160,9 +160,9 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
     draw_bitmap_region_o (from, to, sx, sy, sw, sh, mc.x, mc.y, flags);
   }
 
-  if (room == roomd (nc.l, room, RIGHT)
+  if (room == roomd (nc.l->link, nc.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES
-      && room == roomd (nc.l, room, BELOW)
+      && room == roomd (nc.l->link, nc.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     mc = nc;
     mc.x -= PLACE_WIDTH * PLACES;
@@ -655,54 +655,57 @@ draw_room_actor_front (ALLEGRO_BITMAP *bitmap, struct actor *a0)
 
   struct actor a = *a0;
 
-  if (room == roomd (a.f.c.l, room, LEFT)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, LEFT)
       && x < 0) {
     a.f.c = a0->f.c;
     a.f.c.x += PLACE_WIDTH * PLACES;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, RIGHT)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES) {
     a.f.c = a0->f.c;
     a.f.c.x -= PLACE_WIDTH * PLACES;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, ABOVE)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, ABOVE)
       && y < 3) {
     a.f.c = a0->f.c;
     a.f.c.y += PLACE_HEIGHT * FLOORS;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, BELOW)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     a.f.c = a0->f.c;
     a.f.c.y -= PLACE_HEIGHT * FLOORS;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, LEFT) && x < 0
-      && room == roomd (a.f.c.l, room, ABOVE) && y < 3) {
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, LEFT)
+      && x < 0
+      && room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, ABOVE)
+      && y < 3) {
     a.f.c = a0->f.c;
     a.f.c.x += PLACE_WIDTH * PLACES;
     a.f.c.y += PLACE_HEIGHT * FLOORS;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, RIGHT)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES
-      && room == roomd (a.f.c.l, room, ABOVE) && y < 3) {
+      && room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, ABOVE)
+      && y < 3) {
     a.f.c = a0->f.c;
     a.f.c.x -= PLACE_WIDTH * PLACES;
     a.f.c.y += PLACE_HEIGHT * FLOORS;
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, LEFT)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, LEFT)
       && x < 0
-      && room == roomd (a.f.c.l, room, BELOW)
+      && room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     a.f.c = a0->f.c;
     a.f.c.x += PLACE_WIDTH * PLACES;
@@ -710,9 +713,9 @@ draw_room_actor_front (ALLEGRO_BITMAP *bitmap, struct actor *a0)
     draw_room_actor_front_sub (bitmap, &a);
   }
 
-  if (room == roomd (a.f.c.l, room, RIGHT)
+  if (room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, RIGHT)
       && x + w - 1 >= PLACE_WIDTH * PLACES
-      && room == roomd (a.f.c.l, room, BELOW)
+      && room == roomd (a.f.c.l->link, a.f.c.l->room_nmemb, room, BELOW)
       && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
     a.f.c = a0->f.c;
     a.f.c.x -= PLACE_WIDTH * PLACES;

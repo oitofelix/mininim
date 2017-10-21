@@ -268,7 +268,7 @@ save_native_level (struct level *l, char *filename)
   /* LINKS */
   for (i = 1; i < l->room_nmemb; i++) {
     /* Li=l r a b */
-    struct room_linking *r = llink (l, i);
+    struct room_linking *r = llink (l->link, l->room_nmemb, i);
     k = xasprintf ("L%i", i);
     v = xasprintf ("%i %i %i %i", r->l, r->r, r->a, r->b);
     al_set_config_value (c, NULL, k, v);

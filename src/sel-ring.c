@@ -175,7 +175,7 @@ destroy_rect_sel (struct rect_sel *rs)
 bool
 is_room_in_rect_sel (struct rect_sel *rs, int _room)
 {
-  int room = room_val (rs->level, _room);
+  int room = room_val (rs->level->room_nmemb, _room);
 
   if (! room) return false;
 
@@ -284,7 +284,7 @@ bool
 is_room_in_sel_set (struct sel_set *ss, int _room)
 {
   if (! is_valid_sel_set (ss)) return false;
-  int room = room_val (ss->rs[0].level, _room);
+  int room = room_val (ss->rs[0].level->room_nmemb, _room);
 
   /* optimization */
   if (! is_room_possibly_in_sel_set (ss, room))

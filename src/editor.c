@@ -1292,22 +1292,22 @@ editor (void)
     case 'L':
       get_mouse_coord (&global_mr, &last_mouse_coord);
       set_mouse_room (&global_mr,
-                      roomd (&global_level, global_mr.room, LEFT));
+                      roomd (global_level.link, global_level.room_nmemb, global_mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
       get_mouse_coord (&global_mr, &last_mouse_coord);
       set_mouse_room (&global_mr,
-                      roomd (&global_level, global_mr.room, RIGHT));
+                      roomd (global_level.link, global_level.room_nmemb, global_mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
       get_mouse_coord (&global_mr, &last_mouse_coord);
       set_mouse_room (&global_mr,
-                      roomd (&global_level, global_mr.room, ABOVE));
+                      roomd (global_level.link, global_level.room_nmemb, global_mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
       get_mouse_coord (&global_mr, &last_mouse_coord);
       set_mouse_room (&global_mr,
-                      roomd (&global_level, global_mr.room, BELOW));
+                      roomd (global_level.link, global_level.room_nmemb, global_mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -1335,7 +1335,8 @@ editor (void)
       int room0 = last_mouse_coord.c.room;
       int room1 = global_mr.room;
 
-      exchange_rooms (&global_level, room0, room1);
+      exchange_rooms (global_level.link,
+                      global_level.room_nmemb, room0, room1);
 
       register_link_undo (&undo, l, "ROOM EXCHANGE");
       last_mouse_coord.c.room = room1;
@@ -1529,7 +1530,7 @@ editor (void)
       for (i = 1; i < global_level.room_nmemb; i++) {
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, LEFT, RIGHT);
+        mirror_link (global_level.link, global_level.room_nmemb, i, LEFT, RIGHT);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1539,7 +1540,7 @@ editor (void)
       for (i = 1; i < global_level.room_nmemb; i++) {
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, ABOVE, BELOW);
+        mirror_link (global_level.link, global_level.room_nmemb, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1549,8 +1550,8 @@ editor (void)
       for (i = 1; i < global_level.room_nmemb; i++) {
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, LEFT, RIGHT);
-        mirror_link (&global_level, i, ABOVE, BELOW);
+        mirror_link (global_level.link, global_level.room_nmemb, i, LEFT, RIGHT);
+        mirror_link (global_level.link, global_level.room_nmemb, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1560,7 +1561,7 @@ editor (void)
       for (i = 1; i < global_level.room_nmemb; i++) {
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, random_dir (), random_dir ());
+        mirror_link (global_level.link, global_level.room_nmemb, i, random_dir (), random_dir ());
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1579,7 +1580,7 @@ editor (void)
         register_h_room_mirror_tile_undo (&undo, i, NULL);
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, LEFT, RIGHT);
+        mirror_link (global_level.link, global_level.room_nmemb, i, LEFT, RIGHT);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1590,7 +1591,7 @@ editor (void)
         register_v_room_mirror_tile_undo (&undo, i, NULL);
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, ABOVE, BELOW);
+        mirror_link (global_level.link, global_level.room_nmemb, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1602,8 +1603,8 @@ editor (void)
         register_v_room_mirror_tile_undo (&undo, i, NULL);
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, LEFT, RIGHT);
-        mirror_link (&global_level, i, ABOVE, BELOW);
+        mirror_link (global_level.link, global_level.room_nmemb, i, LEFT, RIGHT);
+        mirror_link (global_level.link, global_level.room_nmemb, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -1615,7 +1616,7 @@ editor (void)
           (&undo, i, false, NULL);
         l = copy_array (global_level.link, global_level.room_nmemb,
                         NULL, sizeof (*l));
-        mirror_link (&global_level, i, random_dir (), random_dir ());
+        mirror_link (global_level.link, global_level.room_nmemb, i, random_dir (), random_dir ());
         register_link_undo (&undo, l, NULL);
         destroy_array ((void **) &l, NULL);
       }
@@ -2156,27 +2157,29 @@ ui_place_guard (struct actor *g, struct pos *p)
 void
 editor_link (int room0, int room1, enum dir dir)
 {
-  *roomd_ptr (&global_level, room0, dir) = room1;
-  if (reciprocal_links) make_reciprocal_link (&global_level, room0, room1, dir);
+  *roomd_ptr (global_level.link, global_level.room_nmemb, room0, dir) = room1;
+  if (reciprocal_links)
+    make_reciprocal_link (global_level.link, global_level.room_nmemb,
+                          room0, room1, dir);
 
   if (locally_unique_links) {
-    make_link_locally_unique (&global_level, room0, dir);
+    make_link_locally_unique (global_level.link, global_level.room_nmemb, room0, dir);
     if (reciprocal_links)
-      make_link_locally_unique (&global_level, room1, opposite_dir (dir));
+      make_link_locally_unique (global_level.link, global_level.room_nmemb, room1, opposite_dir (dir));
   }
 
   if (globally_unique_links) {
-    make_link_globally_unique (&global_level, room0, dir);
+    make_link_globally_unique (global_level.link, global_level.room_nmemb, room0, dir);
     if (reciprocal_links)
-      make_link_globally_unique (&global_level, room1, opposite_dir (dir));
+      make_link_globally_unique (global_level.link, global_level.room_nmemb, room1, opposite_dir (dir));
   }
 }
 
 void
 editor_mirror_link (int room, enum dir dir0, enum dir dir1)
 {
-  int r0 = roomd (&global_level, room, dir0);
-  int r1 = roomd (&global_level, room, dir1);
+  int r0 = roomd (global_level.link, global_level.room_nmemb, room, dir0);
+  int r1 = roomd (global_level.link, global_level.room_nmemb, room, dir1);
   editor_link (room, r0, dir1);
   editor_link (room, r1, dir0);
 }

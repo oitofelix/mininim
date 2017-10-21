@@ -373,7 +373,8 @@ legacy_level_special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    if (k0->f.c.room == roomd (&global_level, 1, BELOW)
+    if (k0->f.c.room == roomd (global_level.link, global_level.room_nmemb,
+                               1, BELOW)
         && k0->f.c.prev_room == 1
         && k0->f.c.xd == BELOW) next_level ();
   }
@@ -421,7 +422,8 @@ legacy_level_special_events (void)
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
-    if (kc->f.c.room == roomd (&global_level, 18, RIGHT)
+    if (kc->f.c.room == roomd (global_level.link,
+                               global_level.room_nmemb, 18, RIGHT)
         && ext (&sword_pos) == SWORD)
       set_ext (&sword_pos, NO_ITEM);
 
@@ -755,10 +757,14 @@ interpret_legacy_level (struct level *l, int n)
 
   /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {
-    link_room (l, p.room, lv.link[p.room - 1][LD_LEFT], LEFT);
-    link_room (l, p.room, lv.link[p.room - 1][LD_RIGHT], RIGHT);
-    link_room (l, p.room, lv.link[p.room - 1][LD_ABOVE], ABOVE);
-    link_room (l, p.room, lv.link[p.room - 1][LD_BELOW], BELOW);
+    link_room (l->link, l->room_nmemb,
+               p.room, lv.link[p.room - 1][LD_LEFT], LEFT);
+    link_room (l->link, l->room_nmemb,
+               p.room, lv.link[p.room - 1][LD_RIGHT], RIGHT);
+    link_room (l->link, l->room_nmemb,
+               p.room, lv.link[p.room - 1][LD_ABOVE], ABOVE);
+    link_room (l->link, l->room_nmemb,
+               p.room, lv.link[p.room - 1][LD_BELOW], BELOW);
   }
 
   /* FORETABLE and BACKTABLE: ok */
