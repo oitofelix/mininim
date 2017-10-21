@@ -34,7 +34,6 @@ enum {
 static int destroy_cb (Ihandle *ih);
 static int show_cb (Ihandle *ih, int state);
 
-static int selected_event_node_id (Ihandle *tree_ctrl);
 static struct level_event *selected_event (Ihandle *tree_ctrl);
 
 static int _update_cb (Ihandle *ih);
@@ -396,31 +395,16 @@ show_cb (Ihandle *ih, int state)
   return IUP_DEFAULT;
 }
 
-int
-selected_event_node_id (Ihandle *tree_ctrl)
-{
-  int id = IupGetInt (tree_ctrl, "VALUE");
-  if (id < 0) return -1;
-
-  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
-  if (depth < EVENT_DEPTH) return -1;
-
-  if (depth == SOURCE_DEPTH) {
-    /* id = IupGetIntId (tree_ctrl, "PARENT", id); */
-    return -1;
-  }
-
-  return id;
-}
-
 struct level_event *
 selected_event (Ihandle *tree_ctrl)
 {
-  struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
-  int id = selected_event_node_id (tree_ctrl);
+  int id = IupGetInt (tree_ctrl, "VALUE");
   if (id < 0) return NULL;
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
+  if (depth != EVENT_DEPTH) return NULL;
   struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
   int *e = tree->node[id].data;
+  struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
   return event (level, *e);
 }
 
@@ -734,6 +718,7 @@ next_button_cb (Ihandle *button)
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
   Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
   struct level_event *e = selected_event (tree_ctrl);
+  if (! e) return IUP_DEFAULT;
   int n = e - level->event;
   struct tree *tree = (void *) IupGetAttribute (button, "_TREE");
   int next = n + d;
@@ -752,6 +737,7 @@ source_button_cb (Ihandle *button)
   /* get event selection */
   Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
   struct level_event *e = selected_event (tree_ctrl);
+  if (! e) return IUP_DEFAULT;
 
   /* change floor extension */
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
@@ -773,6 +759,7 @@ target_button_cb (Ihandle *button)
   /* get event selection */
   Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
   struct level_event *e = selected_event (tree_ctrl);
+  if (! e) return IUP_DEFAULT;
 
   /* change event target */
   struct level *level = (void *) IupGetAttribute (button, "_LEVEL");

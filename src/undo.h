@@ -77,7 +77,7 @@ void random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d,
                                    int dir);
 
 /* LINK */
-void register_link_undo (struct undo *u, struct room_linking *l,
+void register_link_undo (struct undo *u, struct room_linking *rlink,
                          char *desc);
 void link_undo (struct link_undo *d, int dir);
 void destroy_link_undo (struct link_undo *d);

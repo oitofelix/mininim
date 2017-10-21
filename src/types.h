@@ -124,7 +124,7 @@ struct dim {
 };
 
 enum dir {
-  LEFT = 0, RIGHT = 1, ABOVE = 2, BELOW = 3,
+  FIRST_DIR = 0, LEFT = 0, RIGHT = 1, ABOVE = 2, BELOW = 3, LAST_DIR = 3,
 };
 
 struct coord {

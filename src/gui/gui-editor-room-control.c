@@ -27,7 +27,6 @@ enum {
 static int destroy_cb (Ihandle *ih);
 static int show_cb (Ihandle *ih, int state);
 
-static int selected_room_node_id (Ihandle *tree_ctrl);
 static int selected_room (Ihandle *tree_ctrl);
 
 static int _update_cb (Ihandle *ih);
@@ -146,7 +145,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
     (IupSetAttributes
      (IupButton (NULL, NULL),
       "IMAGE = VIEW_RING_DEL_ICON,"
-      "TIP = \"Link to nowhere\","),
+      "TIP = \"Isolate\","),
      "ACTION", delete_button_cb,
      NULL);
 
@@ -342,24 +341,14 @@ show_cb (Ihandle *ih, int state)
 }
 
 int
-selected_room_node_id (Ihandle *tree_ctrl)
-{
-  int id = IupGetInt (tree_ctrl, "VALUE");
-  if (id < 0) return -1;
-
-  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
-  if (depth < ROOM_DEPTH) return -1;
-
-  if (depth > DIR_DEPTH) return -1;
-
-  return id;
-}
-
-int
 selected_room (Ihandle *tree_ctrl)
 {
-  int id = selected_room_node_id (tree_ctrl);
+  int id = IupGetInt (tree_ctrl, "VALUE");
   if (id < 0) return 0;
+
+  while (IupGetIntId (tree_ctrl, "DEPTH", id) != 0)
+    id = IupGetIntId (tree_ctrl, "PARENT", id);
+
   struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
   int *room = tree->node[id].data;
   return *room;
@@ -450,7 +439,7 @@ populate_room_tree (struct room_linking *rlink, size_t room_nmemb,
       (tree, -1, TREE_NODE_TYPE_BRANCH, &room, sizeof (room),
        (m_comparison_fn_t) int_eq);
 
-    for (enum dir d = LEFT; d <= BELOW; d++) {
+    for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++) {
       int dir_id = get_or_put_tree_branch_child
         (tree, room_id, TREE_NODE_TYPE_BRANCH, &d, sizeof (d),
          (m_comparison_fn_t) int_eq);
@@ -597,7 +586,45 @@ next_button_cb (Ihandle *button)
 int
 delete_button_cb (Ihandle *button)
 {
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
 
+  int id = IupGetInt (tree_ctrl, "VALUE");
+  if (id < 0) return IUP_DEFAULT;
+
+  int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
+  int room = selected_room (tree_ctrl);
+
+  switch (depth) {
+  case ROOM_DEPTH: {
+    struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
+    struct room_linking *rlink =
+      copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
+    for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++)
+      link_room (rlink, level->room_nmemb, room, 0, d);
+    char *desc = xasprintf ("ISOLATE ROOM %i", room);
+    register_link_undo (&undo, rlink, desc);
+    al_free (desc);
+    destroy_array ((void **) &rlink, NULL);
+    break;
+  }
+  case DIR_DEPTH: {
+    struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
+    struct room_linking *rlink =
+      copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
+    struct tree *tree = (void *) IupGetAttribute (button, "_TREE");
+    enum dir *d = tree->node[id].data;
+    link_room (rlink, level->room_nmemb, room, 0, *d);
+    char *desc = xasprintf ("ISOLATE ROOM %i %s", room,
+                            direction_string (*d));
+    register_link_undo (&undo, rlink, desc);
+    al_free (desc);
+    destroy_array ((void **) &rlink, NULL);
+    break;
+  }
+  case ADJACENT_DEPTH:
+    break;
+  default: assert (false);
+  }
 
   return IUP_DEFAULT;
 }

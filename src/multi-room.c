@@ -523,7 +523,7 @@ mr_scroll_into_view (struct mr *mr, int room)
   mr_save_origin (mr, &o);
 
   enum dir dir;
-  for (dir = LEFT; dir <= BELOW; dir++) {
+  for (dir = FIRST_DIR; dir <= LAST_DIR; dir++) {
     mr_restore_origin (mr, &o);
     struct mr_origin a, b;
     do {

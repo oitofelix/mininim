@@ -449,17 +449,17 @@ random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d, int dir)
 /********/
 
 void
-register_link_undo (struct undo *u, struct room_linking *l, char *desc)
+register_link_undo (struct undo *u, struct room_linking *rlink, char *desc)
 {
   if (! memcmp
-      (l, global_level.link, global_level.room_nmemb
+      (rlink, global_level.link, global_level.room_nmemb
        * sizeof (*global_level.link))) return;
 
   struct link_undo *d = xmalloc (sizeof (*d));
-  d->b = copy_array (l, global_level.room_nmemb, NULL,
-                     sizeof (*d->b));
-  d->f = copy_array (global_level.link, global_level.room_nmemb, NULL,
+  d->f = copy_array (rlink, global_level.room_nmemb, NULL,
                      sizeof (*d->f));
+  d->b = copy_array (global_level.link, global_level.room_nmemb, NULL,
+                     sizeof (*d->b));
   register_undo (u, d, (undo_f) link_undo, (destroy_undo_f) destroy_link_undo,
                  desc);
   link_undo (d, +1);
