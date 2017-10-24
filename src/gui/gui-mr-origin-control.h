@@ -1,5 +1,5 @@
 /*
-  gui-room-control.c -- GUI room control module;
+  gui-mr-origin-control.c -- GUI MR origin control module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,9 +18,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GUI_ROOM_CONTROL_H
-#define MININIM_GUI_ROOM_CONTROL_H
+#ifndef MININIM_GUI_MR_ORIGIN_CONTROL_H
+#define MININIM_GUI_MR_ORIGIN_CONTROL_H
 
-Ihandle *gui_create_room_control (char *norm_group);
+Ihandle *gui_create_mr_origin_control (char *norm_group);
 
-#endif	/* MININIM_GUI_ROOM_CONTROL */
+#endif	/* MININIM_GUI_MR_ORIGIN_CONTROL */

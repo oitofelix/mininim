@@ -44,7 +44,7 @@ gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
   Ihandle *ih, *vbox, *radio, *tiles_toggle, *links_toggle,
     *place_toggle, *room_toggle, *level_toggle;
 
-  Ihandle *label, *v_button, *vh_button, *h_button, *r_button;
+  Ihandle *v_button, *vh_button, *h_button, *r_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes

@@ -148,8 +148,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui-coordinates-control.c																	\
 	  src/gui/gui-coordinates-control.h src/gui/gui-zoom-control.c			\
 	  src/gui/gui-zoom-control.h src/gui/gui-place-control.c						\
-	  src/gui/gui-place-control.h src/gui/gui-room-control.c						\
-	  src/gui/gui-room-control.h src/gui/gui-row-control.c							\
+	  src/gui/gui-place-control.h src/gui/gui-mr-origin-control.c				\
+	  src/gui/gui-mr-origin-control.h src/gui/gui-row-control.c					\
 	  src/gui/gui-row-control.h src/gui/gui-page-control.c							\
 	  src/gui/gui-page-control.h
 

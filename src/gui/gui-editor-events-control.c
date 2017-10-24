@@ -74,246 +74,230 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 {
   Ihandle *ih, *tree_ctrl;
 
-  Ihandle *refresh_button, *inactive_toggle;
+  Ihandle *tree_frame, *refresh_button, *inactive_toggle;
 
-  Ihandle *next_frame, *next_toggle, *prev_button, *next_button;
+  Ihandle *trigger_frame, *next_toggle, *prev_button, *next_button;
 
-  Ihandle *selection_frame, *source_button, *target_button, *add_button;
+  Ihandle *set_frame, *source_button, *target_button, *add_button;
 
   Ihandle *sanitation_frame, *defrag_button, *clean_button,
     *total_label, *inactive_label, *fragmented_label;
 
+  tree_ctrl = IupSetCallbacks
+    (IupSetAttributes
+     (IupTree (),
+      "ADDROOT = NO,"
+      "ADDEXPANDED = NO,"),
+     "SELECTION_CB", (Icallback) selection_cb,
+     NULL);
+
+  inactive_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("Inactive", NULL),
+      "VALUE = NO,"
+      "TIP = \"Show inactive events\","),
+     "ACTION", _update_tree_cb,
+     NULL);
+
+  refresh_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = RELOAD_ICON,"
+      "TIP = \"Refresh\","),
+     "ACTION", _update_tree_cb,
+     NULL);
+
+  tree_frame = IupSetAttributes
+    (IupFrame
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (inactive_toggle,
+          IupFill (),
+          refresh_button,
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = EVENTS_NORM,")),
+     "TITLE = Tree,");
+
+  next_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("Next", NULL),
+      "TIP = \"Activate next event\","),
+     "ACTION", (Icallback) next_toggle_cb,
+     NULL);
+
+  prev_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = PREVIOUS_ICON,"
+      "TIP = \"Select previous event\","),
+     "ACTION", next_button_cb,
+     NULL);
+
+  next_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = NEXT_ICON,"
+      "TIP = \"Select next event\","),
+     "ACTION", next_button_cb,
+     NULL);
+
+  trigger_frame = IupSetAttributes
+    (IupFrame
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (next_toggle,
+          IupFill (),
+          prev_button,
+          IupFill (),
+          next_button,
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = EVENTS_NORM,")),
+     "TITLE = \"Trigger\",");
+
+  source_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = EVENT_SOURCE_ICON,"
+      "TIP = \"Set selection as source\","),
+     "ACTION", source_button_cb,
+     NULL);
+
+  target_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = EVENT_TARGET_ICON,"
+      "TIP = \"Set selection as target\","),
+     "ACTION", target_button_cb,
+     NULL);
+
+  add_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = EVENT_ADD_ICON,"
+      "TIP = \"Add selection as target\","),
+     "ACTION", add_button_cb,
+     NULL);
+
+  set_frame = IupSetAttributes
+    (IupFrame
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (source_button,
+          IupFill (),
+          target_button,
+          IupFill (),
+          add_button,
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = EVENTS_NORM,")),
+     "TITLE = Set,");
+
+  total_label = IupSetAttributes
+    (IupLabel ("000"),
+     "ALIGNMENT = ARIGHT");
+
+  inactive_label = IupSetAttributes
+    (IupLabel ("000"),
+     "ALIGNMENT = ARIGHT");
+
+  fragmented_label = IupSetAttributes
+    (IupLabel ("000"),
+     "ALIGNMENT = ARIGHT");
+
+  defrag_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = DEFRAG_ICON,"
+      "TIP = \"Defragment inactive events\","),
+     "ACTION", defrag_button_cb,
+     NULL);
+
+  clean_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = CLEAN_ICON,"
+      "TIP = \"Delete trailing inactive events\","),
+     "ACTION", clean_button_cb,
+     NULL);
+
+  sanitation_frame = IupSetAttributes
+    (IupFrame
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupGridBox
+         (IupSetAttributes
+          (IupLabel ("Total: "),
+           "TIP = \"Total number of events\","
+           "ALIGNMENT = ARIGHT"),
+          total_label,
+          IupSetAttributes
+          (IupLabel ("Inactive: "),
+           "TIP = \"Number of inactive events\","
+           "ALIGNMENT = ARIGHT"),
+          inactive_label,
+          IupSetAttributes
+          (IupLabel ("Fragmented: "),
+           "TIP = \"Number of fragmented events\","
+           "ALIGNMENT = ARIGHT"),
+          fragmented_label,
+          NULL),
+         "ORIENTATION = HORIZONTAL,"
+         "NUMDIV = 2,"
+         "SIZECOL = -1,"
+         "SIZELIN = -1,"
+         /* "NORMALIZESIZE = BOTH," */
+         /* "HOMOGENEOUSLIN = YES," */
+         /* "HOMOGENEOUSCOL = YES," */
+         /* "ALIGNMENTLIN = ACENTER," */
+         /* "ALIGNMENTCOL = ACENTER," */
+         /* "FITTOCHILDREN = YES," */
+         ),
+        IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (IupFill (),
+          defrag_button,
+          IupFill (),
+          clean_button,
+          IupFill (),
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = EVENTS_NORM,")),
+     "TITLE = Sanitation,");
+
   ih = IupSetCallbacks
     (IupSetAttributes
      (IupHbox
-      (tree_ctrl = IupSetCallbacks
-       (IupSetAttributes
-        (IupTree (),
-         "ADDROOT = NO,"
-         "ADDEXPANDED = NO,"),
-        "SELECTION_CB", (Icallback) selection_cb,
-        NULL),
-
+      (tree_ctrl,
        IupSetAttributes
        (IupVbox
-        (IupSetAttributes
-         (IupFrame
-          (IupVbox
-           (IupFill (),
-
-            IupSetAttributes
-            (IupHbox
-             (inactive_toggle = IupSetCallbacks
-              (IupSetAttributes
-               (IupToggle ("Inactive", NULL),
-                "VALUE = NO,"
-                "TIP = \"Show inactive events\","),
-               "ACTION", _update_tree_cb,
-               NULL),
-
-              IupFill (),
-
-              refresh_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = RELOAD_ICON,"
-                "TIP = \"Refresh\","),
-               "ACTION", _update_tree_cb,
-               NULL),
-
-              NULL),
-             "ALIGNMENT = ACENTER,"
-             "NORMALIZERGROUP = EVENTS_NORM,"),
-
-            IupFill (),
-
-            NULL)),
-          "TITLE = View,"
-          "NORMALIZERGROUP = EVENTS_NORM,"),
-
-         next_frame = IupSetAttributes
-         (IupFrame
-          (IupVbox
-           (IupFill (),
-
-            IupSetAttributes
-            (IupHbox
-             (next_toggle = IupSetCallbacks
-              (IupSetAttributes
-               (IupToggle (NULL, NULL),
-                "TIP = \"Activate next event\","),
-               "ACTION", (Icallback) next_toggle_cb,
-               NULL),
-
-              IupFill (),
-
-              prev_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = PREVIOUS_ICON,"
-                "TIP = \"Select previous event\","),
-               "ACTION", next_button_cb,
-               NULL),
-
-              IupFill (),
-
-              next_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = NEXT_ICON,"
-                "TIP = \"Select next event\","),
-               "ACTION", next_button_cb,
-               NULL),
-
-              NULL),
-             "ALIGNMENT = ACENTER,"
-             "NORMALIZERGROUP = EVENTS_NORM,"),
-
-            IupFill (),
-
-            NULL)),
-          "TITLE = \"Trigger next\","
-          "NORMALIZERGROUP = EVENTS_NORM,"),
-
-         selection_frame = IupSetAttributes
-         (IupFrame
-          (IupVbox
-           (IupFill (),
-
-            IupSetAttributes
-            (IupHbox
-             (source_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = EVENT_SOURCE_ICON,"
-                "TIP = \"Set selection as source\","),
-               "ACTION", source_button_cb,
-               NULL),
-
-              IupFill (),
-
-              target_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = EVENT_TARGET_ICON,"
-                "TIP = \"Set selection as target\","),
-               "ACTION", target_button_cb,
-               NULL),
-
-              IupFill (),
-
-              add_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = EVENT_ADD_ICON,"
-                "TIP = \"Add selection as target\","),
-               "ACTION", add_button_cb,
-               NULL),
-
-              NULL),
-             "ALIGNMENT = ACENTER,"
-             "NORMALIZERGROUP = EVENTS_NORM,"),
-
-            IupFill (),
-
-            NULL)),
-          "TITLE = Selection,"),
-
-         sanitation_frame = IupSetAttributes
-         (IupFrame
-          (IupVbox
-           (IupFill (),
-
-            IupSetAttributes
-             (IupGridBox
-              (
-               IupSetAttributes
-               (IupLabel ("Total: "),
-                "TIP = \"Total number of events\","
-                "ALIGNMENT = ARIGHT"),
-
-               total_label = IupSetAttributes
-               (IupLabel ("000"),
-                "ALIGNMENT = ARIGHT"),
-
-               IupSetAttributes
-               (IupLabel ("Inactive: "),
-                "TIP = \"Number of inactive events\","
-                "ALIGNMENT = ARIGHT"),
-
-               inactive_label = IupSetAttributes
-               (IupLabel ("000"),
-                "ALIGNMENT = ARIGHT"),
-
-               IupSetAttributes
-               (IupLabel ("Fragmented: "),
-                "TIP = \"Number of fragmented events\","
-                "ALIGNMENT = ARIGHT"),
-
-               fragmented_label = IupSetAttributes
-               (IupLabel ("000"),
-                "ALIGNMENT = ARIGHT"),
-
-
-               NULL),
-              "ORIENTATION = HORIZONTAL,"
-              "NUMDIV = 2,"
-              "SIZECOL = -1,"
-              "SIZELIN = -1,"
-              /* "NORMALIZESIZE = BOTH," */
-              /* "HOMOGENEOUSLIN = YES," */
-              /* "HOMOGENEOUSCOL = YES," */
-              /* "ALIGNMENTLIN = ACENTER," */
-              /* "ALIGNMENTCOL = ACENTER," */
-              /* "FITTOCHILDREN = YES," */
-              ),
-
-            IupFill (),
-
-            IupSetAttributes
-            (IupHbox
-             (IupFill (),
-
-              defrag_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = DEFRAG_ICON,"
-                "TIP = \"Defragment inactive events\","),
-               "ACTION", defrag_button_cb,
-               NULL),
-
-              IupFill (),
-
-              clean_button =
-              IupSetCallbacks
-              (IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = CLEAN_ICON,"
-                "TIP = \"Delete trailing inactive events\","),
-               "ACTION", clean_button_cb,
-               NULL),
-
-              IupFill (),
-
-              NULL),
-             "ALIGNMENT = ACENTER,"
-             "NORMALIZERGROUP = EVENTS_NORM,"),
-
-            IupFill (),
-
-            NULL)),
-          "TITLE = Sanitation,"),
-
+        (tree_frame,
+         trigger_frame,
+         set_frame,
+         sanitation_frame,
          NULL),
         "ALIGNMENT = ACENTER"),
-
        NULL),
       "ALIGNMENT = ACENTER,"),
      "DESTROY_CB", destroy_cb,
@@ -340,15 +324,16 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_TREE", (void *) tree);
   IupSetAttribute (ih, "_TREE_CTRL", (void *) tree_ctrl);
 
+  IupSetAttribute (ih, "_TREE_FRAME", (void *) tree_frame);
   IupSetAttribute (ih, "_INACTIVE_TOGGLE", (void *) inactive_toggle);
   IupSetAttribute (ih, "_REFRESH_BUTTON", (void *) refresh_button);
 
-  IupSetAttribute (ih, "_NEXT_FRAME", (void *) next_frame);
+  IupSetAttribute (ih, "_TRIGGER_FRAME", (void *) trigger_frame);
   IupSetAttribute (ih, "_NEXT_TOGGLE", (void *) next_toggle);
   IupSetAttribute (ih, "_PREV_BUTTON", (void *) prev_button);
   IupSetAttribute (ih, "_NEXT_BUTTON", (void *) next_button);
 
-  IupSetAttribute (ih, "_SELECTION_FRAME", (void *) selection_frame);
+  IupSetAttribute (ih, "_SET_FRAME", (void *) set_frame);
   IupSetAttribute (ih, "_SOURCE_BUTTON", (void *) source_button);
   IupSetAttribute (ih, "_TARGET_BUTTON", (void *) target_button);
   IupSetAttribute (ih, "_ADD_BUTTON", (void *) add_button);
@@ -427,8 +412,8 @@ _update_cb (Ihandle *ih)
 
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   struct level_event *e = selected_event (tree_ctrl);
-  Ihandle *next_frame = (void *) IupGetAttribute (ih, "_NEXT_FRAME");
-  gui_control_active (next_frame, e);
+  Ihandle *trigger_frame = (void *) IupGetAttribute (ih, "_TRIGGER_FRAME");
+  gui_control_active (trigger_frame, e);
   if (e) {
     Ihandle *next_toggle = (void *) IupGetAttribute (ih, "_NEXT_TOGGLE");
     gui_control_int (next_toggle, "VALUE", e->next);
@@ -443,9 +428,9 @@ _update_cb (Ihandle *ih)
       (next_button, e - level->event < level->event_nmemb - 1);
   }
 
-  Ihandle *selection_frame =
-    (void *) IupGetAttribute (ih, "_SELECTION_FRAME");
-  gui_control_active (selection_frame, is_valid_pos (&selection_pos));
+  Ihandle *set_frame =
+    (void *) IupGetAttribute (ih, "_SET_FRAME");
+  gui_control_active (set_frame, is_valid_pos (&selection_pos));
 
   if (is_valid_pos (&selection_pos)) {
     Ihandle *source_button = (void *) IupGetAttribute (ih, "_SOURCE_BUTTON");
@@ -590,6 +575,9 @@ populate_event_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
     case EVENT_DEPTH: {
       int *e = tree->node[id].data;
       IupSetStrfId (tree_ctrl, "TITLE", id, "Event %i", *e);
+      struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
+      if (! is_event_active (level, *e))
+        IupSetAttributeId (tree_ctrl, "COLOR", id, "255 128 0");
       break;
     }
     case SOURCE_DEPTH: {
@@ -605,6 +593,8 @@ populate_event_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
     default: assert (false);
     }
   }
+
+  propagate_children_nodes_color (tree_ctrl);
 }
 
 int

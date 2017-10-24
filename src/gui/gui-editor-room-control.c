@@ -49,7 +49,7 @@ void populate_room_tree (struct level *level, struct tree *tree,
 int new_room (Ihandle *ih, int l, int r, int a, int b);
 
 /* callbacks */
-static int goto_button_cb (Ihandle *button);
+static int go_button_cb (Ihandle *button);
 
 static int isolate_button_cb (Ihandle *button);
 static int new_button_cb (Ihandle *button);
@@ -73,12 +73,12 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
 {
   Ihandle *ih, *tree_ctrl;
 
-  Ihandle *view_frame, *isolated_toggle, *refresh_button;
+  Ihandle *tree_frame, *isolated_toggle, *refresh_button;
 
-  Ihandle *goto_frame, *goto_actively_broken_toggle, *goto_passively_broken_toggle,
-    *goto_isolated_toggle, *goto_radio, *prev_button, *next_button, *start_button;
+  Ihandle *go_frame, *go_actively_broken_toggle, *go_passively_broken_toggle,
+    *go_isolated_toggle, *go_radio, *prev_button, *next_button, *start_button;
 
-  Ihandle *selection_frame, *reciprocal_toggle, *locally_unique_toggle,
+  Ihandle *link_frame, *reciprocal_toggle, *locally_unique_toggle,
     *globally_unique_toggle, *isolate_button, *new_button, *in_button,
     *out_button, *exchange_links_button, *exchange_tiles_button;
 
@@ -109,31 +109,31 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
      "ACTION", _update_tree_cb,
      NULL);
 
-  view_frame = IupSetAttributes
+  tree_frame = IupSetAttributes
     (IupFrame
-     (IupVbox
-      (IupFill (),
-       IupSetAttributes
-       (IupHbox
-        (IupFill (),
-         isolated_toggle,
-         IupFill (),
-         refresh_button,
-         IupFill (),
-         NULL),
-        "ALIGNMENT = ACENTER,"
-        "NORMALIZERGROUP = ROOM_NORM,"),
-       IupFill (),
-       NULL)),
-     "TITLE = View,"
-     "NORMALIZERGROUP = ROOM_NORM,");
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (IupFill (),
+          isolated_toggle,
+          IupFill (),
+          refresh_button,
+          IupFill (),
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = ROOM_NORM,")),
+     "TITLE = Tree,");
 
   prev_button = IupSetCallbacks
     (IupSetAttributes
      (IupButton (NULL, NULL),
       "IMAGE = PREVIOUS_ICON,"
       "TIP = \"Select previous room\","),
-     "ACTION", goto_button_cb,
+     "ACTION", go_button_cb,
      NULL);
 
   next_button = IupSetCallbacks
@@ -141,7 +141,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
      (IupButton (NULL, NULL),
       "IMAGE = NEXT_ICON,"
       "TIP = \"Select next room\","),
-     "ACTION", goto_button_cb,
+     "ACTION", go_button_cb,
      NULL);
 
   start_button = IupSetCallbacks
@@ -149,57 +149,57 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
      (IupButton (NULL, NULL),
       "IMAGE = HOME_ICON,"
       "TIP = \"Select kid's starting room\","),
-     "ACTION", goto_button_cb,
+     "ACTION", go_button_cb,
      NULL);
 
-  goto_actively_broken_toggle = IupSetAttributes
+  go_actively_broken_toggle = IupSetAttributes
     (IupToggle ("A", NULL),
      "VALUE = NO,"
      "TIP = \"Go through actively broken links\",");
 
-  goto_passively_broken_toggle = IupSetAttributes
+  go_passively_broken_toggle = IupSetAttributes
     (IupToggle ("P", NULL),
      "VALUE = NO,"
      "TIP = \"Go through passively broken links\",");
 
-  goto_isolated_toggle = IupSetAttributes
+  go_isolated_toggle = IupSetAttributes
     (IupToggle ("I", NULL),
      "VALUE = NO,"
      "TIP = \"Go through isolated rooms\",");
 
-  goto_radio = IupRadio
+  go_radio = IupRadio
     (IupSetAttributes
      (IupHbox
       (IupFill (),
-       goto_actively_broken_toggle,
-       goto_passively_broken_toggle,
-       goto_isolated_toggle,
+       go_actively_broken_toggle,
+       go_passively_broken_toggle,
+       go_isolated_toggle,
        IupFill (),
        NULL),
       "ALIGNMENT = ACENTER,"));
 
-  goto_frame = IupSetAttributes
+  go_frame = IupSetAttributes
     (IupFrame
-     (IupVbox
-      (IupFill (),
-       goto_radio,
-       IupFill (),
-       IupSetAttributes
-       (IupHbox
-        (IupFill (),
-         prev_button,
-         IupFill (),
-         next_button,
-         IupFill (),
-         start_button,
-         IupFill (),
-         NULL),
-        "ALIGNMENT = ACENTER,"
-        "NORMALIZERGROUP = ROOM_NORM,"),
-       IupFill (),
-       NULL)),
-     "TITLE = \"Go to\","
-     "NORMALIZERGROUP = ROOM_NORM,");
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        go_radio,
+        IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (IupFill (),
+          prev_button,
+          IupFill (),
+          next_button,
+          IupFill (),
+          start_button,
+          IupFill (),
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = ROOM_NORM,")),
+     "TITLE = \"Go\",");
 
   reciprocal_toggle = IupSetCallbacks
     (IupSetAttributes
@@ -273,7 +273,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
      "ACTION", exchange_tiles_button_cb,
      NULL);
 
-  selection_frame = IupSetAttributes
+  link_frame = IupSetAttributes
     (IupFrame
      (IupSetAttributes
       (IupHbox
@@ -287,15 +287,11 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
           IupFill (),
           NULL),
          "ALIGNMENT = ALEFT,"),
-
         IupFill (),
-
         IupSetAttributes
         (IupLabel (NULL),
          "SEPARATOR = VERTICAL,"),
-
         IupFill (),
-
         IupSetAttributes
         (IupGridBox
          (isolate_button,
@@ -314,7 +310,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
         NULL),
        "ALIGNMENT = ACENTER,"
        "NORMALIZERGROUP = ROOM_NORM,")),
-     "TITLE = Selection,");
+     "TITLE = Link,");
 
   fix_button =
     IupSetCallbacks
@@ -361,50 +357,51 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
 
   sanitation_frame = IupSetAttributes
     (IupFrame
-     (IupVbox
-      (IupFill (),
-       IupSetAttributes
-       (IupGridBox
-        (IupSetAttributes
-         (IupLabel ("Total: "),
-          "TIP = \"Total number of rooms\","
-          "ALIGNMENT = ARIGHT"),
-         total_label,
-         IupSetAttributes
-         (IupLabel ("Isolated: "),
-          "TIP = \"Number of isolated rooms\","
-          "ALIGNMENT = ARIGHT"),
-         isolated_label,
-         IupSetAttributes
-         (IupLabel ("Broken: "),
-          "TIP = \"Number of broken rooms\","
-          "ALIGNMENT = ARIGHT"),
-         broken_label,
-         IupSetAttributes
-         (IupLabel ("Start: "),
-          "TIP = \"Kid's starting room\","
-          "ALIGNMENT = ARIGHT"),
-         start_label,
-         NULL),
-        "ORIENTATION = HORIZONTAL,"
-        "NUMDIV = 2,"
-        "SIZECOL = -1,"
-        "SIZELIN = -1,"),
-       IupFill (),
-       IupSetAttributes
-       (IupHbox
-        (IupFill (),
-         fix_button,
-         IupFill (),
-         defrag_button,
-         IupFill (),
-         clean_button,
-         IupFill (),
-         NULL),
-        "ALIGNMENT = ACENTER,"
-        "NORMALIZERGROUP = ROOM_NORM,"),
-       IupFill (),
-       NULL)),
+     (IupSetAttributes
+      (IupVbox
+       (IupFill (),
+        IupSetAttributes
+        (IupGridBox
+         (IupSetAttributes
+          (IupLabel ("Total: "),
+           "TIP = \"Total number of rooms\","
+           "ALIGNMENT = ARIGHT"),
+          total_label,
+          IupSetAttributes
+          (IupLabel ("Isolated: "),
+           "TIP = \"Number of isolated rooms\","
+           "ALIGNMENT = ARIGHT"),
+          isolated_label,
+          IupSetAttributes
+          (IupLabel ("Broken: "),
+           "TIP = \"Number of broken rooms\","
+           "ALIGNMENT = ARIGHT"),
+          broken_label,
+          IupSetAttributes
+          (IupLabel ("Start: "),
+           "TIP = \"Kid's starting room\","
+           "ALIGNMENT = ARIGHT"),
+          start_label,
+          NULL),
+         "ORIENTATION = HORIZONTAL,"
+         "NUMDIV = 2,"
+         "SIZECOL = -1,"
+         "SIZELIN = -1,"),
+        IupFill (),
+        IupSetAttributes
+        (IupHbox
+         (IupFill (),
+          fix_button,
+          IupFill (),
+          defrag_button,
+          IupFill (),
+          clean_button,
+          IupFill (),
+          NULL),
+         "ALIGNMENT = ACENTER,"),
+        IupFill (),
+        NULL),
+       "NORMALIZERGROUP = ROOM_NORM,")),
      "TITLE = Sanitation,");
 
   ih = IupSetCallbacks
@@ -413,9 +410,9 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
       (tree_ctrl,
        IupSetAttributes
        (IupVbox
-        (view_frame,
-         goto_frame,
-         selection_frame,
+        (tree_frame,
+         go_frame,
+         link_frame,
          sanitation_frame,
          NULL),
         "ALIGNMENT = ACENTER"),
@@ -444,22 +441,23 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_TREE", (void *) tree);
   IupSetAttribute (ih, "_TREE_CTRL", (void *) tree_ctrl);
 
+  IupSetAttribute (ih, "_TREE_FRAME", (void *) tree_frame);
   IupSetAttribute (ih, "_ISOLATED_TOGGLE", (void *) isolated_toggle);
   IupSetAttribute (ih, "_REFRESH_BUTTON", (void *) refresh_button);
 
-  IupSetAttribute (ih, "_GOTO_FRAME", (void *) goto_frame);
-  IupSetAttribute (ih, "_GOTO_ACTIVELY_BROKEN_TOGGLE",
-                   (void *) goto_actively_broken_toggle);
-  IupSetAttribute (ih, "_GOTO_PASSIVELY_BROKEN_TOGGLE",
-                   (void *) goto_passively_broken_toggle);
-  IupSetAttribute (ih, "_GOTO_ISOLATED_TOGGLE",
-                   (void *) goto_isolated_toggle);
-  IupSetAttribute (ih, "_GOTO_RADIO", (void *) goto_radio);
+  IupSetAttribute (ih, "_GO_FRAME", (void *) go_frame);
+  IupSetAttribute (ih, "_GO_ACTIVELY_BROKEN_TOGGLE",
+                   (void *) go_actively_broken_toggle);
+  IupSetAttribute (ih, "_GO_PASSIVELY_BROKEN_TOGGLE",
+                   (void *) go_passively_broken_toggle);
+  IupSetAttribute (ih, "_GO_ISOLATED_TOGGLE",
+                   (void *) go_isolated_toggle);
+  IupSetAttribute (ih, "_GO_RADIO", (void *) go_radio);
   IupSetAttribute (ih, "_PREV_BUTTON", (void *) prev_button);
   IupSetAttribute (ih, "_NEXT_BUTTON", (void *) next_button);
   IupSetAttribute (ih, "_START_BUTTON", (void *) start_button);
 
-  IupSetAttribute (ih, "_SELECTION_FRAME", (void *) selection_frame);
+  IupSetAttribute (ih, "_LINK_FRAME", (void *) link_frame);
   IupSetAttribute (ih, "_RECIPROCAL_TOGGLE", (void *) reciprocal_toggle);
   IupSetAttribute
     (ih, "_LOCALLY_UNIQUE_TOGGLE", (void *) locally_unique_toggle);
@@ -537,8 +535,8 @@ _update_cb (Ihandle *ih)
 
   /* Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL"); */
   /* int *room = selected_room (tree_ctrl); */
-  /* Ihandle *goto_frame = (void *) IupGetAttribute (ih, "_GOTO_FRAME"); */
-  /* gui_control_active (goto_frame, e); */
+  /* Ihandle *go_frame = (void *) IupGetAttribute (ih, "_GO_FRAME"); */
+  /* gui_control_active (go_frame, e); */
   /* if (room) { */
   /*   Ihandle *prev_button = (void *) IupGetAttribute (ih, "_PREV_BUTTON"); */
   /*   gui_control_active (prev_button, e - level->room > 0); */
@@ -548,9 +546,9 @@ _update_cb (Ihandle *ih)
   /*     (next_button, e - level->room < level->room_nmemb - 1); */
   /* } */
 
-  /* Ihandle *selection_frame = */
-  /*   (void *) IupGetAttribute (ih, "_SELECTION_FRAME"); */
-  /* gui_control_active (selection_frame, is_valid_pos (&selection_pos)); */
+  /* Ihandle *link_frame = */
+  /*   (void *) IupGetAttribute (ih, "_LINK_FRAME"); */
+  /* gui_control_active (link_frame, is_valid_pos (&selection_pos)); */
 
   /* if (is_valid_pos (&selection_pos)) { */
   /*   Ihandle *isolate_button = (void *) IupGetAttribute (ih, "_ISOLATE_BUTTON"); */
@@ -665,7 +663,7 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       int *room = tree->node[id].data;
       IupSetStrfId (tree_ctrl, "TITLE", id, "Room %02i", *room);
       if (! is_room_accessible_from_kid_start (level, *room))
-        IupSetAttributeId (tree_ctrl, "COLOR", id, "255 255 0");
+        IupSetAttributeId (tree_ctrl, "COLOR", id, "255 128 0");
       break;
     }
     case DIR_DEPTH: {
@@ -755,7 +753,7 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
 }
 
 int
-goto_button_cb (Ihandle *button)
+go_button_cb (Ihandle *button)
 {
   return IUP_DEFAULT;
 }

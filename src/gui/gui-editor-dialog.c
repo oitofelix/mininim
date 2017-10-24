@@ -79,8 +79,8 @@ gui_create_editor_dialog (void)
               IupFill (),
 
               IupSetAttributes
-              (gui_create_room_control (NULL),
-               "NAME = ROOM_CONTROL"),
+              (gui_create_mr_origin_control (NULL),
+               "NAME = MR_ORIGIN_CONTROL"),
 
               IupFill (),
 
@@ -208,7 +208,7 @@ gui_create_editor_dialog (void)
             "NUMDIV = 4,"
             "SIZECOL = -1,"
             "SIZELIN = -1,"
-            "NGAPCOL = 2,"
+            "NGAPCOL = 10,"
             "NGAPLIN = 2,"
             "NORMALIZERGROUP = EDITOR_TAB_NORM"),
 
@@ -334,7 +334,7 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "PLACE_CONTROL"), state);
 
   gui_run_callback_IFni
-    ("SHOW_CB", IupGetDialogChild (ih, "ROOM_CONTROL"), state);
+    ("SHOW_CB", IupGetDialogChild (ih, "MR_ORIGIN_CONTROL"), state);
 
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "ROW_CONTROL"), state);
@@ -401,7 +401,7 @@ _update_cb (Ihandle *ih)
     ("_UPDATE_CB", IupGetDialogChild (ih, "PLACE_CONTROL"));
 
   gui_run_callback_IFn
-    ("_UPDATE_CB", IupGetDialogChild (ih, "ROOM_CONTROL"));
+    ("_UPDATE_CB", IupGetDialogChild (ih, "MR_ORIGIN_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "ROW_CONTROL"));

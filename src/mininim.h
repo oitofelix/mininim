@@ -207,7 +207,7 @@
 #include "gui-undo-control.h"
 #include "gui-zoom-control.h"
 #include "gui-place-control.h"
-#include "gui-room-control.h"
+#include "gui-mr-origin-control.h"
 #include "gui-row-control.h"
 #include "gui-page-control.h"
 #include "gui-tile-part-control.h"

@@ -30,8 +30,8 @@ gui_create_tile_transform_control
 {
   Ihandle *ih, *vbox;
 
-  Ihandle *label, *clear_button, *randomize_button,
-    *decorate_button, *fix_button, *unfake_button, *fg_fake_button;
+  Ihandle *clear_button, *randomize_button, *decorate_button, *fix_button,
+    *unfake_button, *fg_fake_button;
 
   Ihandle *radio, *place_toggle, *room_toggle, *level_toggle;
 

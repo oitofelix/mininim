@@ -1,5 +1,5 @@
 /*
-  gui-room-control.c -- GUI room control module;
+  gui-mr-origin-control.c -- GUI MR origin control module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -25,7 +25,7 @@ static int _update_cb (Ihandle *ih);
 
 
 Ihandle *
-gui_create_room_control (char *norm_group)
+gui_create_mr_origin_control (char *norm_group)
 {
   Ihandle *ih = IupSetCallbacks
     (gui_create_directional_control
