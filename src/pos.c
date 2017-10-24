@@ -23,6 +23,10 @@
 static struct bitmap_rcoord *bitmap_rcoord_cache;
 static size_t bitmap_rcoord_cache_nmemb;
 
+static bool *is_room_accessible_visited;
+static bool is_room_accessible_sub (struct room_linking *rlink, size_t room_nmemb,
+                                    int room_from, int room_to);
+
 bool coord_wa;
 
 int
@@ -68,7 +72,7 @@ void
 link_room (struct room_linking *rlink, size_t room_nmemb,
            int room0, int room1, enum dir dir)
 {
-  if (room0)
+  if (room_val (room_nmemb, room0))
     *roomd_ptr (rlink, room_nmemb, room0, dir)
       = room_val (room_nmemb, room1);
 }
@@ -1462,4 +1466,44 @@ place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c)
   c->y = PLACE_HEIGHT * p->floor + 34 - dy;
 
   return c;
+}
+
+bool
+is_room_accessible_from_kid_start (struct level *l, int room)
+{
+  struct pos p; npos (&l->start_pos, &p);
+  return is_room_accessible (l->link, l->room_nmemb, p.room, room);
+}
+
+bool
+is_room_accessible (struct room_linking *rlink, size_t room_nmemb,
+                    int room_from, int room_to)
+{
+  is_room_accessible_visited =
+    xcalloc (room_nmemb, sizeof (* is_room_accessible_visited));
+  bool r = is_room_accessible_sub (rlink, room_nmemb, room_from, room_to);
+  al_free (is_room_accessible_visited);
+  return r;
+}
+
+bool
+is_room_accessible_sub (struct room_linking *rlink, size_t room_nmemb,
+                        int room_from, int room_to)
+{
+  if (is_room_accessible_visited[room_from]) return false;
+  else is_room_accessible_visited[room_from] = true;
+
+  if (room_val (room_nmemb, room_from)
+      == room_val (room_nmemb, room_to))
+    return true;
+
+  int l = roomd (rlink, room_nmemb, room_from, LEFT);
+  int r = roomd (rlink, room_nmemb, room_from, RIGHT);
+  int a = roomd (rlink, room_nmemb, room_from, ABOVE);
+  int b = roomd (rlink, room_nmemb, room_from, BELOW);
+
+  return is_room_accessible_sub (rlink, room_nmemb, l, room_to)
+    || is_room_accessible_sub (rlink, room_nmemb, r, room_to)
+    || is_room_accessible_sub (rlink, room_nmemb, a, room_to)
+    || is_room_accessible_sub (rlink, room_nmemb, b, room_to);
 }

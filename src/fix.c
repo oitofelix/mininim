@@ -252,36 +252,37 @@ void
 make_reciprocal_link (struct room_linking *rlink, size_t room_nmemb,
                       int room0, int room1, enum dir dir)
 {
-  link_room (rlink, room_nmemb, room0, room1, dir);
-  link_room (rlink, room_nmemb, room1, room0, opposite_dir (dir));
+  if (room_val (room_nmemb, room0))
+    link_room (rlink, room_nmemb, room0, room1, dir);
+  if (room_val (room_nmemb, room1))
+    link_room (rlink, room_nmemb, room1, room0, opposite_dir (dir));
 }
 
 void
 make_link_locally_unique (struct room_linking *rlink, size_t room_nmemb,
-                          int room, enum dir dir)
+                          int room0, int room1, enum dir dir)
 {
-  if (dir != LEFT && roomd (rlink, room_nmemb, room, LEFT)
-      == roomd (rlink, room_nmemb, room, dir))
-    link_room (rlink, room_nmemb, room, 0, LEFT);
-  if (dir != RIGHT && roomd (rlink, room_nmemb, room, RIGHT)
-      == roomd (rlink, room_nmemb, room, dir))
-    link_room (rlink, room_nmemb, room, 0, RIGHT);
-  if (dir != ABOVE && roomd (rlink, room_nmemb, room, ABOVE)
-      == roomd (rlink, room_nmemb, room, dir))
-    link_room (rlink, room_nmemb, room, 0, ABOVE);
-  if (dir != BELOW && roomd (rlink, room_nmemb, room, BELOW)
-      == roomd (rlink, room_nmemb, room, dir))
-    link_room (rlink, room_nmemb, room, 0, BELOW);
+  int r = roomd (rlink, room_nmemb, room0, dir);
+  r = r ? r : room_val (room_nmemb, room1);
+
+  if (! r) return;
+
+  for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++)
+    if (d != dir && roomd (rlink, room_nmemb, room0, d) == r)
+      link_room (rlink, room_nmemb, room0, 0, d);
 }
 
 void
 make_link_globally_unique (struct room_linking *rlink, size_t room_nmemb,
-                           int room, enum dir dir)
+                           int room0, int room1, enum dir dir)
 {
-  int i;
-  for (i = 1; i < room_nmemb; i++) {
-    if (room != i && roomd (rlink, room_nmemb, i, dir)
-        == roomd (rlink, room_nmemb, room, dir))
+  int r = roomd (rlink, room_nmemb, room0, dir);
+  r = r ? r : room_val (room_nmemb, room1);
+
+  if (! r) return;
+
+  for (int i = 1; i < room_nmemb; i++) {
+    if (room0 != i && roomd (rlink, room_nmemb, i, dir) == r)
       link_room (rlink, room_nmemb, i, 0, dir);
   }
 }
@@ -292,11 +293,11 @@ make_semi_consistent_link (struct room_linking *rlink, size_t room_nmemb,
 {
   make_reciprocal_link (rlink, room_nmemb, room0, room1, dir);
 
-  make_link_locally_unique (rlink, room_nmemb, room0, dir);
-  make_link_locally_unique (rlink, room_nmemb, room1, opposite_dir (dir));
+  make_link_locally_unique (rlink, room_nmemb, room0, room1, dir);
+  make_link_locally_unique (rlink, room_nmemb, room1, room0, opposite_dir (dir));
 
-  make_link_globally_unique (rlink, room_nmemb, room0, dir);
-  make_link_globally_unique (rlink, room_nmemb, room1, opposite_dir (dir));
+  make_link_globally_unique (rlink, room_nmemb, room0, room1, dir);
+  make_link_globally_unique (rlink, room_nmemb, room1, room0, opposite_dir (dir));
 }
 
 void

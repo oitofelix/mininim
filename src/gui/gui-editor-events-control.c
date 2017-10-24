@@ -175,7 +175,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
             IupFill (),
 
             NULL)),
-          "TITLE = Next,"
+          "TITLE = \"Trigger next\","
           "NORMALIZERGROUP = EVENTS_NORM,"),
 
          selection_frame = IupSetAttributes
@@ -284,7 +284,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
               IupSetCallbacks
               (IupSetAttributes
                (IupButton (NULL, NULL),
-                "IMAGE = EVENT_DEFRAG_ICON,"
+                "IMAGE = DEFRAG_ICON,"
                 "TIP = \"Defragment inactive events\","),
                "ACTION", defrag_button_cb,
                NULL),
@@ -295,7 +295,7 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
               IupSetCallbacks
               (IupSetAttributes
                (IupButton (NULL, NULL),
-                "IMAGE = EVENT_CLEAN_ICON,"
+                "IMAGE = CLEAN_ICON,"
                 "TIP = \"Delete trailing inactive events\","),
                "ACTION", clean_button_cb,
                NULL),

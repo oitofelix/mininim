@@ -127,12 +127,10 @@
 #define HEART_ICON "data/icons/heart.png"
 #define PLUS_ICON "data/icons/plus.png"
 #define MINUS_ICON "data/icons/minus.png"
-#define TOOLS_ICON "data/icons/tools.png"
 #define CLEAR_ICON "data/icons/clear.png"
 #define RANDOM_ICON "data/icons/random.png"
 #define DECORATION_ICON "data/icons/decoration.png"
 #define FIX_ICON "data/icons/fix.png"
-#define MIRROR_ICON "data/icons/mirror.png"
 #define SHUFFLE_ICON "data/icons/shuffle.png"
 #define UNMASK_ICON "data/icons/unmask.png"
 #define MASK_EXCHANGE_ICON "data/icons/mask-exchange.png"
@@ -143,8 +141,6 @@
 #define EVENT_SOURCE_ICON "data/icons/event-source.png"
 #define EVENT_TARGET_ICON "data/icons/event-target.png"
 #define EVENT_ADD_ICON "data/icons/event-add.png"
-#define EVENT_DEFRAG_ICON "data/icons/event-defrag.png"
-#define EVENT_CLEAN_ICON "data/icons/event-clean.png"
 
 #define PLACE_SEL_LOCK_ICON "data/icons/place-sel-lock.png"
 #define PLACE_SEL_UNLOCK_ICON "data/icons/place-sel-unlock.png"
@@ -168,5 +164,12 @@
 #define VIEW_RING_NEXT_ICON "data/icons/view-ring-next.png"
 #define VIEW_RING_NEW_ICON "data/icons/view-ring-new.png"
 #define VIEW_RING_DEL_ICON "data/icons/view-ring-del.png"
+
+#define DEFRAG_ICON "data/icons/defrag.png"
+#define CLEAN_ICON "data/icons/clean.png"
+#define OUT_ICON "data/icons/out.png"
+#define IN_ICON "data/icons/in.png"
+#define EXCHANGE_LINKS_ICON "data/icons/exchange-links.png"
+#define EXCHANGE_TILES_ICON "data/icons/exchange-tiles.png"
 
 #endif	/* MININIM_GUI_ICONS_H */

@@ -55,12 +55,7 @@ gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
 
          IupSetAttributes
          (IupGridBox
-          (
-           label = IupSetAttributes
-           (IupLabel (NULL),
-            "IMAGE = MIRROR_ICON,"),
-
-           v_button = IupSetCallbacks
+          (v_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = V_ICON,"
@@ -83,10 +78,6 @@ gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
              "TIP = \"Horizontal\""),
             "ACTION", button_action_cb,
             NULL),
-
-           IupFill (),
-
-           IupFill (),
 
            r_button = IupSetCallbacks
            (IupSetAttributes

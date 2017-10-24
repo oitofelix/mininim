@@ -208,19 +208,20 @@ gui_create_editor_dialog (void)
             "NUMDIV = 4,"
             "SIZECOL = -1,"
             "SIZELIN = -1,"
-            "NGAPCOL = 5,"
-            "NGAPLIN = 5,"),
+            "NGAPCOL = 2,"
+            "NGAPLIN = 2,"
+            "NORMALIZERGROUP = EDITOR_TAB_NORM"),
 
            /* Events */
            IupSetAttributes
            (gui_create_editor_events_control
-            (NULL, &global_level),
+            ("EDITOR_TAB_NORM", &global_level),
             "NAME = EVENTS_CONTROL"),
 
            /* Room */
            IupSetAttributes
            (gui_create_editor_room_control
-            (NULL, &global_level),
+            ("EDITOR_TAB_NORM", &global_level),
             "NAME = ROOM_CONTROL"),
 
            IupVbox (NULL),
@@ -277,8 +278,8 @@ gui_create_editor_dialog (void)
         NULL)),
       "TITLE = \"MININIM: Editor\","
       "ICON = LOGO_ICON,"
-      "MARGIN = 5,"
-      "GAP = 5"),
+      "MARGIN = 2,"
+      "GAP = 2,"),
      "K_ANY", (Icallback) k_any,
      "SHOW_CB", (Icallback) show_cb,
      "CLOSE_CB", exit_editor,
@@ -290,6 +291,9 @@ gui_create_editor_dialog (void)
 
   Ihandle *norm = IupGetHandle ("TILE_PART_NORM");
   IupSetAttribute (norm, "NORMALIZE", "BOTH");
+
+  Ihandle *tab_norm = IupGetHandle ("EDITOR_TAB_NORM");
+  IupSetAttribute (tab_norm, "NORMALIZE", "BOTH");
 
   dialog_fit_natural_size (ih);
 

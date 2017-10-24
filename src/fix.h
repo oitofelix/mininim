@@ -49,9 +49,9 @@ void
 make_reciprocal_link (struct room_linking *rlink, size_t room_nmemb,
                       int room0, int room1, enum dir dir);
 void make_link_locally_unique (struct room_linking *rlink, size_t room_nmemb,
-                               int room, enum dir dir);
+                               int room0, int room1, enum dir dir);
 void make_link_globally_unique (struct room_linking *rlink, size_t room_nmemb,
-                                int room, enum dir dir);
+                                int room0, int room1, enum dir dir);
 void make_semi_consistent_link (struct room_linking *rlink, size_t room_nmemb,
                                 int room0, int room1, enum dir dir);
 void make_link_adjacency_bound (struct room_linking *rlink, size_t room_nmemb,

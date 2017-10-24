@@ -44,12 +44,7 @@ gui_create_tile_transform_control
 
          IupSetAttributes
          (IupGridBox
-          (
-           label = IupSetAttributes
-           (IupLabel (NULL),
-            "IMAGE = TOOLS_ICON,"),
-
-           clear_button = IupSetCallbacks
+          (clear_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = CLEAR_ICON,"
@@ -72,8 +67,6 @@ gui_create_tile_transform_control
              "TIP = \"Decorate\""),
             "ACTION", button_action_cb,
             NULL),
-
-           IupFill (),
 
            fix_button = IupSetCallbacks
            (IupSetAttributes
@@ -101,7 +94,7 @@ gui_create_tile_transform_control
 
            NULL),
           "ORIENTATION = HORIZONTAL,"
-          "NUMDIV = 4,"
+          "NUMDIV = 3,"
           "SIZECOL = -1,"
           "SIZELIN = -1,"
           "NORMALIZESIZE = BOTH,"),

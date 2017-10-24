@@ -20,6 +20,10 @@
 
 #include "mininim.h"
 
+bool editor_reciprocal_links = true;
+bool editor_locally_unique_links = true;
+bool editor_globally_unique_links = true;
+
 static char bmenu_int_ext (struct pos *p, int steps, int fases,
                           char *prefix, char *b_str);
 static char bmenu_select_room (enum edit up_edit, char *prefix);
@@ -31,8 +35,6 @@ static char bmenu_skill (char *prefix, int *skill, int max, enum edit up_edit);
 static int last_event;
 static struct mouse_coord last_mouse_coord;
 static struct pos last_event2floor_pos;
-static bool reciprocal_links, locally_unique_links,
-  globally_unique_links;
 static bool b0, b1, b2, b3, b4, b5;
 static int guard_index;
 static int bb, r, s, t;
@@ -1128,9 +1130,9 @@ editor (void)
       break;
     case 'L': edit = EDIT_LINK; break;
     case 'S': edit = EDIT_LINKING_SETTINGS;
-      b0 = reciprocal_links;
-      b1 = locally_unique_links;
-      b2 = globally_unique_links;
+      b0 = editor_reciprocal_links;
+      b1 = editor_locally_unique_links;
+      b2 = editor_globally_unique_links;
       break;
     case 'X':
       get_mouse_coord (&global_mr, &last_mouse_coord);
@@ -1355,9 +1357,9 @@ editor (void)
     case -1: edit = EDIT_ROOM; break;
     case 0: break;
     case 1:
-      reciprocal_links = b0;
-      locally_unique_links = b1;
-      globally_unique_links = b2;
+      editor_reciprocal_links = b0;
+      editor_locally_unique_links = b1;
+      editor_globally_unique_links = b2;
       edit = EDIT_ROOM;
       break;
     }
@@ -2160,20 +2162,21 @@ editor_link (struct room_linking *rlink, size_t room_nmemb,
              int room0, int room1, enum dir dir)
 {
   *roomd_ptr (rlink, room_nmemb, room0, dir) = room1;
-  if (reciprocal_links)
-    make_reciprocal_link (rlink, room_nmemb,
-                          room0, room1, dir);
+  if (editor_reciprocal_links)
+    make_reciprocal_link (rlink, room_nmemb, room0, room1, dir);
 
-  if (locally_unique_links) {
-    make_link_locally_unique (rlink, room_nmemb, room0, dir);
-    if (reciprocal_links)
-      make_link_locally_unique (rlink, room_nmemb, room1, opposite_dir (dir));
+  if (editor_locally_unique_links) {
+    make_link_locally_unique (rlink, room_nmemb, room0, room1, dir);
+    if (editor_reciprocal_links)
+      make_link_locally_unique
+        (rlink, room_nmemb, room1, room0, opposite_dir (dir));
   }
 
-  if (globally_unique_links) {
-    make_link_globally_unique (rlink, room_nmemb, room0, dir);
-    if (reciprocal_links)
-      make_link_globally_unique (rlink, room_nmemb, room1, opposite_dir (dir));
+  if (editor_globally_unique_links) {
+    make_link_globally_unique (rlink, room_nmemb, room0, room1, dir);
+    if (editor_reciprocal_links)
+      make_link_globally_unique
+        (rlink, room_nmemb, room1, room0, opposite_dir (dir));
   }
 }
 

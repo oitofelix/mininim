@@ -26,6 +26,8 @@ extern enum edit edit;
 extern enum edit last_edit;
 extern uint64_t editor_register;
 extern bool selection_locked;
+extern bool editor_reciprocal_links, editor_locally_unique_links,
+  editor_globally_unique_links;
 
 /* functions */
 void change_tile_fg (struct pos *p, enum tile_fg f);

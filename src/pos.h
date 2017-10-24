@@ -44,6 +44,9 @@ int room_dist (struct room_linking *rlink, size_t room_nmemb,
 int min_room_dist (size_t room_nmemb;
                    struct room_dist room[room_nmemb],
                    size_t room_nmemb, int *dmax);
+bool is_room_accessible (struct room_linking *rlink, size_t room_nmemb,
+                         int room_from, int room_to);
+bool is_room_accessible_from_kid_start (struct level *l, int room);
 struct coord *new_coord (struct coord *c, struct level *l, int room,
                          lua_Number x, lua_Number y);
 struct coord *invalid_coord (struct coord *c);
