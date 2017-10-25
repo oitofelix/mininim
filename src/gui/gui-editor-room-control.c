@@ -20,8 +20,15 @@
 
 #include "mininim.h"
 
+#define ACTIVELY_BROKEN_COLOR "255 0 0"
+#define PASSIVELY_BROKEN_COLOR "0 128 0"
+#define ISOLATED_COLOR "0 0 255"
+
 struct last {
   size_t total_rooms, isolated_rooms, broken_rooms, start_room, level_n;
+  int first_actively_broken_id, last_actively_broken_id;
+  int first_passively_broken_id, last_passively_broken_id;
+  int first_isolated_id, last_isolated_id;
 };
 
 enum {
@@ -39,6 +46,9 @@ static int _update_cb (Ihandle *ih);
 /* tree build */
 static bool is_broken_link (struct room_linking *rlink, size_t room_nmemb,
                             int room, enum dir d);
+static bool is_passively_broken_link (struct room_linking *rlink,
+                                      size_t room_nmemb, int room, enum dir d);
+
 static int count_isolated_rooms (struct level *level);
 static int count_broken_rooms (struct room_linking *rlink, size_t room_nmemb);
 
@@ -51,6 +61,10 @@ void populate_room_tree (struct level *level, struct tree *tree,
 int new_room (Ihandle *ih, int l, int r, int a, int b);
 
 /* callbacks */
+static int next_broken_link_id (struct level *level, struct tree *tree,
+                                int start_id, int d, bool passive);
+static int next_isolated_room_id (struct level *level, struct tree *tree,
+                                  int start_id, int d);
 static int go_button_cb (Ihandle *button);
 
 static int isolate_button_cb (Ihandle *button);
@@ -156,16 +170,19 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
 
   go_actively_broken_toggle = IupSetAttributes
     (IupToggle ("A", NULL),
+     "FGCOLOR = \"" ACTIVELY_BROKEN_COLOR "\","
      "VALUE = NO,"
      "TIP = \"Go through actively broken links\",");
 
   go_passively_broken_toggle = IupSetAttributes
     (IupToggle ("P", NULL),
+     "FGCOLOR = \"" PASSIVELY_BROKEN_COLOR "\","
      "VALUE = NO,"
      "TIP = \"Go through passively broken links\",");
 
   go_isolated_toggle = IupSetAttributes
     (IupToggle ("I", NULL),
+     "FGCOLOR = \"" ISOLATED_COLOR "\","
      "VALUE = NO,"
      "TIP = \"Go through isolated rooms\",");
 
@@ -520,11 +537,8 @@ selected_room (Ihandle *tree_ctrl)
 {
   int id = IupGetInt (tree_ctrl, "VALUE");
   if (id < 0) return 0;
-
-  while (IupGetIntId (tree_ctrl, "DEPTH", id) != 0)
-    id = IupGetIntId (tree_ctrl, "PARENT", id);
-
   struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
+  while (tree->node[id].depth != 0) id = tree_node_parent_id (tree, id);
   int *room = tree->node[id].data;
   return *room;
 }
@@ -546,7 +560,8 @@ _update_cb (Ihandle *ih)
   if (! tree_eq (tree, &new_tree)) update_tree_ctrl (ih, &new_tree);
   else destroy_tree (&new_tree);
 
-  /* Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL"); */
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+
   /* int *room = selected_room (tree_ctrl); */
   /* Ihandle *go_frame = (void *) IupGetAttribute (ih, "_GO_FRAME"); */
   /* gui_control_active (go_frame, e); */
@@ -570,6 +585,36 @@ _update_cb (Ihandle *ih)
   /*   Ihandle *new_button = (void *) IupGetAttribute (ih, "_NEW_BUTTON"); */
   /*   gui_control_active (new_button, e); */
   /* } */
+
+  Ihandle *go_radio = (void *) IupGetAttribute (ih, "_GO_RADIO");
+  Ihandle *go_selected = (void *) IupGetAttribute (go_radio, "VALUE_HANDLE");
+
+  Ihandle *go_actively_broken_toggle =
+    (void *) IupGetAttribute (ih, "_GO_ACTIVELY_BROKEN_TOGGLE");
+  Ihandle *go_passively_broken_toggle =
+    (void *) IupGetAttribute (ih, "_GO_PASSIVELY_BROKEN_TOGGLE");
+  Ihandle *go_isolated_toggle =
+    (void *) IupGetAttribute (ih, "_GO_ISOLATED_TOGGLE");
+
+  Ihandle *next_button = (void *) IupGetAttribute (ih, "_NEXT_BUTTON");
+  Ihandle *prev_button = (void *) IupGetAttribute (ih, "_PREV_BUTTON");
+
+  int id = IupGetInt (tree_ctrl, "VALUE");
+  int first_id, last_id;
+
+  if (go_selected == go_actively_broken_toggle) {
+    first_id = last->first_actively_broken_id;
+    last_id = last->last_actively_broken_id;
+  } else if (go_selected == go_passively_broken_toggle) {
+    first_id = last->first_passively_broken_id;
+    last_id = last->last_passively_broken_id;
+  } else if (go_selected == go_isolated_toggle) {
+    first_id = last->first_isolated_id;
+    last_id = last->last_isolated_id;
+  } else assert (false);
+
+  gui_control_active (prev_button, first_id >= 0 && id > first_id);
+  gui_control_active (next_button, last_id >= 0 && id < last_id);
 
   Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL");
   if (gui_control_attribute_strf
@@ -609,6 +654,20 @@ is_broken_link (struct room_linking *rlink, size_t room_nmemb,
   int rd = roomd (rlink, room_nmemb, room, d);
   return room != 0 && rd != 0 &&
     room != roomd (rlink, room_nmemb, rd, opposite_dir (d));
+}
+
+bool
+is_passively_broken_link (struct room_linking *rlink, size_t room_nmemb,
+                          int room, enum dir d)
+{
+  enum dir od = opposite_dir (d);
+
+  for (int i = 1; i < room_nmemb; i++)
+    if (roomd (rlink, room_nmemb, i, od) == room
+        && is_broken_link (rlink, room_nmemb, i, od))
+      return true;
+
+  return false;
 }
 
 int
@@ -704,11 +763,11 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       int *room = tree->node[id].data;
       IupSetStrfId (tree_ctrl, "TITLE", id, "Room %02i", *room);
       if (! is_room_accessible_from_kid_start (level, *room))
-        IupSetAttributeId (tree_ctrl, "COLOR", id, "0 0 255");
+        IupSetAttributeId (tree_ctrl, "COLOR", id, ISOLATED_COLOR);
       break;
     }
     case DIR_DEPTH: {
-      int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
+      int parent_id = tree_node_parent_id (tree, id);
       int *room = tree->node[parent_id].data;
       enum dir *d = tree->node[id].data;
       IupSetStrfId (tree_ctrl, "TITLE", id, "Room %02i: %s",
@@ -719,8 +778,8 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       break;
     }
     case ADJACENT_DEPTH: {
-      int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
-      int parent_parent_id = IupGetIntId (tree_ctrl, "PARENT", parent_id);
+      int parent_id = tree_node_parent_id (tree, id);
+      int parent_parent_id = tree_node_parent_id (tree, parent_id);
       int *room = tree->node[id].data;
       int *parent_room = tree->node[parent_parent_id].data;
 
@@ -738,8 +797,8 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
 
       if (is_broken_link (level->link, level->room_nmemb, src_room, d))
         IupSetAttributeId (tree_ctrl, "COLOR", id, first
-                           ? "255 0 0"
-                           : "180 0 0");
+                           ? ACTIVELY_BROKEN_COLOR
+                           : PASSIVELY_BROKEN_COLOR);
 
       break;
     }
@@ -781,6 +840,19 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
   last->start_room = p.room;
   last->level_n = level->n;
 
+  last->first_actively_broken_id =
+    next_broken_link_id (level, tree, -1, +1, false);
+  last->last_actively_broken_id =
+    next_broken_link_id (level, tree, tree->nmemb, -1, false);
+  last->first_passively_broken_id =
+    next_broken_link_id (level, tree, -1, +1, true);
+  last->last_passively_broken_id =
+    next_broken_link_id (level, tree, tree->nmemb, -1, true);
+  last->first_isolated_id =
+    next_isolated_room_id (level, tree, -1, +1);
+  last->last_isolated_id =
+    next_isolated_room_id (level, tree, tree->nmemb, -1);
+
   /* record current selection */
   int id = IupGetInt (tree_ctrl, "VALUE");
   char *title_buffer = IupGetAttributeId (tree_ctrl, "TITLE", id);
@@ -800,11 +872,93 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
   /* recall previous "current" selection */
   select_node_by_title (tree_ctrl, selected_title, selected_depth);
   al_free (selected_title);
+ }
+
+int
+next_broken_link_id (struct level *level, struct tree *tree,
+                     int start_id, int d, bool passive)
+{
+  int inc = d >= 0 ? +1 : -1;
+  for (int id = start_id + inc;
+       d >= 0 ? id < tree->nmemb : id >= 0;
+       id += inc) {
+      if (tree->node[id].depth != DIR_DEPTH) continue;
+      int parent_id = tree_node_parent_id (tree, id);
+      int *room = tree->node[parent_id].data;
+      enum dir *dir = tree->node[id].data;
+      if ((passive &&
+           is_passively_broken_link (level->link, level->room_nmemb, *room, *dir))
+          || (! passive
+              && is_broken_link (level->link, level->room_nmemb, *room, *dir)))
+        return id;
+  }
+  return -1;
+}
+
+int
+next_isolated_room_id (struct level *level, struct tree *tree,
+                       int start_id, int d)
+{
+  int inc = d >= 0 ? +1 : -1;
+  for (int id = start_id + inc;
+       d >= 0 ? id < tree->nmemb : id >= 0;
+       id += inc) {
+      if (tree->node[id].depth != ROOM_DEPTH) continue;
+      int *room = tree->node[id].data;
+      if (! is_room_accessible_from_kid_start (level, *room))
+        return id;
+  }
+  return -1;
 }
 
 int
 go_button_cb (Ihandle *button)
 {
+  struct level *level = (void *) IupGetAttribute (button, "_LEVEL");
+  struct tree *tree = (void *) IupGetAttribute (button, "_TREE");
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (button, "_TREE_CTRL");
+
+  Ihandle *start_button = (void *) IupGetAttribute (button, "_START_BUTTON");
+  if (button == start_button) {
+    struct pos p; npos (&level->start_pos, &p);
+    int id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &p.room);
+    if (id < 0) return IUP_DEFAULT;
+    select_node_by_id (tree_ctrl, id);
+    return IUP_DEFAULT;
+  }
+
+  Ihandle *next_button = (void *) IupGetAttribute (button, "_NEXT_BUTTON");
+  Ihandle *prev_button = (void *) IupGetAttribute (button, "_PREV_BUTTON");
+
+  int d;
+  if (button == next_button) d = +1;
+  else if (button == prev_button) d = -1;
+  else assert (false);
+
+  Ihandle *go_radio = (void *) IupGetAttribute (button, "_GO_RADIO");
+  Ihandle *go_selected = (void *) IupGetAttribute (go_radio, "VALUE_HANDLE");
+
+  Ihandle *go_actively_broken_toggle =
+    (void *) IupGetAttribute (button, "_GO_ACTIVELY_BROKEN_TOGGLE");
+  Ihandle *go_passively_broken_toggle =
+    (void *) IupGetAttribute (button, "_GO_PASSIVELY_BROKEN_TOGGLE");
+  Ihandle *go_isolated_toggle =
+    (void *) IupGetAttribute (button, "_GO_ISOLATED_TOGGLE");
+
+  int start_id = IupGetInt (tree_ctrl, "VALUE");
+  if (start_id < 0) return IUP_DEFAULT;
+
+  int id;
+  if (go_selected == go_actively_broken_toggle)
+    id = next_broken_link_id (level, tree, start_id, d, false);
+  else if (go_selected == go_passively_broken_toggle)
+    id = next_broken_link_id (level, tree, start_id, d, true);
+  else if (go_selected == go_isolated_toggle)
+    id = next_isolated_room_id (level, tree, start_id, d);
+  else assert (false);
+
+  select_node_by_id (tree_ctrl, id);
+
   return IUP_DEFAULT;
 }
 
@@ -942,7 +1096,7 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
     break;
   }
   case DIR_DEPTH: {
-    int parent_id = IupGetIntId (tree_ctrl, "PARENT", id);
+    int parent_id = tree_node_parent_id (tree, id);
     int *room = tree->node[parent_id].data;
     mr_simple_center_room (&global_mr, *room);
     break;
@@ -954,8 +1108,8 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
       if (id < 0) return IUP_DEFAULT;
       select_node_by_id (tree_ctrl, id);
     } else {
-      int pid = IupGetIntId (tree_ctrl, "PARENT", id);
-      int ppid = IupGetIntId (tree_ctrl, "PARENT", pid);
+      int pid = tree_node_parent_id (tree, id);
+      int ppid = tree_node_parent_id (tree, pid);
       if (ppid < 0) return IUP_DEFAULT;
       int *pproom = tree->node[ppid].data;
       mr_simple_center_room (&global_mr, *pproom);

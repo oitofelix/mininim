@@ -20,6 +20,8 @@
 
 #include "mininim.h"
 
+#define INACTIVE_COLOR "0 0 255"
+
 struct last {
   char *video_mode;
   enum em em;
@@ -571,7 +573,7 @@ populate_event_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       IupSetStrfId (tree_ctrl, "TITLE", id, "Event %i", *e);
       struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
       if (! is_event_active (level, *e))
-        IupSetAttributeId (tree_ctrl, "COLOR", id, "0 0 255");
+        IupSetAttributeId (tree_ctrl, "COLOR", id, INACTIVE_COLOR);
       break;
     }
     case SOURCE_DEPTH: {

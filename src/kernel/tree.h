@@ -47,6 +47,7 @@ int get_or_put_tree_branch_child (struct tree *tree, int parent_id,
                                   m_comparison_fn_t cmp);
 int get_tree_node_id_by_data (struct tree *tree, int depth, void *data);
 bool tree_eq (struct tree *a, struct tree *b);
+int tree_node_parent_id (struct tree *tree, int child_id);
 void destroy_tree (struct tree *tree);
 
 /* Tree control */

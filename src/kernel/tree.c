@@ -133,6 +133,15 @@ tree_eq (struct tree *a, struct tree *b)
   return true;
 }
 
+int
+tree_node_parent_id (struct tree *tree, int child_id)
+{
+  for (int id = child_id - 1; id >= 0; id--)
+    if (tree->node[id].depth < tree->node[child_id].depth)
+      return id;
+  return -1;
+}
+
 void
 destroy_tree (struct tree *tree)
 {
@@ -175,6 +184,8 @@ populate_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
 void
 select_node_by_id (Ihandle *tree_ctrl, int id)
 {
+  if (id < 0) return;
+
   IupSetInt (tree_ctrl, "VALUE", id);
 
   /* Motif bug workaround */
