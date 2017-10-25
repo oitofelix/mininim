@@ -20,6 +20,10 @@
 
 #include "mininim.h"
 
+struct last {
+  size_t total_rooms, isolated_rooms, broken_rooms, start_room, level_n;
+};
+
 enum {
   ROOM_DEPTH, DIR_DEPTH, ADJACENT_DEPTH,
 };
@@ -35,10 +39,8 @@ static int _update_cb (Ihandle *ih);
 /* tree build */
 static bool is_broken_link (struct room_linking *rlink, size_t room_nmemb,
                             int room, enum dir d);
-static int count_room_broken_links (struct room_linking *rlink,
-                                    size_t room_nmemb, int room);
-static int count_level_broken_links (struct room_linking *rlink,
-                                     size_t room_nmemb);
+static int count_isolated_rooms (struct level *level);
+static int count_broken_rooms (struct room_linking *rlink, size_t room_nmemb);
 
 static int _update_tree_cb (Ihandle *ih);
 static void update_tree_ctrl (Ihandle *ih, struct tree *tree);
@@ -365,28 +367,29 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
          (IupSetAttributes
           (IupLabel ("Total: "),
            "TIP = \"Total number of rooms\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           total_label,
           IupSetAttributes
           (IupLabel ("Isolated: "),
            "TIP = \"Number of isolated rooms\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           isolated_label,
           IupSetAttributes
           (IupLabel ("Broken: "),
            "TIP = \"Number of broken rooms\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           broken_label,
           IupSetAttributes
           (IupLabel ("Start: "),
            "TIP = \"Kid's starting room\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           start_label,
           NULL),
          "ORIENTATION = HORIZONTAL,"
          "NUMDIV = 2,"
          "SIZECOL = -1,"
-         "SIZELIN = -1,"),
+         "SIZELIN = -1,"
+         "EXPANDCHILDREN = HORIZONTAL,"),
         IupFill (),
         IupSetAttributes
         (IupHbox
@@ -480,6 +483,10 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_BROKEN_LABEL", (void *) broken_label);
   IupSetAttribute (ih, "_START_LABEL", (void *) start_label);
 
+  struct last *last = xmalloc (sizeof (*last));
+  memset (last, 0, sizeof (*last));
+  IupSetAttribute (ih, "_LAST", (void *) last);
+
   Ihandle *norm = IupGetHandle ("ROOM_NORM");
   IupSetAttribute (norm, "NORMALIZE", "HORIZONTAL");
 
@@ -489,6 +496,8 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
 int
 destroy_cb (Ihandle *ih)
 {
+  struct last *last = (void *) IupGetAttribute (ih, "_LAST");
+  al_free (last);
   struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
   destroy_tree (tree);
   al_free (tree);
@@ -523,15 +532,19 @@ selected_room (Ihandle *tree_ctrl)
 int
 _update_cb (Ihandle *ih)
 {
-  /* if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT; */
+  if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
-  /* struct level *level = (void *) IupGetAttribute (ih, "_LEVEL"); */
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
+  struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
-  /* struct tree *tree = (void *) IupGetAttribute (ih, "_TREE"); */
-  /* struct tree new_tree; */
-  /* populate_room_tree (level, &new_tree); */
-  /* if (! tree_eq (tree, &new_tree)) update_tree_ctrl (ih, &new_tree); */
-  /* else destroy_tree (&new_tree); */
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  Ihandle *isolated_toggle =
+    (void *) IupGetAttribute (ih, "_ISOLATED_TOGGLE");
+  bool isolated_toggle_value = IupGetInt (isolated_toggle, "VALUE");
+  struct tree new_tree;
+  populate_room_tree (level, &new_tree, ! isolated_toggle_value);
+  if (! tree_eq (tree, &new_tree)) update_tree_ctrl (ih, &new_tree);
+  else destroy_tree (&new_tree);
 
   /* Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL"); */
   /* int *room = selected_room (tree_ctrl); */
@@ -558,16 +571,33 @@ _update_cb (Ihandle *ih)
   /*   gui_control_active (new_button, e); */
   /* } */
 
-  /* Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL"); */
-  /* if (gui_control_attribute_strf */
-  /*     (total_label, "TITLE", "%zu", level->room_nmemb)) */
-  /*   IupRefresh (total_label); */
+  Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL");
+  if (gui_control_attribute_strf
+      (total_label, "TITLE", "%zu", last->total_rooms))
+    IupRefresh (total_label);
 
-  /* Ihandle *broken_label = */
-  /*   (void *) IupGetAttribute (ih, "_BROKEN_LABEL"); */
-  /* if (gui_control_attribute_strf */
-  /*     (broken_label, "TITLE", "%i", count_level_broken_links (level))) */
-  /*   IupRefresh (broken_label); */
+  Ihandle *isolated_label =
+    (void *) IupGetAttribute (ih, "_ISOLATED_LABEL");
+  if (gui_control_attribute_strf
+      (isolated_label, "TITLE", "%zu", last->isolated_rooms))
+    IupRefresh (isolated_label);
+
+  Ihandle *broken_label =
+    (void *) IupGetAttribute (ih, "_BROKEN_LABEL");
+  if (gui_control_attribute_strf
+      (broken_label, "TITLE", "%zu", last->broken_rooms))
+    IupRefresh (broken_label);
+
+  Ihandle *start_label =
+    (void *) IupGetAttribute (ih, "_START_LABEL");
+  if (gui_control_attribute_strf
+      (start_label, "TITLE", "%02zu", last->start_room))
+    IupRefresh (start_label);
+
+  struct pos p; npos (&level->start_pos, &p);
+
+  if (last->level_n != level->n || last->start_room != p.room)
+    _update_tree_cb (ih);
 
   return IUP_DEFAULT;
 }
@@ -582,15 +612,26 @@ is_broken_link (struct room_linking *rlink, size_t room_nmemb,
 }
 
 int
-count_room_broken_links (struct room_linking *rlink, size_t room_nmemb, int room)
+count_isolated_rooms (struct level *level)
 {
-  return 0;
+  size_t count = 0;
+  for (size_t room = 1; room < level->room_nmemb; room++)
+    if (! is_room_accessible_from_kid_start (level, room))
+      count++;
+  return count;
 }
 
 int
-count_level_broken_links (struct room_linking *rlink, size_t room_nmemb)
+count_broken_rooms (struct room_linking *rlink, size_t room_nmemb)
 {
-  return 0;
+  size_t count = 0;
+  for (size_t room = 1; room < room_nmemb; room++)
+    for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++)
+      if (is_broken_link (rlink, room_nmemb, room, d)) {
+        count++;
+        break;
+      }
+  return count;
 }
 
 void
@@ -663,7 +704,7 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       int *room = tree->node[id].data;
       IupSetStrfId (tree_ctrl, "TITLE", id, "Room %02i", *room);
       if (! is_room_accessible_from_kid_start (level, *room))
-        IupSetAttributeId (tree_ctrl, "COLOR", id, "255 128 0");
+        IupSetAttributeId (tree_ctrl, "COLOR", id, "0 0 255");
       break;
     }
     case DIR_DEPTH: {
@@ -730,6 +771,15 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
   *tree = *new_tree;
 
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
+
+  struct last *last = (void *) IupGetAttribute (ih, "_LAST");
+  last->total_rooms = level->room_nmemb - 1;
+  last->isolated_rooms = count_isolated_rooms (level);
+  last->broken_rooms = count_broken_rooms (level->link, level->room_nmemb);
+  struct pos p; npos (&level->start_pos, &p);
+  last->start_room = p.room;
+  last->level_n = level->n;
 
   /* record current selection */
   int id = IupGetInt (tree_ctrl, "VALUE");
@@ -800,6 +850,12 @@ isolate_button_cb (Ihandle *button)
     break;
   default: assert (false);
   }
+
+  Ihandle *isolated_toggle =
+    (void *) IupGetAttribute (button, "_ISOLATED_TOGGLE");
+  IupSetInt (isolated_toggle, "VALUE", true);
+
+  _update_tree_cb (button);
 
   return IUP_DEFAULT;
 }

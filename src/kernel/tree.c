@@ -126,7 +126,7 @@ tree_eq (struct tree *a, struct tree *b)
     if (a->node[id].depth != b->node[id].depth
         || a->node[id].type != b->node[id].type
         || a->node[id].cmp != b->node[id].cmp
-        || ! a->node[id].cmp (a->node[id].data, a->node[id].data))
+        || ! a->node[id].cmp (a->node[id].data, b->node[id].data))
       return false;
   }
 

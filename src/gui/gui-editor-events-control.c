@@ -247,30 +247,24 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
          (IupSetAttributes
           (IupLabel ("Total: "),
            "TIP = \"Total number of events\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           total_label,
           IupSetAttributes
           (IupLabel ("Inactive: "),
            "TIP = \"Number of inactive events\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           inactive_label,
           IupSetAttributes
           (IupLabel ("Fragmented: "),
            "TIP = \"Number of fragmented events\","
-           "ALIGNMENT = ARIGHT"),
+           "ALIGNMENT = ALEFT"),
           fragmented_label,
           NULL),
          "ORIENTATION = HORIZONTAL,"
          "NUMDIV = 2,"
          "SIZECOL = -1,"
          "SIZELIN = -1,"
-         /* "NORMALIZESIZE = BOTH," */
-         /* "HOMOGENEOUSLIN = YES," */
-         /* "HOMOGENEOUSCOL = YES," */
-         /* "ALIGNMENTLIN = ACENTER," */
-         /* "ALIGNMENTCOL = ACENTER," */
-         /* "FITTOCHILDREN = YES," */
-         ),
+         "EXPANDCHILDREN = HORIZONTAL,"),
         IupFill (),
         IupSetAttributes
         (IupHbox
@@ -577,7 +571,7 @@ populate_event_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       IupSetStrfId (tree_ctrl, "TITLE", id, "Event %i", *e);
       struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
       if (! is_event_active (level, *e))
-        IupSetAttributeId (tree_ctrl, "COLOR", id, "255 128 0");
+        IupSetAttributeId (tree_ctrl, "COLOR", id, "0 0 255");
       break;
     }
     case SOURCE_DEPTH: {
