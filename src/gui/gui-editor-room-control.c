@@ -586,6 +586,18 @@ _update_cb (Ihandle *ih)
   /*   gui_control_active (new_button, e); */
   /* } */
 
+  Ihandle *reciprocal_toggle =
+    (void *) IupGetAttribute (ih, "_RECIPROCAL_TOGGLE");
+  gui_control_int (reciprocal_toggle, "VALUE", editor_reciprocal_links);
+
+  Ihandle *locally_unique_toggle =
+    (void *) IupGetAttribute (ih, "_LOCALLY_UNIQUE_TOGGLE");
+  gui_control_int (locally_unique_toggle, "VALUE", editor_locally_unique_links);
+
+  Ihandle *globally_unique_toggle =
+    (void *) IupGetAttribute (ih, "_GLOBALLY_UNIQUE_TOGGLE");
+  gui_control_int (globally_unique_toggle, "VALUE", editor_globally_unique_links);
+
   Ihandle *go_radio = (void *) IupGetAttribute (ih, "_GO_RADIO");
   Ihandle *go_selected = (void *) IupGetAttribute (go_radio, "VALUE_HANDLE");
 
