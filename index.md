@@ -143,14 +143,15 @@ This way the latest developments are always available to an wider
 audience.  Notice that its version number reflects the date of
 release.
 
-Its user's manual (in PDF format) is bundled in the hope that it might
-be useful, but keep in mind that it lags far behind the current
-development stage of MININIM and thus doesn't describe several
-features thereof accurately or at all.  The author plans to update
-MININIM's documentation in a definitive manner when MININIM reaches
-reasonable feature-set stability.  In case you'd like to help in
-speeding up this process by maintaining its documentation, you're very
-welcome!  Please, contact the MININIM community at its
+[Its user's manual (in PDF format)](https://github.com/oitofelix/mininim/releases/download/v201701122309/mininim.pdf)
+is bundled in the hope that it might be useful, but keep in mind that
+it lags far behind the current development stage of MININIM and thus
+doesn't describe several features thereof accurately or at all.  The
+author plans to update MININIM's documentation in a definitive manner
+when MININIM reaches reasonable feature-set stability.  In case you'd
+like to help in speeding up this process by maintaining its
+documentation, you're very welcome!  Please, contact the MININIM
+community at its
 [forum](http://forum.princed.org/viewforum.php?f=127).
 
 
