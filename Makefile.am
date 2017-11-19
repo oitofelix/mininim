@@ -151,7 +151,11 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui-place-control.h src/gui/gui-mr-origin-control.c				\
 	  src/gui/gui-mr-origin-control.h src/gui/gui-row-control.c					\
 	  src/gui/gui-row-control.h src/gui/gui-page-control.c							\
-	  src/gui/gui-page-control.h
+	  src/gui/gui-page-control.h src/gui/gui-editor-tabs.c							\
+	  src/gui/gui-editor-tabs.h src/gui/gui-editor-tile-control.c				\
+	  src/gui/gui-editor-tile-control.h																	\
+	  src/gui/gui-editor-view-nav-control.c															\
+	  src/gui/gui-editor-view-nav-control.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 

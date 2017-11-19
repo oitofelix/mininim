@@ -71,7 +71,6 @@ gui_create_tile_part_dialog (Ihandle *parent)
         (IupSetAttributes (IupFill (), "MINSIZE = 0x10"),
          IupSetAttributes
          (grid = IupGridBoxv (buttons),
-          "NAME = GRID,"
           "ORIENTATION = HORIZONTAL,"
           "SIZECOL = -1,"
           "SIZELIN = -1,"
@@ -106,6 +105,8 @@ gui_create_tile_part_dialog (Ihandle *parent)
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
   IupSetAttribute (ih, "_LAST", (void *) last);
+
+  IupSetAttribute (ih, "_GRID", (void *) grid);
 
   update (ih);
 
@@ -146,7 +147,7 @@ _update_cb (Ihandle *ih)
   Ihandle *parent = (void *) IupGetAttribute (ih, "_PARENT");
   struct pos *p = (void *) IupGetAttribute (parent, "_POS");
 
-  Ihandle *grid = IupGetDialogChild (ih, "GRID");
+  Ihandle *grid = (void *) IupGetAttribute (ih, "_GRID");
 
   gui_control_active (grid, is_valid_pos (p));
 

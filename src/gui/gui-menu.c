@@ -356,7 +356,7 @@ static struct {
   /* auxiliary popup menu */
   struct {
     uint16_t lock_selection, unlock_selection, select_event_target,
-      select_event_source, add_event;
+      select_event_source, add_event, select_mr_origin_room_tab;
     struct {
       uint16_t add, sub, inv, undo, redo, clear, set, prev, next, new, del;
     } sel_ring;
@@ -408,6 +408,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *view_ring_new_icon, *view_ring_del_icon,
   *event_target_icon, *event_source_icon, *event_add_icon;
 
+struct mouse_coord aux_mouse_coord;
 struct pos aux_pos;
 
 
@@ -1926,6 +1927,12 @@ aux_menu (void)
                 && is_event_fg (&aux_pos), event_source_icon,
                 "Select as event sour&ce");
 
+  menu_sep (NULL);
+
+  item.aux.select_mr_origin_room_tab =
+    menu_sitem (is_valid_pos (&aux_pos), view_ring_icon,
+                "Select origin in room &tab");
+
   end_menu ();
 }
 
@@ -2039,6 +2046,7 @@ void
 show_aux_menu (void)
 {
   if (edit == EDIT_NONE) return;
+  get_mouse_coord (&global_mr, &aux_mouse_coord);
   get_mouse_pos (&global_mr, &aux_pos);
   aux_menu ();
   al_popup_menu (menu.aux.m, display);
@@ -2282,7 +2290,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.aux.sel_ring.del)
     del_sel_ring_entry (&global_sel_ring);
 
-
   else if (id == item.aux.view_ring.set_mr_origin)
     mr_focus_room (&global_mr, aux_pos.room);
   else if (id == item.aux.view_ring.prev)
@@ -2296,15 +2303,21 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
 
   else if (id == item.aux.select_event_target) {
     Ihandle *events =
-      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+      IupGetDialogChild (gui_editor_dialog, "_EVENTS_CTRL");
     gui_run_callback_IFns ("_SELECT_TARGET_CB", events, (void *) &aux_pos);
   } else if (id == item.aux.select_event_source) {
     Ihandle *events =
-      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+      IupGetDialogChild (gui_editor_dialog, "_EVENTS_CTRL");
     gui_run_callback_IFns ("_SELECT_SOURCE_CB", events, (void *) &aux_pos);
   } else if (id == item.aux.add_event) {
     Ihandle *events =
-      IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+      IupGetDialogChild (gui_editor_dialog, "_EVENTS_CTRL");
     gui_run_callback_IFns ("_ADD_EVENT_CB", events, (void *) &aux_pos);
+  } else if (id == item.aux.select_mr_origin_room_tab) {
+    Ihandle *room_tab =
+      IupGetDialogChild (gui_editor_dialog, "_ROOM_CTRL");
+    gui_run_callback_IFnss ("_SELECT_ORIGIN_CB", room_tab,
+                            (void *) &aux_mouse_coord,
+                            (void *) &aux_pos);
   }
 }

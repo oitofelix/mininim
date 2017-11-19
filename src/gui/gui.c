@@ -478,6 +478,15 @@ gui_run_callback_IFns (const char *name, Ihandle *ih, char *s)
   else return IUP_DEFAULT;
 }
 
+int
+gui_run_callback_IFnss (const char *name, Ihandle *ih, char *s0, char *s1)
+{
+  if (! ih) return IUP_DEFAULT;
+  IFnss cb = (IFnss) IupGetCallback (ih, name);
+  if (cb) return cb (ih, s0, s1);
+  else return IUP_DEFAULT;
+}
+
 void
 dialog_fit_natural_size (Ihandle *ih)
 {

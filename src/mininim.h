@@ -222,6 +222,9 @@
 #include "gui-editor-toolbar-control.h"
 #include "gui-directional-control.h"
 #include "gui-coordinates-control.h"
+#include "gui-editor-tabs.h"
+#include "gui-editor-tile-control.h"
+#include "gui-editor-view-nav-control.h"
 
 #include "script.h"
 #include "repl.h"

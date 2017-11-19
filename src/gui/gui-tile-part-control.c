@@ -346,7 +346,7 @@ int
 view_button_action_cb (Ihandle *ih)
 {
   Ihandle *events =
-    IupGetDialogChild (gui_editor_dialog, "EVENTS_CONTROL");
+    (void *) IupGetAttribute (ih, "_EVENTS_CTRL");
   gui_run_callback_IFns
     ("_SELECT_SOURCE_CB", events, (void *) &selection_pos);
   return IUP_DEFAULT;

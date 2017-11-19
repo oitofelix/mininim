@@ -922,7 +922,7 @@ _select_target_cb (Ihandle *ih, struct pos *p)
   int e = target_event (p);
   if (e < 0) return IUP_DEFAULT;
 
-  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
   if (! is_event_active (p->l, e)) {
@@ -947,7 +947,7 @@ _select_source_cb (Ihandle *ih, struct pos *p)
 {
   if (! is_event_fg (p)) return IUP_DEFAULT;
 
-  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
   _update_tree_cb (ih);
@@ -964,7 +964,7 @@ _select_source_cb (Ihandle *ih, struct pos *p)
 int
 _add_event_cb (Ihandle *ih, struct pos *p)
 {
-  Ihandle *tabs = IupGetDialogChild (ih, "TABS_CONTROL");
+  Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
   new_event (ih, p, false);
   return IUP_DEFAULT;

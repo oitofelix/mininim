@@ -52,6 +52,8 @@ int gui_run_callback_IFn (const char *name, Ihandle *ih);
 int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
 int gui_run_callback_IFnii (const char *name, Ihandle *ih, int i0, int i1);
 int gui_run_callback_IFns (const char *name, Ihandle *ih, char *s);
+int gui_run_callback_IFnss (const char *name, Ihandle *ih,
+                            char *s0, char *s1);
 
 void dialog_fit_natural_size (Ihandle *ih);
 

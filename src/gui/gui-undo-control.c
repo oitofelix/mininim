@@ -258,8 +258,7 @@ valuechanged_cb (Ihandle *ih)
 void
 gui_undo_pass (int dir)
 {
-  Ihandle *uc =
-    IupGetDialogChild (gui_editor_dialog, "UNDO_CONTROL");
+  Ihandle *uc = (void *) IupGetAttribute (gui_editor_dialog, "_UNDO_CTRL");
 
   Ihandle *undo_button = (void *) IupGetAttribute (uc, "_UNDO_BUTTON");
   Ihandle *redo_button = (void *) IupGetAttribute (uc, "_REDO_BUTTON");
