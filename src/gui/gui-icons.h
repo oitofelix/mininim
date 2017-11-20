@@ -172,4 +172,7 @@
 #define EXCHANGE_LINKS_ICON "data/icons/exchange-links.png"
 #define EXCHANGE_TILES_ICON "data/icons/exchange-tiles.png"
 
+#define SELECT_MR_ORIGIN_ROOM_TAB_ICON "data/icons/select-mr-origin-room-tab.png"
+#define SWAP_ORIGIN_SELECTION_ICON "data/icons/swap-origin-selection.png"
+
 #endif	/* MININIM_GUI_ICONS_H */

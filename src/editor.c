@@ -131,6 +131,9 @@ editor (void)
   global_mr.select_cycles = SELECT_CYCLES;
   gui_run_callback_IFn ("_UPDATE_CB", gui_editor_dialog);
 
+  /* TEMPORARY */
+  return;
+
   struct bmenu_item bmain_menu[] =
     {{'T', "TILE>"},
      {'E', "EVENT>"},

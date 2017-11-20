@@ -54,11 +54,6 @@ _update_cb (Ihandle *ih)
   Ihandle *bl_button = (void *) IupGetAttribute (ih, "_BL_BUTTON");
   Ihandle *br_button = (void *) IupGetAttribute (ih, "_BR_BUTTON");
 
-  Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
-  Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
-  Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
-  Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
-
   struct link_survey ls;
   link_survey (&ls, global_level.link, global_level.room_nmemb,
                global_mr.room);
@@ -68,17 +63,10 @@ _update_cb (Ihandle *ih)
   gui_control_active (a_button, ls.a);
   gui_control_active (b_button, ls.b);
 
-  if (selected == v_toggle) {
-    gui_control_active (al_button, ls.al);
-    gui_control_active (ar_button, ls.ar);
-    gui_control_active (bl_button, ls.bl);
-    gui_control_active (br_button, ls.br);
-  } else if (selected == h_toggle) {
-    gui_control_active (al_button, ls.la);
-    gui_control_active (ar_button, ls.ra);
-    gui_control_active (bl_button, ls.lb);
-    gui_control_active (br_button, ls.rb);
-  }
+  gui_control_active (al_button, ls.al || ls.la);
+  gui_control_active (ar_button, ls.ar || ls.ra);
+  gui_control_active (bl_button, ls.bl || ls.lb);
+  gui_control_active (br_button, ls.br || ls.rb);
 
   return IUP_DEFAULT;
 }
@@ -101,7 +89,10 @@ button_action_cb (Ihandle *ih)
   Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
-  Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
+
+  struct link_survey ls;
+  link_survey (&ls, global_level.link, global_level.room_nmemb,
+               global_mr.room);
 
   if (ih == c_button) mr_center_room (&global_mr, global_mr.room);
   else if (ih == l_button) mr_room_trans (&global_mr, LEFT);
@@ -109,34 +100,34 @@ button_action_cb (Ihandle *ih)
   else if (ih == a_button) mr_room_trans (&global_mr, ABOVE);
   else if (ih == b_button) mr_room_trans (&global_mr, BELOW);
   else if (ih == al_button) {
-    if (selected == v_toggle) {
+    if (ls.al && (selected == v_toggle || ! ls.la)) {
       mr_room_trans (&global_mr, ABOVE);
       mr_room_trans (&global_mr, LEFT);
-    } else if (selected == h_toggle) {
+    } else if (ls.la) {
       mr_room_trans (&global_mr, LEFT);
       mr_room_trans (&global_mr, ABOVE);
     }
   } else if (ih == ar_button) {
-    if (selected == v_toggle) {
+    if (ls.ar && (selected == v_toggle || ! ls.ra)) {
       mr_room_trans (&global_mr, ABOVE);
       mr_room_trans (&global_mr, RIGHT);
-    } else if (selected == h_toggle) {
+    } else if (ls.ra) {
       mr_room_trans (&global_mr, RIGHT);
       mr_room_trans (&global_mr, ABOVE);
     }
   } else if (ih == bl_button) {
-    if (selected == v_toggle) {
+    if (ls.bl && (selected == v_toggle || ! ls.lb)) {
       mr_room_trans (&global_mr, BELOW);
       mr_room_trans (&global_mr, LEFT);
-    } else if (selected == h_toggle) {
+    } else if (ls.lb) {
       mr_room_trans (&global_mr, LEFT);
       mr_room_trans (&global_mr, BELOW);
     }
   } else if (ih == br_button) {
-    if (selected == v_toggle) {
+    if (ls.br && (selected == v_toggle || ! ls.rb)) {
       mr_room_trans (&global_mr, BELOW);
       mr_room_trans (&global_mr, RIGHT);
-    } else if (selected == h_toggle) {
+    } else if (ls.rb) {
       mr_room_trans (&global_mr, RIGHT);
       mr_room_trans (&global_mr, BELOW);
     }

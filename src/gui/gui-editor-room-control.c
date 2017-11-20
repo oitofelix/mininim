@@ -77,11 +77,13 @@ static int exchange_tiles_button_cb (Ihandle *button);
 static int defrag_button_cb (Ihandle *button);
 static int clean_button_cb (Ihandle *button);
 
+static void select_room_node (Ihandle *ih, int room);
+
 static int selection_cb (Ihandle *ih, int id, int status);
 
 static int _select_origin_cb (Ihandle *ih, struct mouse_coord *mc,
                               struct pos *p);
-static int _select_source_cb (Ihandle *ih, struct pos *p);
+static int _swap_origin_selection_cb (Ihandle *ih);
 static int _add_room_cb (Ihandle *ih, struct pos *p);
 
 
@@ -444,7 +446,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
      "_UPDATE_CB", _update_cb,
      "_UPDATE_TREE_CB", _update_tree_cb,
      "_SELECT_ORIGIN_CB", (Icallback) _select_origin_cb,
-     "_SELECT_SOURCE_CB", (Icallback) _select_source_cb,
+     "_SWAP_ORIGIN_SELECTION_CB", _swap_origin_selection_cb,
      "_ADD_ROOM_CB", (Icallback) _add_room_cb,
      NULL);
 
@@ -1134,6 +1136,23 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
 
   return IUP_DEFAULT;
 }
+void
+select_room_node (Ihandle *ih, int room)
+{
+  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+  int id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &room);
+  if (id < 0) {
+    Ihandle *isolated_toggle =
+      (void *) IupGetAttribute (ih, "_ISOLATED_TOGGLE");
+    IupSetInt (isolated_toggle, "VALUE", true);
+    _update_tree_cb (ih);
+    struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+    id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &room);
+  }
+
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  select_node_by_id (tree_ctrl, id);
+}
 
 int
 _select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
@@ -1142,27 +1161,25 @@ _select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
   struct pos np; npos (p, &np);
-  struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
-  int id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &np.room);
-  if (id < 0) {
-    Ihandle *isolated_toggle =
-      (void *) IupGetAttribute (ih, "_ISOLATED_TOGGLE");
-    IupSetInt (isolated_toggle, "VALUE", true);
-    _update_tree_cb (ih);
-    struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
-    id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &np.room);
-  }
-
-  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
-  select_node_by_id (tree_ctrl, id);
+  select_room_node (ih, np.room);
   mr_set_origin (&global_mr, np.room, mc->x, mc->y);
 
   return IUP_DEFAULT;
 }
 
 int
-_select_source_cb (Ihandle *ih, struct pos *p)
+_swap_origin_selection_cb (Ihandle *ih)
 {
+  Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
+  IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
+
+  int room = global_mr.room;
+  int x = global_mr.x, y = global_mr.y;
+  mr_coord (&global_mr, selection_pos.room, -1, &x, &y);
+  select_room_node (ih, selection_pos.room);
+  mr_set_origin (&global_mr, selection_pos.room, x, y);
+  selection_pos.room = room;
+
   return IUP_DEFAULT;
 }
 

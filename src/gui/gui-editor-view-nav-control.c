@@ -105,19 +105,19 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   Ihandle *zoom_ctrl = (void *) IupGetAttribute (ih, "_ZOOM_CTRL");
-  gui_run_callback_IFn ("UPDATE_CB", zoom_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", zoom_ctrl);
 
   Ihandle *place_ctrl = (void *) IupGetAttribute (ih, "_PLACE_CTRL");
-  gui_run_callback_IFn ("UPDATE_CB", place_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", place_ctrl);
 
   Ihandle *mr_origin_ctrl = (void *) IupGetAttribute (ih, "_MR_ORIGIN_CTRL");
-  gui_run_callback_IFn ("UPDATE_CB", mr_origin_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", mr_origin_ctrl);
 
   Ihandle *row_ctrl =  (void *) IupGetAttribute (ih, "_ROW_CTRL");
-  gui_run_callback_IFn ("UPDATE_CB", row_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", row_ctrl);
 
   Ihandle *page_ctrl = (void *) IupGetAttribute (ih, "_PAGE_CTRL");
-  gui_run_callback_IFn ("UPDATE_CB", page_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", page_ctrl);
 
   return IUP_DEFAULT;
 }

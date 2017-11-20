@@ -356,7 +356,8 @@ static struct {
   /* auxiliary popup menu */
   struct {
     uint16_t lock_selection, unlock_selection, select_event_target,
-      select_event_source, add_event, select_mr_origin_room_tab;
+      select_event_source, add_event, select_mr_origin_room_tab,
+      swap_origin_selection;
     struct {
       uint16_t add, sub, inv, undo, redo, clear, set, prev, next, new, del;
     } sel_ring;
@@ -406,10 +407,11 @@ ALLEGRO_BITMAP *small_logo_icon,
   *sel_ring_next_icon, *sel_ring_new_icon, *sel_ring_del_icon,
   *view_ring_icon, *view_ring_prev_icon, *view_ring_next_icon,
   *view_ring_new_icon, *view_ring_del_icon,
-  *event_target_icon, *event_source_icon, *event_add_icon;
+  *event_target_icon, *event_source_icon, *event_add_icon,
+  *select_mr_origin_room_tab_icon, *swap_origin_selection_icon;
 
 struct mouse_coord aux_mouse_coord;
-struct pos aux_pos;
+struct pos aux_pos, naux_pos;
 
 
 
@@ -575,6 +577,8 @@ load_icons (void)
   event_target_icon = load_icon (EVENT_TARGET_ICON);
   event_source_icon = load_icon (EVENT_SOURCE_ICON);
   event_add_icon = load_icon (EVENT_ADD_ICON);
+  select_mr_origin_room_tab_icon = load_icon (SELECT_MR_ORIGIN_ROOM_TAB_ICON);
+  swap_origin_selection_icon = load_icon (SWAP_ORIGIN_SELECTION_ICON);
 }
 
 void
@@ -707,6 +711,8 @@ unload_icons (void)
   al_destroy_bitmap (event_target_icon);
   al_destroy_bitmap (event_source_icon);
   al_destroy_bitmap (event_add_icon);
+  al_destroy_bitmap (select_mr_origin_room_tab_icon);
+  al_destroy_bitmap (swap_origin_selection_icon);
 }
 
 
@@ -1930,8 +1936,17 @@ aux_menu (void)
   menu_sep (NULL);
 
   item.aux.select_mr_origin_room_tab =
-    menu_sitem (is_valid_pos (&aux_pos), view_ring_icon,
-                "Select origin in room &tab");
+    menu_sitem (is_valid_pos (&aux_pos)
+                && naux_pos.room != global_mr.room,
+                select_mr_origin_room_tab_icon,
+                "Select as origin in room &tab");
+
+  item.aux.swap_origin_selection =
+    menu_sitem (selection_locked
+                && is_valid_pos (&selection_pos)
+                && selection_pos.room != global_mr.room,
+                swap_origin_selection_icon,
+                "S&wap origin and selection");
 
   end_menu ();
 }
@@ -2015,7 +2030,7 @@ view_ring_menu (intptr_t index)
   menu_sep (NULL);
 
   item.aux.view_ring.set_mr_origin =
-    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
+    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != naux_pos.room,
                 view_ring_icon, "Set &origin (Super+M1)");
 
   menu_sep (NULL);
@@ -2048,6 +2063,7 @@ show_aux_menu (void)
   if (edit == EDIT_NONE) return;
   get_mouse_coord (&global_mr, &aux_mouse_coord);
   get_mouse_pos (&global_mr, &aux_pos);
+  npos (&aux_pos, &naux_pos);
   aux_menu ();
   al_popup_menu (menu.aux.m, display);
 }
@@ -2291,7 +2307,7 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     del_sel_ring_entry (&global_sel_ring);
 
   else if (id == item.aux.view_ring.set_mr_origin)
-    mr_focus_room (&global_mr, aux_pos.room);
+    mr_focus_room (&global_mr, naux_pos.room);
   else if (id == item.aux.view_ring.prev)
     view_ring_go_next (&global_mr, &global_view_ring, -1);
   else if (id == item.aux.view_ring.next)
@@ -2319,5 +2335,9 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     gui_run_callback_IFnss ("_SELECT_ORIGIN_CB", room_tab,
                             (void *) &aux_mouse_coord,
                             (void *) &aux_pos);
+  } else if (id == item.aux.swap_origin_selection) {
+    Ihandle *room_tab =
+      IupGetDialogChild (gui_editor_dialog, "_ROOM_CTRL");
+    gui_run_callback_IFn ("_SWAP_ORIGIN_SELECTION_CB", room_tab);
   }
 }

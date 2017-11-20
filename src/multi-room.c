@@ -479,32 +479,72 @@ mr_room_trans (struct mr *mr, enum dir d)
 void
 mr_row_trans (struct mr *mr, enum dir d)
 {
-  int dx = +0, dy = +0, r;
+  int dx = +0, dy = +0, r = 0, i0 = 1, i1 = 1;
 
-  mr->select_cycles = SELECT_CYCLES;
+  int x = mr->x;
+  int y = mr->y;
+  int room = mr->room;
 
+ retry:
   switch (d) {
   case RIGHT:
-    if (mr->x > 0) dx = -1;
-    r = roomd (global_level.link, global_level.room_nmemb, mr->room, RIGHT);
+    if (x > 0) dx = -1;
+    r = roomd (global_level.link, global_level.room_nmemb, room, RIGHT);
     break;
   case LEFT:
-    if (mr->x < mr->w - 1) dx = +1;
-    r = roomd (global_level.link, global_level.room_nmemb, mr->room, LEFT);
+    if (x < mr->w - 1) dx = +1;
+    r = roomd (global_level.link, global_level.room_nmemb, room, LEFT);
     break;
   case BELOW:
-    if (mr->y > 0) dy = -1;
-    r = roomd (global_level.link, global_level.room_nmemb, mr->room, BELOW);
+    if (y > 0) dy = -1;
+    r = roomd (global_level.link, global_level.room_nmemb, room, BELOW);
     break;
   case ABOVE:
-    if (mr->y < mr->h - 1) dy = +1;
-    r = roomd (global_level.link, global_level.room_nmemb, mr->room, ABOVE);
+    if (y < mr->h - 1) dy = +1;
+    r = roomd (global_level.link, global_level.room_nmemb, room, ABOVE);
     break;
   }
 
-  if (! dx && ! dy && r) mr->room = r;
+  if (! dx && ! dy) {
+    if (r) room = r;
+    else {
+      switch (d) {
+      case RIGHT: case LEFT:
+        if (mr->y - i0 >= 0 && (i0 <= i1 || mr->y + i1 > mr->h - 1)) {
+          y = mr->y - i0++;
+          room = mr->cell[x][y].room;
+          goto retry;
+        }
 
-  mr_set_origin (mr, mr->room, mr->x + dx, mr->y + dy);
+        if (mr->y + i1 <= mr->h - 1 && (i1 <= i0 || mr->y - i0 < 0)) {
+          y = mr->y + i1++;
+          room = mr->cell[x][y].room;
+          goto retry;
+        }
+        break;
+      case BELOW: case ABOVE:
+        if (mr->x - i0 >= 0 && (i0 <= i1 || mr->x + i1 > mr->w - 1)) {
+          x = mr->x - i0++;
+          room = mr->cell[x][y].room;
+          goto retry;
+        }
+
+        if (mr->x + i1 <= mr->w - 1 && (i1 <= i0 || mr->x - i0 < 0)) {
+          x = mr->x + i1++;
+          room = mr->cell[x][y].room;
+          goto retry;
+        }
+        break;
+      }
+
+      room = mr->room;
+      x = mr->x;
+      y = mr->y;
+    }
+  }
+
+  mr->select_cycles = SELECT_CYCLES;
+  mr_set_origin (mr, room, x + dx, y + dy);
 }
 
 void
