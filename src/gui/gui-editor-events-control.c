@@ -27,6 +27,7 @@ struct last {
   enum em em;
   enum hue hue;
   int level_n;
+  int inactive_events, fragmented_events;
 };
 
 enum {
@@ -397,6 +398,7 @@ _update_cb (Ihandle *ih)
   struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
+  /* Update tree (if necessary) */
   struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
   Ihandle *inactive_toggle =
     (void *) IupGetAttribute (ih, "_INACTIVE_TOGGLE");
@@ -406,6 +408,7 @@ _update_cb (Ihandle *ih)
   if (! tree_eq (tree, &new_tree)) update_tree_ctrl (ih, &new_tree);
   else destroy_tree (&new_tree);
 
+  /* Trigger frame */
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   struct level_event *e = selected_event (tree_ctrl);
   Ihandle *trigger_frame = (void *) IupGetAttribute (ih, "_TRIGGER_FRAME");
@@ -424,6 +427,7 @@ _update_cb (Ihandle *ih)
       (next_button, e - level->event < level->event_nmemb - 1);
   }
 
+  /* Set frame */
   Ihandle *set_frame =
     (void *) IupGetAttribute (ih, "_SET_FRAME");
   gui_control_active (set_frame, is_valid_pos (&selection_pos));
@@ -436,6 +440,7 @@ _update_cb (Ihandle *ih)
     gui_control_active (target_button, e);
   }
 
+  /* Sanitation frame */
   Ihandle *total_label = (void *) IupGetAttribute (ih, "_TOTAL_LABEL");
   if (gui_control_attribute_strf
       (total_label, "TITLE", "%zu", level->event_nmemb))
@@ -443,13 +448,22 @@ _update_cb (Ihandle *ih)
 
   Ihandle *inactive_label = (void *) IupGetAttribute (ih, "_INACTIVE_LABEL");
   if (gui_control_attribute_strf
-      (inactive_label, "TITLE", "%i", count_inactive_events (level)))
+      (inactive_label, "TITLE", "%i", last->inactive_events))
     IupRefresh (inactive_label);
 
   Ihandle *fragmented_label = (void *) IupGetAttribute (ih, "_FRAGMENTED_LABEL");
   if (gui_control_attribute_strf
-      (fragmented_label, "TITLE", "%i", count_fragmented_events (level)))
+      (fragmented_label, "TITLE", "%i", last->fragmented_events))
     IupRefresh (fragmented_label);
+
+  Ihandle *defrag_button =
+    (void *) IupGetAttribute (ih, "_DEFRAG_BUTTON");
+  gui_control_active (defrag_button, last->fragmented_events > 0);
+
+  Ihandle *clean_button =
+    (void *) IupGetAttribute (ih, "_CLEAN_BUTTON");
+  gui_control_active
+    (clean_button, last->inactive_events > last->fragmented_events);
 
   if ((last->video_mode && strcmp (video_mode, last->video_mode))
       || last->em != em || last->hue != hue)
@@ -618,6 +632,8 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
 
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   last->level_n = level->n;
+  last->inactive_events = count_inactive_events (level);
+  last->fragmented_events = count_fragmented_events (level);
 
   /* record current selection */
   int id = IupGetInt (tree_ctrl, "VALUE");
@@ -711,6 +727,7 @@ next_button_cb (Ihandle *button)
   int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &next);
   if (id < 0) return IUP_DEFAULT;
   select_node_by_id (tree_ctrl, id);
+  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
   return IUP_DEFAULT;
 }
 
@@ -807,6 +824,7 @@ new_event (Ihandle *ih, struct pos *p, bool next)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &e);
   select_node_by_id (tree_ctrl, id);
+  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
 
   return e;
 }
@@ -898,6 +916,8 @@ clean_button_cb (Ihandle *button)
   destroy_array ((void **) &event, &event_nmemb);
   al_free (desc);
 
+  _update_tree_cb (button);
+
   return IUP_DEFAULT;
 }
 
@@ -937,7 +957,7 @@ _select_target_cb (Ihandle *ih, struct pos *p)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, TARGET_DEPTH, p);
   select_node_by_id (tree_ctrl, id);
-  select_pos (&global_mr, p);
+  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }
@@ -956,7 +976,7 @@ _select_source_cb (Ihandle *ih, struct pos *p)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, SOURCE_DEPTH, p);
   select_node_by_id (tree_ctrl, id);
-  select_pos (&global_mr, p);
+  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }

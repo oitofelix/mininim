@@ -34,23 +34,28 @@ add_to_array (void *s_base, size_t s_nmemb,
   if (*d_nmemb > 0 ) assert (d_index <= *d_nmemb);
   assert (size > 0);
 
-  /* Allocate space in the destination array */
-  void *ptr = xrealloc (d_base, (*d_nmemb + s_nmemb) * size);
+  /* copy source array to a temporary location in order to prevent
+     data corruption in case it's a subarray of the destination one */
+  void *src = copy_array (s_base, s_nmemb, NULL, size);
 
-  /* Move data in the destination array */
+  /* Allocate space in the destination array */
+  void *dst = xrealloc (d_base, (*d_nmemb + s_nmemb) * size);
+
+  /* Move data within the destination array in order to make room for
+     the source data */
   if (d_index < *d_nmemb)
-    memmove ((char *) ptr + (d_index + s_nmemb) * size,
-             (char *) ptr + d_index * size,
+    memmove ((char *) dst + (d_index + s_nmemb) * size,
+             (char *) dst + d_index * size,
              (*d_nmemb - d_index) * size);
 
   /* Copy source array into destination */
-  memmove ((char *) ptr + d_index * size, s_base, s_nmemb * size);
+  memcpy ((char *) dst + d_index * size, src, s_nmemb * size);
 
   /* Increment destination array counter */
   *d_nmemb += s_nmemb;
 
   /* Return the pointer to the new array */
-  return ptr;
+  return dst;
 }
 
 void *
@@ -80,7 +85,7 @@ copy_array (void *s_base, size_t s_nmemb, size_t *d_nmemb, size_t size)
 {
   void *d_base = xcalloc (s_nmemb, size);
   if (d_nmemb) *d_nmemb = s_nmemb;
-  return memmove (d_base, s_base, s_nmemb * size);
+  return memcpy (d_base, s_base, s_nmemb * size);
 }
 
 void

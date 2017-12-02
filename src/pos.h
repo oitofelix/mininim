@@ -37,6 +37,8 @@ bool is_room_adjacent (struct room_linking *rlink, size_t room_nmemb,
                        int room0, int room1);
 void link_room (struct room_linking *rlink, size_t room_nmemb,
                 int room0, int room1, enum dir dir);
+void closure_link_room (struct room_linking *rlink, size_t room_nmemb,
+                        int room0, int room1, enum dir dir);
 void mirror_link (struct room_linking *rlink, size_t room_nmemb,
                   int room, enum dir dir0, enum dir dir1);
 int room_dist (struct room_linking *rlink, size_t room_nmemb,

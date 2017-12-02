@@ -82,6 +82,10 @@ void register_link_undo (struct undo *u, struct room_linking *rlink,
 void link_undo (struct link_undo *d, int dir);
 void destroy_link_undo (struct link_undo *d);
 
+/* NEW ROOM */
+void register_new_room_undo (struct undo *u, char *desc);
+void new_room_undo (void *d, int dir);
+
 /* START POSITION */
 void register_start_pos_undo (struct undo *u, struct pos *p, char *desc);
 void start_pos_undo (struct start_pos_undo *d, int dir);

@@ -78,6 +78,64 @@ link_room (struct room_linking *rlink, size_t room_nmemb,
 }
 
 void
+closure_link_room (struct room_linking *rlink, size_t room_nmemb,
+                   int room0, int room1, enum dir dir)
+{
+  editor_link (rlink, room_nmemb, room0, room1, dir);
+
+  struct link_survey ls;
+  link_survey (&ls, rlink, room_nmemb, room0);
+
+  switch (dir) {
+  case LEFT:
+    if (ls.al) editor_link (rlink, room_nmemb, ls.al, room1, BELOW);
+    struct link_survey ls_al;
+    link_survey (&ls_al, rlink, room_nmemb, ls.al);
+    if (ls_al.lb) editor_link (rlink, room_nmemb, ls_al.lb, room1, RIGHT);
+
+    if (ls.bl) editor_link (rlink, room_nmemb, ls.bl, room1, ABOVE);
+    struct link_survey ls_bl;
+    link_survey (&ls_bl, rlink, room_nmemb, ls.bl);
+    if (ls_bl.la) editor_link (rlink, room_nmemb, ls_bl.la, room1, RIGHT);
+    break;
+  case RIGHT:
+    if (ls.ar) editor_link (rlink, room_nmemb, ls.ar, room1, BELOW);
+    struct link_survey ls_ar;
+    link_survey (&ls_ar, rlink, room_nmemb, ls.ar);
+    if (ls_ar.rb) editor_link (rlink, room_nmemb, ls_ar.rb, room1, LEFT);
+
+    if (ls.br) editor_link (rlink, room_nmemb, ls.br, room1, ABOVE);
+    struct link_survey ls_br;
+    link_survey (&ls_br, rlink, room_nmemb, ls.br);
+    if (ls_br.ra) editor_link (rlink, room_nmemb, ls_br.ra, room1, LEFT);
+    break;
+  case ABOVE:
+    if (ls.la) editor_link (rlink, room_nmemb, ls.la, room1, RIGHT);
+    struct link_survey ls_la;
+    link_survey (&ls_la, rlink, room_nmemb, ls.la);
+    if (ls_la.ar) editor_link (rlink, room_nmemb, ls_la.ar, room1, BELOW);
+
+    if (ls.ra) editor_link (rlink, room_nmemb, ls.ra, room1, LEFT);
+    struct link_survey ls_ra;
+    link_survey (&ls_ra, rlink, room_nmemb, ls.ra);
+    if (ls_ra.al) editor_link (rlink, room_nmemb, ls_ra.al, room1, BELOW);
+    break;
+  case BELOW:
+    if (ls.lb) editor_link (rlink, room_nmemb, ls.lb, room1, RIGHT);
+    struct link_survey ls_lb;
+    link_survey (&ls_lb, rlink, room_nmemb, ls.lb);
+    if (ls_lb.br) editor_link (rlink, room_nmemb, ls_lb.br, room1, ABOVE);
+
+    if (ls.rb) editor_link (rlink, room_nmemb, ls.rb, room1, LEFT);
+    struct link_survey ls_rb;
+    link_survey (&ls_rb, rlink, room_nmemb, ls.rb);
+    if (ls_rb.bl) editor_link (rlink, room_nmemb, ls_rb.bl, room1, ABOVE);
+    break;
+  default: assert (false);
+  }
+}
+
+void
 mirror_link (struct room_linking *rlink, size_t room_nmemb,
              int room, enum dir dir0, enum dir dir1)
 {

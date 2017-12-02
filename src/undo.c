@@ -481,6 +481,43 @@ destroy_link_undo (struct link_undo *d)
   destroy_array ((void **) &d->f, NULL);
 }
 
+/************/
+/* NEW ROOM */
+/************/
+
+void
+register_new_room_undo (struct undo *u, char *desc)
+{
+  register_undo (u, NULL, (undo_f) new_room_undo, NULL, desc);
+  new_room_undo (NULL, +1);
+}
+
+void
+new_room_undo (void *d, int dir)
+{
+  if (dir >= 0) {
+    global_level.tile =
+      add_to_array (&global_level.tile[0], 1,
+                    global_level.tile, &global_level.room_nmemb,
+                    global_level.room_nmemb, sizeof (*global_level.tile));
+    global_level.room_nmemb--;
+    global_level.link =
+      add_to_array (&global_level.link[0], 1,
+                    global_level.link, &global_level.room_nmemb,
+                    global_level.room_nmemb, sizeof (*global_level.link));
+  } else {
+    global_level.tile =
+      remove_from_array (global_level.tile, &global_level.room_nmemb,
+                         global_level.room_nmemb - 1, 1,
+                         sizeof (*global_level.tile));
+    global_level.room_nmemb++;
+    global_level.link =
+      remove_from_array (global_level.link, &global_level.room_nmemb,
+                         global_level.room_nmemb - 1, 1,
+                         sizeof (*global_level.link));
+  }
+}
+
 /******************/
 /* START POSITION */
 /******************/

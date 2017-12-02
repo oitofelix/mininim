@@ -196,8 +196,6 @@ select_node_by_id (Ihandle *tree_ctrl, int id)
     IupSetAttributeId (tree_ctrl, "STATE", parent_id, "EXPANDED");
     IupSetInt (tree_ctrl, "VALUE", id);
   }
-
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
 }
 
 void

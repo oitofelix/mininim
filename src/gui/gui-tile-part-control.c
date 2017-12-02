@@ -76,49 +76,49 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
     tile_part_str = tile_item_str;
     tile_parts = TILE_ITEMS;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Item Extension";
+    title = "Item";
     break;
   case TILE_EXT_DESIGN:
     tile_part_str = NULL;
     tile_parts = CARPET_DESIGNS;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Design Extension";
+    title = "Design";
     break;
   case TILE_EXT_STEP_SPIKES_FLOOR:
     tile_part_str = NULL;
     tile_parts = SPIKES_TOTAL;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Step Extension";
+    title = "Step";
     break;
   case TILE_EXT_STEP_CHOMPER:
     tile_part_str = NULL;
     tile_parts = CHOMPER_TOTAL;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Step Extension";
+    title = "Step";
     break;
   case TILE_EXT_STEP_DOOR:
     tile_part_str = NULL;
     tile_parts = DOOR_TOTAL;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Step Extension";
+    title = "Step";
     break;
   case TILE_EXT_STEP_LEVEL_DOOR:
     tile_part_str = NULL;
     tile_parts = LEVEL_DOOR_STEPS;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Step Extension";
+    title = "Step";
     break;
   case TILE_EXT_EVENT:
     tile_part_str = NULL;
     tile_parts = 0;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Event Extension";
+    title = "Event";
     break;
   case TILE_EXT_FALL:
     tile_part_str = NULL;
     tile_parts = 0;
     change_tile_part = (change_tile_part_t) change_tile_ext;
-    title = "Fall Extension";
+    title = "Fall";
     break;
   case TILE_FAKE:
     tile_part_str = tile_fg_str;

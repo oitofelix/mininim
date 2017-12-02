@@ -2164,7 +2164,8 @@ void
 editor_link (struct room_linking *rlink, size_t room_nmemb,
              int room0, int room1, enum dir dir)
 {
-  *roomd_ptr (rlink, room_nmemb, room0, dir) = room1;
+  link_room (rlink, room_nmemb, room0, room1, dir);
+
   if (editor_reciprocal_links)
     make_reciprocal_link (rlink, room_nmemb, room0, room1, dir);
 
