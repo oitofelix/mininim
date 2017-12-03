@@ -49,6 +49,7 @@ void hide_menu (void);
 bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 
-bool main_menu_enabled;
+extern bool main_menu_enabled;
+extern struct pos aux_pos, naux_pos;
 
 #endif	/* MININIM_GUI_MENU_H */

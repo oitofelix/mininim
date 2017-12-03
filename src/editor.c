@@ -2194,6 +2194,23 @@ editor_link (struct room_linking *rlink, size_t room_nmemb,
 }
 
 void
+closure_link_room (struct room_linking *rlink, size_t room_nmemb,
+                   int room0, int room1, enum dir dir)
+{
+  editor_link (rlink, room_nmemb, room0, room1, dir);
+
+  struct mr mr;
+  memset (&mr, 0, sizeof (mr));
+  mr_redim (&mr, 3, 3);
+  mr_set_origin (&mr, room0, 1, 1, rlink, room_nmemb);
+
+  editor_link (rlink, room_nmemb, room0, mr.cell[0][1].room, LEFT);
+  editor_link (rlink, room_nmemb, room0, mr.cell[2][1].room, RIGHT);
+  editor_link (rlink, room_nmemb, room0, mr.cell[1][0].room, ABOVE);
+  editor_link (rlink, room_nmemb, room0, mr.cell[1][2].room, BELOW);
+}
+
+void
 editor_mirror_link (struct room_linking *rlink, size_t room_nmemb,
                     int room, enum dir dir0, enum dir dir1)
 {
@@ -2201,4 +2218,26 @@ editor_mirror_link (struct room_linking *rlink, size_t room_nmemb,
   int r1 = roomd (rlink, room_nmemb, room, dir1);
   editor_link (rlink, room_nmemb, room, r0, dir1);
   editor_link (rlink, room_nmemb, room, r1, dir0);
+}
+
+int
+editor_new_room (int room, enum dir d)
+{
+  register_new_room_undo (&undo, NULL);
+
+  int new_room = global_level.room_nmemb - 1;
+  struct room_linking *new_rlink =
+    copy_array (global_level.rlink, global_level.room_nmemb,
+                NULL, sizeof (*global_level.rlink));
+
+  closure_link_room (new_rlink, global_level.room_nmemb, new_room, room,
+                     opposite_dir (d));
+
+  char *desc = xasprintf ("NEW ROOM %i %s %i", new_room,
+                          direction_string (d), room);
+  register_link_undo (&undo, new_rlink, desc);
+  al_free (desc);
+  destroy_array ((void **) &new_rlink, NULL);
+
+  return new_room;
 }

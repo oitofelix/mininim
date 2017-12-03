@@ -833,6 +833,10 @@ struct link_undo {
   struct room_linking *b, *f;
 };
 
+struct new_room_undo {
+  int mr_room;
+};
+
 struct start_pos_undo {
   struct pos b, f;
 };

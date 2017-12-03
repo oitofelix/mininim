@@ -414,10 +414,15 @@ void
 mr_focus_room (struct mr *mr, int room, struct room_linking *rlink,
                size_t room_nmemb)
 {
+  if (room >= room_nmemb) return;
+
   int x, y;
   if (mr_coord (mr, room, -1, &x, &y))
     mr_set_origin (mr, room, x, y, rlink, room_nmemb);
-  else mr_center_room (mr, room, rlink, room_nmemb);
+  else {
+    mr_scroll_into_view (mr, room, rlink, room_nmemb);
+    mr_focus_room (mr, room, rlink, room_nmemb);
+  }
   mr->select_cycles = SELECT_CYCLES;
 }
 

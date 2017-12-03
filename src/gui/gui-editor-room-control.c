@@ -59,9 +59,6 @@ static void update_tree_ctrl (Ihandle *ih, struct tree *tree);
 void populate_room_tree (struct level *level, struct tree *tree,
                          bool ignore_isolated);
 
-/* auxiliary */
-int new_room (Ihandle *ih, int l, int r, int a, int b);
-
 /* callbacks */
 static int next_broken_link_id (struct level *level, struct tree *tree,
                                 int start_id, int d, bool passive);
@@ -1153,31 +1150,11 @@ new_button_cb (Ihandle *button)
   default: assert (false);
   }
 
-  register_new_room_undo (&undo, NULL);
-  int new_room = level->room_nmemb - 1;
-  struct room_linking *rlink =
-    copy_array (level->rlink, level->room_nmemb, NULL, sizeof (*rlink));
-
-  closure_link_room (rlink, level->room_nmemb, new_room, room,
-                     opposite_dir (d));
-
-  char *desc = xasprintf ("NEW ROOM %i %s %i", new_room,
-                          direction_string (d), room);
-  register_link_undo (&undo, rlink, desc);
-  al_free (desc);
-  destroy_array ((void **) &rlink, NULL);
-
+  int new_room = editor_new_room (room, d);
   _update_tree_cb (button);
-
   select_room_node (button, new_room);
 
   return IUP_DEFAULT;
-}
-
-int
-new_room (Ihandle *ih, int l, int r, int a, int b)
-{
-  return 0;
 }
 
 int
@@ -1273,6 +1250,7 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
     else {
       int pid = tree_node_parent_id (tree, id);
       select_node_by_id (tree_ctrl, pid);
+      gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, pid, true);
     }
     break;
   }
@@ -1281,6 +1259,7 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
 
   return IUP_DEFAULT;
 }
+
 void
 select_room_node (Ihandle *ih, int room)
 {
@@ -1289,11 +1268,16 @@ select_room_node (Ihandle *ih, int room)
   if (id < 0) {
     Ihandle *isolated_toggle =
       (void *) IupGetAttribute (ih, "_ISOLATED_TOGGLE");
-    IupSetInt (isolated_toggle, "VALUE", true);
-    _update_tree_cb (ih);
-    struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
-    id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &room);
+    bool isolated = IupGetInt (isolated_toggle, "VALUE");
+    if (! isolated) {
+      IupSetInt (isolated_toggle, "VALUE", true);
+      _update_tree_cb (ih);
+      struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
+      id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &room);
+    }
   }
+
+  if (id < 0) return;
 
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   select_node_by_id (tree_ctrl, id);
@@ -1303,6 +1287,8 @@ select_room_node (Ihandle *ih, int room)
 int
 _select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
 {
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
+
   Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 

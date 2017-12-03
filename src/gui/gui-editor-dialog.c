@@ -48,11 +48,13 @@ gui_create_editor_dialog (void)
 
   Ihandle *selection_hotkeys_toggle = IupSetAttributes
     (IupToggle ("&Selection", NULL),
+     "VALUE = YES,"
      "TIP = \"Arrow keys move the locked place selection\",");
 
   Ihandle *game_hotkeys_toggle = IupSetAttributes
     (IupToggle ("&Game", NULL),
-     "TIP = \"Usual game key bindings work anywhere\"");
+     "VALUE = YES,"
+     "TIP = \"Usual game key bindings work anywhere\",");
 
   Ihandle *hotkeys_ctrl = IupSetAttributes
     (IupFrame

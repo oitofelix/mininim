@@ -45,7 +45,10 @@ void ui_place_kid (struct actor *k, struct pos *p);
 void ui_place_guard (struct actor *g, struct pos *p);
 void editor_link (struct room_linking *rlink, size_t room_nmemb,
                   int room0, int room1, enum dir dir);
+void closure_link_room (struct room_linking *rlink, size_t room_nmemb,
+                        int room0, int room1, enum dir dir);
 void editor_mirror_link (struct room_linking *rlink, size_t room_nmemb,
                          int room, enum dir dir0, enum dir dir1);
+int editor_new_room (int room, enum dir d);
 
 #endif	/* MININIM_EDITOR_H */

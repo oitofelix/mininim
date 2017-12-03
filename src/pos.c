@@ -44,7 +44,11 @@ typed_int (int i, int n, int f, int *nr, int *nf)
 int
 room_val (size_t room_nmemb, int room)
 {
+/* #if DEBUG */
+/*   return room >= (int) room_nmemb ? -1 : room; */
+/* #else */
   return typed_int (room, room_nmemb, 1, NULL, NULL);
+/* #end */
 }
 
 int *
@@ -75,23 +79,6 @@ link_room (struct room_linking *rlink, size_t room_nmemb,
   if (room_val (room_nmemb, room0))
     *roomd_ptr (rlink, room_nmemb, room0, dir)
       = room_val (room_nmemb, room1);
-}
-
-void
-closure_link_room (struct room_linking *rlink, size_t room_nmemb,
-                   int room0, int room1, enum dir dir)
-{
-  editor_link (rlink, room_nmemb, room0, room1, dir);
-
-  struct mr mr;
-  memset (&mr, 0, sizeof (mr));
-  mr_redim (&mr, 3, 3);
-  mr_set_origin (&mr, room0, 1, 1, rlink, room_nmemb);
-
-  editor_link (rlink, room_nmemb, room0, mr.cell[0][1].room, LEFT);
-  editor_link (rlink, room_nmemb, room0, mr.cell[2][1].room, RIGHT);
-  editor_link (rlink, room_nmemb, room0, mr.cell[1][0].room, ABOVE);
-  editor_link (rlink, room_nmemb, room0, mr.cell[1][2].room, BELOW);
 }
 
 void
@@ -333,8 +320,7 @@ bool
 is_valid_pos (struct pos *p)
 {
   return cutscene || (p->l && p->room >= 0
-                      /* && p->room < ROOMS */
-                      );
+                      && p->room < (int) global_level.room_nmemb);
 }
 
 struct pos *
@@ -774,6 +760,9 @@ bool
 peq (struct pos *p0, struct pos *p1)
 {
   struct pos np0, np1;
+
+  if (! is_valid_pos (p0) && ! is_valid_pos (p1))
+    return true;
 
   if (! is_valid_pos (p0) || ! is_valid_pos (p1))
     return false;

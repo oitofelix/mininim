@@ -939,6 +939,8 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
 int
 _select_target_cb (Ihandle *ih, struct pos *p)
 {
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
+
   int e = target_event (p);
   if (e < 0) return IUP_DEFAULT;
 
@@ -965,6 +967,7 @@ _select_target_cb (Ihandle *ih, struct pos *p)
 int
 _select_source_cb (Ihandle *ih, struct pos *p)
 {
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
   if (! is_event_fg (p)) return IUP_DEFAULT;
 
   Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
@@ -984,6 +987,7 @@ _select_source_cb (Ihandle *ih, struct pos *p)
 int
 _add_event_cb (Ihandle *ih, struct pos *p)
 {
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
   Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
   new_event (ih, p, false);

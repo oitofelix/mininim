@@ -2294,7 +2294,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.aux.unlock_selection)
     unlock_relock_place_selection ();
 
-
   else if (id == item.aux.sel_ring.add)
     ui_add_rect_sel_to_sel_ring (RECT_SEL_ADD, &aux_pos);
   else if (id == item.aux.sel_ring.sub)

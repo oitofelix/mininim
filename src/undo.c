@@ -120,7 +120,7 @@ undo_pass (struct undo *u, int dir, char **desc)
 void
 end_undo_set (struct undo *u, char *desc)
 {
-  if (! u->count) return;
+  if (! u->count || u->current < 0 || u->pass[u->current].desc) return;
   if (desc) {
     u->pass[u->current].desc = xasprintf ("%s", desc);
     if (editor_register) editor_msg (desc, editor_register);
@@ -488,12 +488,14 @@ destroy_link_undo (struct link_undo *d)
 void
 register_new_room_undo (struct undo *u, char *desc)
 {
-  register_undo (u, NULL, (undo_f) new_room_undo, NULL, desc);
-  new_room_undo (NULL, +1);
+  struct new_room_undo *d = xmalloc (sizeof (*d));
+  d->mr_room = global_mr.room;
+  register_undo (u, d, (undo_f) new_room_undo, NULL, desc);
+  new_room_undo (d, +1);
 }
 
 void
-new_room_undo (void *d, int dir)
+new_room_undo (struct new_room_undo *d, int dir)
 {
   if (dir >= 0) {
     global_level.tile =
@@ -506,6 +508,13 @@ new_room_undo (void *d, int dir)
                     global_level.rlink, &global_level.room_nmemb,
                     global_level.room_nmemb, sizeof (*global_level.rlink));
   } else {
+    if (global_mr.room == global_level.room_nmemb - 1)
+      mr_focus_room (&global_mr, d->mr_room, global_level.rlink,
+                     global_level.room_nmemb);
+    if (selection_pos.room == global_level.room_nmemb - 1) {
+      invalid_pos (&selection_pos);
+      selection_locked = false;
+    }
     global_level.tile =
       remove_from_array (global_level.tile, &global_level.room_nmemb,
                          global_level.room_nmemb - 1, 1,
