@@ -135,8 +135,8 @@ load_native_level (struct level *l, int n)
   /* LINKS */
 
   /* Room 0  */
-  l->link = xcalloc (1, sizeof (*l->link));
-  memset (l->link, 0, 1 * sizeof (*l->link));
+  l->rlink = xcalloc (1, sizeof (*l->rlink));
+  memset (l->rlink, 0, 1 * sizeof (*l->rlink));
   l->room_nmemb = 1;
 
   for (i = 1;; i++) {
@@ -150,8 +150,8 @@ load_native_level (struct level *l, int n)
     if (! v) break;
     sscanf (v, "%i %i %i %i", &r.l, &r.r, &r.a, &r.b);
 
-    l->link = add_to_array (&r, 1, l->link, &l->room_nmemb,
-                            l->room_nmemb, sizeof (*l->link));
+    l->rlink = add_to_array (&r, 1, l->rlink, &l->room_nmemb,
+                            l->room_nmemb, sizeof (*l->rlink));
   }
 
   /* EVENTS */
@@ -268,7 +268,7 @@ save_native_level (struct level *l, char *filename)
   /* LINKS */
   for (i = 1; i < l->room_nmemb; i++) {
     /* Li=l r a b */
-    struct room_linking *r = llink (l->link, l->room_nmemb, i);
+    struct room_linking *r = llink (l->rlink, l->room_nmemb, i);
     k = xasprintf ("L%i", i);
     v = xasprintf ("%i %i %i %i", r->l, r->r, r->a, r->b);
     al_set_config_value (c, NULL, k, v);

@@ -94,19 +94,14 @@ _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
-  Ihandle *selected_tab = (void *) IupGetAttribute (ih, "VALUE_HANDLE");
-
   Ihandle *tile_ctrl = (void *) IupGetAttribute (ih, "_TILE_CTRL");
-  if (selected_tab == tile_ctrl)
-    gui_run_callback_IFn ("_UPDATE_CB", tile_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", tile_ctrl);
 
   Ihandle *events_ctrl = (void *) IupGetAttribute (ih, "_EVENTS_CTRL");
-  if (selected_tab == events_ctrl)
-    gui_run_callback_IFn ("_UPDATE_CB", events_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", events_ctrl);
 
   Ihandle *room_ctrl = (void *) IupGetAttribute (ih, "_ROOM_CTRL");
-  if (selected_tab == room_ctrl)
-    gui_run_callback_IFn ("_UPDATE_CB", room_ctrl);
+  gui_run_callback_IFn ("_UPDATE_CB", room_ctrl);
 
   return IUP_DEFAULT;
 }

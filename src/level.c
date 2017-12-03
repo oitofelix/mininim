@@ -48,7 +48,7 @@ new_level (struct level *l, size_t room_nmemb, size_t event_nmemb,
 {
   l->room_nmemb = room_nmemb;
   l->tile = xcalloc (l->room_nmemb, sizeof (*l->tile));
-  l->link = xcalloc (l->room_nmemb, sizeof (*l->link));
+  l->rlink = xcalloc (l->room_nmemb, sizeof (*l->rlink));
 
   l->event_nmemb = event_nmemb;
   l->event = xcalloc (l->event_nmemb, sizeof (*l->event));
@@ -73,8 +73,8 @@ copy_level (struct level *ld, struct level *ls)
     (ls->tile, ls->room_nmemb, &ld->room_nmemb, sizeof (*ld->tile));
 
   /* link */
-  ld->link = copy_array
-    (ls->link, ls->room_nmemb, &ld->room_nmemb, sizeof (*ld->link));
+  ld->rlink = copy_array
+    (ls->rlink, ls->room_nmemb, &ld->room_nmemb, sizeof (*ld->rlink));
 
   /* events */
   ld->event = copy_array
@@ -95,7 +95,7 @@ destroy_level (struct level *l)
   destroy_array ((void **) &l->event, &l->event_nmemb);
   destroy_array ((void **) &l->guard, &l->guard_nmemb);
   destroy_array ((void **) &l->tile, &l->room_nmemb);
-  destroy_array ((void **) &l->link, &l->room_nmemb);
+  destroy_array ((void **) &l->rlink, &l->room_nmemb);
 }
 
 struct level *
@@ -194,8 +194,8 @@ level_eq (struct level *l0, struct level *l1)
 
   if (l0->room_nmemb != l1->room_nmemb) return false;
   for (size_t i = 0; i < l0->room_nmemb; i++)
-    if (! room_linking_eq (llink (l0->link, l0->room_nmemb, i),
-                           llink (l1->link, l1->room_nmemb, i)))
+    if (! room_linking_eq (llink (l0->rlink, l0->room_nmemb, i),
+                           llink (l1->rlink, l1->room_nmemb, i)))
       return false;
 
   if (l0->event_nmemb != l1->event_nmemb) return false;
@@ -273,7 +273,8 @@ play_level (struct level *lv)
 
   normalize_level (&global_level);
 
-  apply_mr_fit_mode (&global_mr);
+  apply_mr_fit_mode (&global_mr, global_level.rlink,
+                     global_level.room_nmemb);
 
   register_tiles ();
   register_actors ();
@@ -796,8 +797,9 @@ compute_level (void)
       mr_coord (&global_mr, k->f.c.prev_room,
                 k->f.c.xd, &global_mr.x, &global_mr.y);
       mr_set_origin (&global_mr, k->f.c.room, global_mr.x, global_mr.y,
-                     global_level.link, global_level.room_nmemb);
-    } else mr_focus_room (&global_mr, k->f.c.room);
+                     global_level.rlink, global_level.room_nmemb);
+    } else mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
+                          global_level.room_nmemb);
     global_mr.select_cycles = 0;
   }
 
@@ -807,16 +809,20 @@ compute_level (void)
       && camera_follow_kid == k->id
       && (ke = get_reciprocal_enemy (k))
       && ! is_room_visible (&global_mr, ke->f.c.room)) {
-    if (ke->f.c.room == roomd (global_level.link, global_level.room_nmemb,
+    if (ke->f.c.room == roomd (global_level.rlink, global_level.room_nmemb,
                                k->f.c.room, LEFT)) {
-      mr_row_trans (&global_mr, LEFT);
-      mr_focus_room (&global_mr, k->f.c.room);
+      mr_row_trans (&global_mr, LEFT, global_level.rlink,
+                    global_level.room_nmemb);
+      mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
+                     global_level.room_nmemb);
       global_mr.room_select = ke->f.c.room;
     } else if (ke->f.c.room ==
-               roomd (global_level.link, global_level.room_nmemb,
+               roomd (global_level.rlink, global_level.room_nmemb,
                       k->f.c.room, RIGHT)) {
-      mr_row_trans (&global_mr, RIGHT);
-      mr_focus_room (&global_mr, k->f.c.room);
+      mr_row_trans (&global_mr, RIGHT, global_level.rlink,
+                    global_level.room_nmemb);
+      mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
+                     global_level.room_nmemb);
       global_mr.room_select = ke->f.c.room;
     }
   } else if (global_mr.room_select > 0

@@ -1310,22 +1310,22 @@ void
 nav_room_menu (intptr_t index)
 {
   item.main.view.nav.select.left =
-    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+    menu_sitem (roomd (global_level.rlink, global_level.room_nmemb,
                        global_mr.room, LEFT),
                 l_icon, "&Left (H)");
 
   item.main.view.nav.select.above =
-    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+    menu_sitem (roomd (global_level.rlink, global_level.room_nmemb,
                        global_mr.room, ABOVE),
                 a_icon, "&Above (U)");
 
   item.main.view.nav.select.right =
-    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+    menu_sitem (roomd (global_level.rlink, global_level.room_nmemb,
                        global_mr.room, RIGHT),
                 r_icon, "&Right (J)");
 
   item.main.view.nav.select.below =
-    menu_sitem (roomd (global_level.link, global_level.room_nmemb,
+    menu_sitem (roomd (global_level.rlink, global_level.room_nmemb,
                        global_mr.room, BELOW),
                 b_icon, "&Below (N)");
 }
@@ -2158,35 +2158,48 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.view.nav.home)
     ui_home ();
   else if (id == item.main.view.nav.center)
-    mr_center_room (&global_mr, global_mr.room);
+    mr_center_room (&global_mr, global_mr.room, global_level.rlink,
+                    global_level.room_nmemb);
   else if (id == item.main.view.nav.coord)
     ui_show_coordinates ();
   else if (id == item.main.view.nav.ind_coord)
     ui_show_indirect_coordinates ();
   else if (id == item.main.view.nav.select.left)
-    mr_room_trans (&global_mr, LEFT);
+    mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.select.above)
-    mr_room_trans (&global_mr, ABOVE);
+    mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.select.right)
-    mr_room_trans (&global_mr, RIGHT);
+    mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.select.below)
-    mr_room_trans (&global_mr, BELOW);
+    mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.cell.left)
-    mr_row_trans (&global_mr, LEFT);
+    mr_row_trans (&global_mr, LEFT, global_level.rlink,
+                  global_level.room_nmemb);
   else if (id == item.main.view.nav.cell.above)
-    mr_row_trans (&global_mr, ABOVE);
+    mr_row_trans (&global_mr, ABOVE, global_level.rlink,
+                  global_level.room_nmemb);
   else if (id == item.main.view.nav.cell.right)
-    mr_row_trans (&global_mr, RIGHT);
+    mr_row_trans (&global_mr, RIGHT, global_level.rlink,
+                  global_level.room_nmemb);
   else if (id == item.main.view.nav.cell.below)
-    mr_row_trans (&global_mr, BELOW);
+    mr_row_trans (&global_mr, BELOW, global_level.rlink,
+                  global_level.room_nmemb);
   else if (id == item.main.view.nav.page.left)
-    mr_page_trans (&global_mr, LEFT);
+    mr_page_trans (&global_mr, LEFT, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.page.above)
-    mr_page_trans (&global_mr, ABOVE);
+    mr_page_trans (&global_mr, ABOVE, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.page.right)
-    mr_page_trans (&global_mr, RIGHT);
+    mr_page_trans (&global_mr, RIGHT, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.nav.page.below)
-    mr_page_trans (&global_mr, BELOW);
+    mr_page_trans (&global_mr, BELOW, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.main.view.em.original) ui_em (ORIGINAL_EM);
   else if (id == item.main.view.em.dungeon) ui_em (DUNGEON);
   else if (id == item.main.view.em.palace) ui_em (PALACE);
@@ -2307,7 +2320,8 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     del_sel_ring_entry (&global_sel_ring);
 
   else if (id == item.aux.view_ring.set_mr_origin)
-    mr_focus_room (&global_mr, naux_pos.room);
+    mr_focus_room (&global_mr, naux_pos.room, global_level.rlink,
+                   global_level.room_nmemb);
   else if (id == item.aux.view_ring.prev)
     view_ring_go_next (&global_mr, &global_view_ring, -1);
   else if (id == item.aux.view_ring.next)

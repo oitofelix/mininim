@@ -47,7 +47,7 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   memset (&nmr, 0, sizeof (nmr));
   nmr.room = mr->room;
 
-  mr_fit_stretch (&nmr);
+  mr_fit_stretch (&nmr, a->l->rlink, a->l->room_nmemb);
 
   int ax, ay;
   bool a_visible = mr_coord (&nmr, na.room, -1, &ax, &ay);

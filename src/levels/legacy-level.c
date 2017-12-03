@@ -73,10 +73,11 @@ legacy_level_start (void)
 
   /* define camera's starting room */
   if (global_level.n == 7) {
-    mr_center_room (&global_mr, 1);
+    mr_center_room (&global_mr, 1, global_level.rlink, global_level.room_nmemb);
     camera_follow_kid = -1;
   } else {
-    mr_center_room (&global_mr, k->f.c.room);
+    mr_center_room (&global_mr, k->f.c.room, global_level.rlink,
+                    global_level.room_nmemb);
     camera_follow_kid = k->id;
   }
 
@@ -102,7 +103,8 @@ legacy_level_start (void)
       int dy = +15;
       place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
 
-      mr_center_room (&global_mr, 2);
+      mr_center_room (&global_mr, 2, global_level.rlink,
+                      global_level.room_nmemb);
       k->total_hp = checkpoint_total_hp;
       k->current_hp = checkpoint_current_hp;
       k->skill = checkpoint_skill;
@@ -373,7 +375,7 @@ legacy_level_special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    if (k0->f.c.room == roomd (global_level.link, global_level.room_nmemb,
+    if (k0->f.c.room == roomd (global_level.rlink, global_level.room_nmemb,
                                1, BELOW)
         && k0->f.c.prev_room == 1
         && k0->f.c.xd == BELOW) next_level ();
@@ -422,7 +424,7 @@ legacy_level_special_events (void)
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
-    if (kc->f.c.room == roomd (global_level.link,
+    if (kc->f.c.room == roomd (global_level.rlink,
                                global_level.room_nmemb, 18, RIGHT)
         && ext (&sword_pos) == SWORD)
       set_ext (&sword_pos, NO_ITEM);
@@ -757,13 +759,13 @@ interpret_legacy_level (struct level *l, int n)
 
   /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {
-    link_room (l->link, l->room_nmemb,
+    link_room (l->rlink, l->room_nmemb,
                p.room, lv.link[p.room - 1][LD_LEFT], LEFT);
-    link_room (l->link, l->room_nmemb,
+    link_room (l->rlink, l->room_nmemb,
                p.room, lv.link[p.room - 1][LD_RIGHT], RIGHT);
-    link_room (l->link, l->room_nmemb,
+    link_room (l->rlink, l->room_nmemb,
                p.room, lv.link[p.room - 1][LD_ABOVE], ABOVE);
-    link_room (l->link, l->room_nmemb,
+    link_room (l->rlink, l->room_nmemb,
                p.room, lv.link[p.room - 1][LD_BELOW], BELOW);
   }
 

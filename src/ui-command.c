@@ -166,7 +166,7 @@ ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit)
     return;
   }
 
-  apply_mr_fit_mode (mr);
+  apply_mr_fit_mode (mr, global_level.rlink, global_level.room_nmemb);
 
   ui_msg (1, "ZOOM FIT: %s", value);
 
@@ -189,7 +189,8 @@ ui_mr_set_dim (struct mr *mr, int w, int h, bool correct_mouse)
 
   if (w != mr->w || h != mr->h) mr_set_dim (mr, w, h);
 
-  mr_center_room (mr, mr->room);
+  mr_center_room (mr, mr->room, global_level.rlink,
+                  global_level.room_nmemb);
 
   if (mr_coord (mr, m.c.room, -1, NULL, NULL) && correct_mouse)
     set_mouse_coord (mr, &m);
@@ -206,7 +207,7 @@ ui_mr_set_dim (struct mr *mr, int w, int h, bool correct_mouse)
 void
 ui_show_coordinates (void)
 {
-  struct room_linking *rlink = global_level.link;
+  struct room_linking *rlink = global_level.rlink;
   size_t room_nmemb = global_level.room_nmemb;
 
   int s = global_mr.room;
@@ -223,7 +224,7 @@ ui_show_coordinates (void)
 void
 ui_show_indirect_coordinates (void)
 {
-  struct room_linking *rlink = global_level.link;
+  struct room_linking *rlink = global_level.rlink;
   size_t room_nmemb = global_level.room_nmemb;
 
   int a = roomd (rlink, room_nmemb, global_mr.room, ABOVE);
@@ -790,7 +791,8 @@ ui_change_kcd (int d)
 void
 ui_home (void)
 {
-  mr_focus_room (&global_mr, get_actor_by_id (current_kid_id)->f.c.room);
+  mr_focus_room (&global_mr, get_actor_by_id (current_kid_id)->f.c.room,
+                 global_level.rlink, global_level.room_nmemb);
 }
 
 

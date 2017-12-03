@@ -1132,7 +1132,7 @@ mirror_level_h (struct level *l)
   int i;
   for (i = 1; i < l->room_nmemb; i++) {
     mirror_room_h (l, i);
-    mirror_link (l->link, l->room_nmemb, i, LEFT, RIGHT);
+    mirror_link (l->rlink, l->room_nmemb, i, LEFT, RIGHT);
   }
   return l;
 }

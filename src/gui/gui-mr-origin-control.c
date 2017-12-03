@@ -55,7 +55,7 @@ _update_cb (Ihandle *ih)
   Ihandle *br_button = (void *) IupGetAttribute (ih, "_BR_BUTTON");
 
   struct link_survey ls;
-  link_survey (&ls, global_level.link, global_level.room_nmemb,
+  link_survey (&ls, global_level.rlink, global_level.room_nmemb,
                global_mr.room);
 
   gui_control_active (l_button, ls.l);
@@ -91,45 +91,71 @@ button_action_cb (Ihandle *ih)
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
 
   struct link_survey ls;
-  link_survey (&ls, global_level.link, global_level.room_nmemb,
+  link_survey (&ls, global_level.rlink, global_level.room_nmemb,
                global_mr.room);
 
-  if (ih == c_button) mr_center_room (&global_mr, global_mr.room);
-  else if (ih == l_button) mr_room_trans (&global_mr, LEFT);
-  else if (ih == r_button) mr_room_trans (&global_mr, RIGHT);
-  else if (ih == a_button) mr_room_trans (&global_mr, ABOVE);
-  else if (ih == b_button) mr_room_trans (&global_mr, BELOW);
+  if (ih == c_button)
+    mr_center_room (&global_mr, global_mr.room,
+                    global_level.rlink, global_level.room_nmemb);
+  else if (ih == l_button)
+    mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                   global_level.room_nmemb);
+  else if (ih == r_button)
+    mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                   global_level.room_nmemb);
+  else if (ih == a_button)
+    mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                   global_level.room_nmemb);
+  else if (ih == b_button)
+    mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                   global_level.room_nmemb);
   else if (ih == al_button) {
     if (ls.al && (selected == v_toggle || ! ls.la)) {
-      mr_room_trans (&global_mr, ABOVE);
-      mr_room_trans (&global_mr, LEFT);
+      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                     global_level.room_nmemb);
     } else if (ls.la) {
-      mr_room_trans (&global_mr, LEFT);
-      mr_room_trans (&global_mr, ABOVE);
+      mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                     global_level.room_nmemb);
     }
   } else if (ih == ar_button) {
     if (ls.ar && (selected == v_toggle || ! ls.ra)) {
-      mr_room_trans (&global_mr, ABOVE);
-      mr_room_trans (&global_mr, RIGHT);
+      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                     global_level.room_nmemb);
     } else if (ls.ra) {
-      mr_room_trans (&global_mr, RIGHT);
-      mr_room_trans (&global_mr, ABOVE);
+      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
+                     global_level.room_nmemb);
     }
   } else if (ih == bl_button) {
     if (ls.bl && (selected == v_toggle || ! ls.lb)) {
-      mr_room_trans (&global_mr, BELOW);
-      mr_room_trans (&global_mr, LEFT);
+      mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                     global_level.room_nmemb);
     } else if (ls.lb) {
-      mr_room_trans (&global_mr, LEFT);
-      mr_room_trans (&global_mr, BELOW);
+      mr_room_trans (&global_mr, LEFT, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                     global_level.room_nmemb);
     }
   } else if (ih == br_button) {
     if (ls.br && (selected == v_toggle || ! ls.rb)) {
-      mr_room_trans (&global_mr, BELOW);
-      mr_room_trans (&global_mr, RIGHT);
+      mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                     global_level.room_nmemb);
     } else if (ls.rb) {
-      mr_room_trans (&global_mr, RIGHT);
-      mr_room_trans (&global_mr, BELOW);
+      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
+                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, BELOW, global_level.rlink,
+                     global_level.room_nmemb);
     }
   }
 

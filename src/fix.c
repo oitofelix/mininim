@@ -218,10 +218,10 @@ is_there_event_handler (struct level *l, int e)
 void
 fix_room_0 (struct level *l)
 {
-  link_room (l->link, l->room_nmemb, 0, 0, LEFT);
-  link_room (l->link, l->room_nmemb, 0, 0, RIGHT);
-  link_room (l->link, l->room_nmemb, 0, 0, ABOVE);
-  link_room (l->link, l->room_nmemb, 0, 0, BELOW);
+  link_room (l->rlink, l->room_nmemb, 0, 0, LEFT);
+  link_room (l->rlink, l->room_nmemb, 0, 0, RIGHT);
+  link_room (l->rlink, l->room_nmemb, 0, 0, ABOVE);
+  link_room (l->rlink, l->room_nmemb, 0, 0, BELOW);
 
   struct pos p; new_pos (&p, l, 0, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
@@ -237,7 +237,7 @@ fix_traversable_above_room_0 (struct level *l)
   struct pos p; new_pos (&p, l, -1, 2, -1);
   for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
-      if (roomd (p.l->link, p.l->room_nmemb, p.room, BELOW) != 0) continue;
+      if (roomd (p.l->rlink, p.l->room_nmemb, p.room, BELOW) != 0) continue;
       if (is_critical (&p)) set_fg (&p, SPIKES_FLOOR);
     }
 }

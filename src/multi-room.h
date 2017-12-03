@@ -46,21 +46,31 @@ bool mr_bottommost_cell (struct mr *mr, int *rx, int *ry);
 bool mr_rightmost_cell (struct mr *mr, int *rx, int *ry);
 struct mr_origin *mr_save_origin (struct mr *mr, struct mr_origin *o);
 bool mr_origin_eq (struct mr_origin *a, struct mr_origin *b);
-void mr_restore_origin (struct mr *mr, struct mr_origin *o);
+void mr_restore_origin (struct mr *mr, struct mr_origin *o,
+                        struct room_linking *rlink, size_t room_nmemb);
 void mr_map_rooms (struct mr *mr, int room, int x, int y,
                    struct room_linking *rlink, size_t room_nmemb,
                    bool visited[room_nmemb]);
 void mr_set_origin (struct mr *mr, int room, int x, int y,
                     struct room_linking *rlink, size_t room_nmemb);
-void mr_center_room (struct mr *mr, int room);
-void mr_simple_center_room (struct mr *mr, int room);
-void mr_focus_room (struct mr *mr, int room);
-void mr_focus_cell (struct mr *mr, int x, int y);
-void mr_focus_mouse (struct mr *mr);
-void mr_scroll_into_view (struct mr *mr, int room);
-void mr_room_trans (struct mr *mr, enum dir d);
-void mr_row_trans (struct mr *mr, enum dir d);
-void mr_page_trans (struct mr *mr, enum dir d);
+void mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
+                     size_t room_nmemb);
+void mr_simple_center_room (struct mr *mr, int room,
+                            struct room_linking *rlink, size_t room_nmemb);
+void mr_focus_room (struct mr *mr, int room, struct room_linking *rlink,
+                    size_t room_nmemb);
+void mr_focus_cell (struct mr *mr, int x, int y,
+                    struct room_linking *rlink, size_t room_nmemb);
+void mr_focus_mouse (struct mr *mr, struct room_linking *rlink,
+                     size_t room_nmemb);
+void mr_scroll_into_view (struct mr *mr, int room,
+                          struct room_linking *rlink, size_t room_nmemb);
+void mr_room_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+                    size_t room_nmemb);
+void mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+                   size_t room_nmemb);
+void mr_page_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+                    size_t room_nmemb);
 void mr_draw (struct mr *mr);
 void nmr_coord (struct mr *mr, int x, int y, int *rx, int *ry);
 bool mr_coord (struct mr *mr, int room0, enum dir dir, int *rx, int *ry);
@@ -75,14 +85,18 @@ void remove_changed_pos (struct pos *pos);
 void register_changed_room (int room);
 bool has_room_changed (int room);
 void mr_update_last_settings (struct mr *mr);
-void mr_fit_stretch (struct mr *mr);
-void mr_fit_ratio (struct mr *mr);
-void apply_mr_fit_mode (struct mr *mr);
+void mr_fit_stretch (struct mr *mr, struct room_linking *rlink,
+                     size_t room_nmemb);
+void mr_fit_ratio (struct mr *mr, struct room_linking *rlink,
+                   size_t room_nmemb);
+void apply_mr_fit_mode (struct mr *mr, struct room_linking *rlink,
+                        size_t room_nmemb);
 bool mr_room_list_has_room (struct mr_room_list *l, int room);
 struct mr_room_list *mr_get_room_list (struct mr *mr, struct mr_room_list *l);
 void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (struct mr *mr);
-void mr_stabilize_origin (struct mr *mr, struct mr_origin *o);
+void mr_stabilize_origin (struct mr *mr, struct mr_origin *o,
+                          struct room_linking *rlink, size_t room_nmemb);
 void mr_busy (struct mr *mr);
 
 #endif	/* MININIM_MULTI_ROOM_H */

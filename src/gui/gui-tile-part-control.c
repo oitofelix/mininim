@@ -355,12 +355,15 @@ view_button_action_cb (Ihandle *ih)
 int
 _update_cb (Ihandle *ih)
 {
-  if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
-
   Ihandle *tile_part_dialog =
     (void *) IupGetAttribute (ih, "_TILE_PART_DIALOG");
   if (tile_part_dialog)
     gui_run_callback_IFn ("_UPDATE_CB", tile_part_dialog);
+
+  /* This must come after the tile part dialog update call, otherwise
+     that dialog is prevented from updating in case this control is
+     not visible */
+  if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   gui_control_active (ih, is_valid_pos (p));

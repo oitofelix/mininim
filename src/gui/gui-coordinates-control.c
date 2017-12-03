@@ -322,7 +322,7 @@ _update_cb (Ihandle *ih)
   Ihandle *rb_link = (void *) IupGetAttribute (ih, "_RB_LINK");
 
   struct link_survey ls;
-  link_survey (&ls, level->link, level->room_nmemb, global_mr.room);
+  link_survey (&ls, level->rlink, level->room_nmemb, global_mr.room);
 
   update_label (l_label, ls.s, ls.l, ls.s, ls.lr);
   update_label (r_label, ls.s, ls.r, ls.s, ls.rl);
@@ -376,7 +376,8 @@ update_link (Ihandle *ih, int room)
 int
 action_cb (Ihandle *ih)
 {
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   int room = IupGetInt (ih, "TITLE");
-  mr_focus_room (&global_mr, room);
+  mr_focus_room (&global_mr, room, level->rlink, level->room_nmemb);
   return IUP_DEFAULT;
 }

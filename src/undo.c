@@ -452,13 +452,13 @@ void
 register_link_undo (struct undo *u, struct room_linking *rlink, char *desc)
 {
   if (! memcmp
-      (rlink, global_level.link, global_level.room_nmemb
-       * sizeof (*global_level.link))) return;
+      (rlink, global_level.rlink, global_level.room_nmemb
+       * sizeof (*global_level.rlink))) return;
 
   struct link_undo *d = xmalloc (sizeof (*d));
   d->f = copy_array (rlink, global_level.room_nmemb, NULL,
                      sizeof (*d->f));
-  d->b = copy_array (global_level.link, global_level.room_nmemb, NULL,
+  d->b = copy_array (global_level.rlink, global_level.room_nmemb, NULL,
                      sizeof (*d->b));
   register_undo (u, d, (undo_f) link_undo, (destroy_undo_f) destroy_link_undo,
                  desc);
@@ -468,10 +468,10 @@ register_link_undo (struct undo *u, struct room_linking *rlink, char *desc)
 void
 link_undo (struct link_undo *d, int dir)
 {
-  destroy_array ((void **) &global_level.link, NULL);
-  global_level.link = copy_array
+  destroy_array ((void **) &global_level.rlink, NULL);
+  global_level.rlink = copy_array
     ((dir >= 0) ? d->f : d->b, global_level.room_nmemb,
-     NULL, sizeof (*global_level.link));
+     NULL, sizeof (*global_level.rlink));
 }
 
 void
@@ -501,20 +501,20 @@ new_room_undo (void *d, int dir)
                     global_level.tile, &global_level.room_nmemb,
                     global_level.room_nmemb, sizeof (*global_level.tile));
     global_level.room_nmemb--;
-    global_level.link =
-      add_to_array (&global_level.link[0], 1,
-                    global_level.link, &global_level.room_nmemb,
-                    global_level.room_nmemb, sizeof (*global_level.link));
+    global_level.rlink =
+      add_to_array (&global_level.rlink[0], 1,
+                    global_level.rlink, &global_level.room_nmemb,
+                    global_level.room_nmemb, sizeof (*global_level.rlink));
   } else {
     global_level.tile =
       remove_from_array (global_level.tile, &global_level.room_nmemb,
                          global_level.room_nmemb - 1, 1,
                          sizeof (*global_level.tile));
     global_level.room_nmemb++;
-    global_level.link =
-      remove_from_array (global_level.link, &global_level.room_nmemb,
+    global_level.rlink =
+      remove_from_array (global_level.rlink, &global_level.room_nmemb,
                          global_level.room_nmemb - 1, 1,
-                         sizeof (*global_level.link));
+                         sizeof (*global_level.rlink));
   }
 }
 

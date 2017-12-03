@@ -317,7 +317,8 @@ play_anim (anim_callback_t draw_callback,
         else if (super) {
           struct pos np;
           npos (&mouse_pos, &np);
-          mr_focus_room (&global_mr, np.room);
+          mr_focus_room (&global_mr, np.room, global_level.rlink,
+                         global_level.room_nmemb);
         } else {
           if (selection_locked && peq (&selection_pos, &mouse_pos))
             selection_locked = false;
@@ -374,10 +375,22 @@ play_anim (anim_callback_t draw_callback,
       if (flip_gamepad_vertical) dz *= -1;
       if (flip_gamepad_horizontal) dw *= -1;
 
-      if (dz < 0) while (dz++ < 0) mr_row_trans (&global_mr, BELOW);
-      else if (dz > 0) while (dz-- > 0) mr_row_trans (&global_mr, ABOVE);
-      if (dw < 0) while (dw++ < 0) mr_row_trans (&global_mr, LEFT);
-      else if (dw > 0) while (dw-- > 0) mr_row_trans (&global_mr, RIGHT);
+      if (dz < 0)
+        while (dz++ < 0)
+          mr_row_trans (&global_mr, BELOW, global_level.rlink,
+                        global_level.room_nmemb);
+      else if (dz > 0)
+        while (dz-- > 0)
+          mr_row_trans (&global_mr, ABOVE, global_level.rlink,
+                        global_level.room_nmemb);
+      if (dw < 0)
+        while (dw++ < 0)
+          mr_row_trans (&global_mr, LEFT, global_level.rlink,
+                        global_level.room_nmemb);
+      else if (dw > 0)
+        while (dw-- > 0)
+          mr_row_trans (&global_mr, RIGHT, global_level.rlink,
+                        global_level.room_nmemb);
 
       break;
 

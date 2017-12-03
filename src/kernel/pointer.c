@@ -136,7 +136,8 @@ set_mouse_coord (struct mr *mr, struct mouse_coord *m)
 
   int x, y;
 
-  mr_restore_origin (mr, &m->o);
+  mr_restore_origin (mr, &m->o, global_level.rlink,
+                     global_level.room_nmemb);
 
   if (! m->c.room) {
     al_set_mouse_xy (display, m->sx, m->sy);
@@ -144,7 +145,8 @@ set_mouse_coord (struct mr *mr, struct mouse_coord *m)
   }
 
   if (! mr_coord (mr, m->c.room, -1, &x, &y)) {
-    mr_center_room (mr, m->c.room);
+    mr_center_room (mr, m->c.room, global_level.rlink,
+                    global_level.room_nmemb);
     x = mr->x;
     y = mr->y;
   }
@@ -201,7 +203,8 @@ set_mouse_pos (struct mr *mr, struct pos *p)
 
   int x, y;
   if (! mr_coord (mr, np.room, -1, &x, &y)) {
-    mr_center_room (mr, np.room);
+    mr_center_room (mr, np.room, global_level.rlink,
+                    global_level.room_nmemb);
     x = mr->x;
     y = mr->y;
   }
@@ -219,7 +222,7 @@ set_mouse_room (struct mr *mr, int room)
 
   int x, y;
   if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y, global_level.link,
+    mr_set_origin (mr, room, x, y, global_level.rlink,
                    global_level.room_nmemb);
 
   mr_save_origin (mr, &m.o);
@@ -228,7 +231,7 @@ set_mouse_room (struct mr *mr, int room)
   set_mouse_coord (mr, &m);
 
   if (! room) {
-    mr_center_room (mr, 0);
+    mr_center_room (mr, 0, global_level.rlink, global_level.room_nmemb);
     mr->select_cycles = 0;
     int w = al_get_display_width (display);
     int h = al_get_display_height (display);

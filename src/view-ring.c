@@ -100,5 +100,5 @@ view_ring_restore (struct mr *mr, struct view_ring *vr)
   if (! is_valid_view_ring (vr)) return;
   struct mr_origin *o = &vr->o[vr->c_nmemb - 1];
   ui_mr_set_dim (mr, o->w, o->h, false);
-  mr_restore_origin (mr, o);
+  mr_restore_origin (mr, o, global_level.rlink, global_level.room_nmemb);
 }

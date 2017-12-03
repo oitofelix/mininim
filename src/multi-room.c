@@ -276,7 +276,8 @@ mr_rightmost_cell (struct mr *mr, int *rx, int *ry)
 }
 
 void
-mr_center_room (struct mr *mr, int room)
+mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
+                size_t room_nmemb)
 {
   int x, y, lc = 0, c = 0, ld = INT_MAX;
   float ldc = INFINITY;
@@ -284,7 +285,7 @@ mr_center_room (struct mr *mr, int room)
   int ly = mr->y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++) {
-      mr_set_origin (mr, room, x, y, global_level.link, global_level.room_nmemb);
+      mr_set_origin (mr, room, x, y, rlink, room_nmemb);
       c = mr_count_rooms (mr);
       int cx, cy;
       mr_topmost_cell (mr, &cx, &cy);
@@ -308,14 +309,15 @@ mr_center_room (struct mr *mr, int room)
       }
     }
 
-  mr_set_origin (mr, room, lx, ly, global_level.link, global_level.room_nmemb);
+  mr_set_origin (mr, room, lx, ly, rlink, room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_simple_center_room (struct mr *mr, int room)
+mr_simple_center_room (struct mr *mr, int room, struct room_linking *rlink,
+                       size_t room_nmemb)
 {
-  mr_set_origin (mr, room, mr->w / 2, mr->h / 2, global_level.link, global_level.room_nmemb);
+  mr_set_origin (mr, room, mr->w / 2, mr->h / 2, rlink, room_nmemb);
 }
 
 struct mr_origin *
@@ -338,11 +340,12 @@ mr_origin_eq (struct mr_origin *a, struct mr_origin *b)
 }
 
 void
-mr_restore_origin (struct mr *mr, struct mr_origin *o)
+mr_restore_origin (struct mr *mr, struct mr_origin *o,
+                   struct room_linking *rlink, size_t room_nmemb)
 {
   if (o->w == mr->w && o->h == mr->h)
-    mr_set_origin (mr, o->room, o->x, o->y, global_level.link, global_level.room_nmemb);
-  else mr_center_room (mr, o->room);
+    mr_set_origin (mr, o->room, o->x, o->y, rlink, room_nmemb);
+  else mr_center_room (mr, o->room, rlink, room_nmemb);
 }
 
 void
@@ -388,7 +391,8 @@ mr_map_rooms (struct mr *mr, int room, int x, int y,
 }
 
 void
-mr_stabilize_origin (struct mr *mr, struct mr_origin *o)
+mr_stabilize_origin (struct mr *mr, struct mr_origin *o,
+                     struct room_linking *rlink, size_t room_nmemb)
 {
   int x, y, tx, ty;
   float ld, cd = INFINITY;
@@ -403,41 +407,42 @@ mr_stabilize_origin (struct mr *mr, struct mr_origin *o)
         }
       }
 
-  mr_set_origin (mr, mr->cell[tx][ty].room, tx, ty,
-                 global_level.link, global_level.room_nmemb);
+  mr_set_origin (mr, mr->cell[tx][ty].room, tx, ty, rlink, room_nmemb);
 }
 
 void
-mr_focus_room (struct mr *mr, int room)
+mr_focus_room (struct mr *mr, int room, struct room_linking *rlink,
+               size_t room_nmemb)
 {
   int x, y;
   if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y, global_level.link,
-                   global_level.room_nmemb);
-  else mr_center_room (mr, room);
+    mr_set_origin (mr, room, x, y, rlink, room_nmemb);
+  else mr_center_room (mr, room, rlink, room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_focus_cell (struct mr *mr, int x, int y)
+mr_focus_cell (struct mr *mr, int x, int y, struct room_linking *rlink,
+               size_t room_nmemb)
 {
   if (x < 0 || y < 0) return;
   if (! mr->cell[x][y].room) return;
-  mr_set_origin (mr, mr->cell[x][y].room, x, y,
-                 global_level.link, global_level.room_nmemb);
+  mr_set_origin (mr, mr->cell[x][y].room, x, y, rlink, room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_focus_mouse (struct mr *mr)
+mr_focus_mouse (struct mr *mr, struct room_linking *rlink,
+                size_t room_nmemb)
 {
   struct mouse_coord m;
   get_mouse_coord (mr, &m);
-  mr_focus_cell (mr, m.x, m.y);
+  mr_focus_cell (mr, m.x, m.y, rlink, room_nmemb);
 }
 
 void
-mr_room_trans (struct mr *mr, enum dir d)
+mr_room_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+               size_t room_nmemb)
 {
   int dx = +0, dy = +0;
   switch (d) {
@@ -447,19 +452,18 @@ mr_room_trans (struct mr *mr, enum dir d)
   case BELOW: dy = +1; break;
   }
 
-  int r = roomd (global_level.link, global_level.room_nmemb, mr->room, d);
+  int r = roomd (rlink, room_nmemb, mr->room, d);
   if (r) {
     nmr_coord (mr, mr->x + dx, mr->y + dy, &mr->x, &mr->y);
-    mr_set_origin (mr, r, mr->x, mr->y,
-                   global_level.link,
-                   global_level.room_nmemb);
+    mr_set_origin (mr, r, mr->x, mr->y, rlink, room_nmemb);
   }
 
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_row_trans (struct mr *mr, enum dir d)
+mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+              size_t room_nmemb)
 {
   int dx = +0, dy = +0, r = 0, i0 = 1, i1 = 1;
 
@@ -471,19 +475,19 @@ mr_row_trans (struct mr *mr, enum dir d)
   switch (d) {
   case RIGHT:
     if (x > 0) dx = -1;
-    r = roomd (global_level.link, global_level.room_nmemb, room, RIGHT);
+    r = roomd (rlink, room_nmemb, room, RIGHT);
     break;
   case LEFT:
     if (x < mr->w - 1) dx = +1;
-    r = roomd (global_level.link, global_level.room_nmemb, room, LEFT);
+    r = roomd (rlink, room_nmemb, room, LEFT);
     break;
   case BELOW:
     if (y > 0) dy = -1;
-    r = roomd (global_level.link, global_level.room_nmemb, room, BELOW);
+    r = roomd (rlink, room_nmemb, room, BELOW);
     break;
   case ABOVE:
     if (y < mr->h - 1) dy = +1;
-    r = roomd (global_level.link, global_level.room_nmemb, room, ABOVE);
+    r = roomd (rlink, room_nmemb, room, ABOVE);
     break;
   }
 
@@ -526,19 +530,20 @@ mr_row_trans (struct mr *mr, enum dir d)
   }
 
   mr->select_cycles = SELECT_CYCLES;
-  mr_set_origin (mr, room, x + dx, y + dy,
-                 global_level.link, global_level.room_nmemb);
+  mr_set_origin (mr, room, x + dx, y + dy, rlink, room_nmemb);
 }
 
 void
-mr_page_trans (struct mr *mr, enum dir d)
+mr_page_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
+               size_t room_nmemb)
 {
   int n = (d == LEFT || d == RIGHT) ? mr->w : mr->h;
-  for (int i = 0; i < n; i++) mr_row_trans (mr, d);
+  for (int i = 0; i < n; i++) mr_row_trans (mr, d, rlink, room_nmemb);
 }
 
 void
-mr_scroll_into_view (struct mr *mr, int room)
+mr_scroll_into_view (struct mr *mr, int room, struct room_linking *rlink,
+                     size_t room_nmemb)
 {
   if (is_room_visible (mr, room)) return;
 
@@ -547,17 +552,17 @@ mr_scroll_into_view (struct mr *mr, int room)
 
   enum dir dir;
   for (dir = FIRST_DIR; dir <= LAST_DIR; dir++) {
-    mr_restore_origin (mr, &o);
+    mr_restore_origin (mr, &o, rlink, room_nmemb);
     struct mr_origin a, b;
     do {
       mr_save_origin (mr, &a);
-      mr_row_trans (mr, dir);
+      mr_row_trans (mr, dir, rlink, room_nmemb);
       mr_save_origin (mr, &b);
       if (is_room_visible (mr, room)) return;
     } while (! mr_origin_eq (&a, &b));
   }
 
-  mr_center_room (mr, room);
+  mr_center_room (mr, room, rlink, room_nmemb);
 }
 
 bool
@@ -822,7 +827,7 @@ mr_draw (struct mr *mr)
   int x, y;
 
   mr_set_origin (mr, mr->room, mr->x, mr->y,
-                 global_level.link, global_level.room_nmemb);
+                 global_level.rlink, global_level.room_nmemb);
 
   bool mr_full_update = has_mr_view_changed (mr)
     || mr->full_update;
@@ -1046,7 +1051,8 @@ mr_count_uniq_rooms (struct mr *mr)
 }
 
 void
-mr_fit_stretch (struct mr *mr)
+mr_fit_stretch (struct mr *mr, struct room_linking *rlink,
+                size_t room_nmemb)
 {
   int w = 1;
   int h = 1;
@@ -1057,13 +1063,13 @@ mr_fit_stretch (struct mr *mr)
   do {
     lc = c;
     mr_redim (mr, ++w, h);
-    mr_center_room (mr, mr->room);
+    mr_center_room (mr, mr->room, rlink, room_nmemb);
     c = mr_count_uniq_rooms (mr);
     /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", */
     /*         mr->room, mr->w, mr->h, c); */
   } while (c > lc);
   mr_redim (mr, --w, h);
-  mr_center_room (mr, mr->room);
+  mr_center_room (mr, mr->room, rlink, room_nmemb);
 
   if (c < hc) return;
   wc = c;
@@ -1071,13 +1077,13 @@ mr_fit_stretch (struct mr *mr)
   do {
     lc = c;
     mr_redim (mr, w, ++h);
-    mr_center_room (mr, mr->room);
+    mr_center_room (mr, mr->room, rlink, room_nmemb);
     c = mr_count_uniq_rooms (mr);
     /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", */
     /*         mr->room, mr->w, mr->h, c); */
   } while (c > lc);
   mr_redim (mr, w, --h);
-  mr_center_room (mr, mr->room);
+  mr_center_room (mr, mr->room, rlink, room_nmemb);
 
   hc = c;
 
@@ -1085,15 +1091,17 @@ mr_fit_stretch (struct mr *mr)
 }
 
 void
-mr_fit_ratio (struct mr *mr)
+mr_fit_ratio (struct mr *mr, struct room_linking *rlink,
+              size_t room_nmemb)
 {
-  mr_fit_stretch (mr);
+  mr_fit_stretch (mr, rlink, room_nmemb);
   if (mr->w < mr->h) mr_redim (mr, mr->h, mr->h);
   else if (mr->w > mr->h) mr_redim (mr, mr->w, mr->w);
 }
 
 void
-apply_mr_fit_mode (struct mr *mr)
+apply_mr_fit_mode (struct mr *mr, struct room_linking *rlink,
+                   size_t room_nmemb)
 {
   int w, h;
 
@@ -1107,7 +1115,7 @@ apply_mr_fit_mode (struct mr *mr)
 
   if (! mr->room) {
     struct pos p; get_kid_start_pos (&p);
-    mr_center_room (mr, p.room);
+    mr_center_room (mr, p.room, rlink, room_nmemb);
   }
 
   switch (mr->fit_mode) {
@@ -1116,19 +1124,19 @@ apply_mr_fit_mode (struct mr *mr)
     h = mr->fit_h;
     break;
   case MR_FIT_STRETCH:
-    mr_fit_stretch (mr);
+    mr_fit_stretch (mr, rlink, room_nmemb);
     w = mr->w;
     h = mr->h;
     break;
   case MR_FIT_RATIO:
-    mr_fit_ratio (mr);
+    mr_fit_ratio (mr, rlink, room_nmemb);
     w = mr->w;
     h = mr->h;
     break;
   }
 
   mr_set_dim (mr, w, h);
-  mr_center_room (mr, mr->room);
+  mr_center_room (mr, mr->room, rlink, room_nmemb);
 }
 
 bool

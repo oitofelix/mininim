@@ -583,7 +583,7 @@ _update_cb (Ihandle *ih)
   int depth = IupGetIntId (tree_ctrl, "DEPTH", id);
   int room = selected_room (tree_ctrl);
   struct link_survey ls;
-  if (room) link_survey (&ls, level->link, level->room_nmemb, room);
+  if (room) link_survey (&ls, level->rlink, level->room_nmemb, room);
 
   /* Go frame */
   Ihandle *go_radio = (void *) IupGetAttribute (ih, "_GO_RADIO");
@@ -636,7 +636,7 @@ _update_cb (Ihandle *ih)
       break;
     case DIR_DEPTH: {
       enum dir *d = tree->node[id].data;
-      c = roomd (level->link, level->room_nmemb, room, *d);
+      c = roomd (level->rlink, level->room_nmemb, room, *d);
       break;
     }
     case ADJACENT_DEPTH:
@@ -659,7 +659,7 @@ _update_cb (Ihandle *ih)
       break;
     case DIR_DEPTH: {
       enum dir *d = tree->node[id].data;
-      c = ! roomd (level->link, level->room_nmemb, room, *d);
+      c = ! roomd (level->rlink, level->room_nmemb, room, *d);
       break;
     }
     case ADJACENT_DEPTH:
@@ -818,13 +818,13 @@ populate_room_tree (struct level *level, struct tree *tree,
         (tree, room_id, TREE_NODE_TYPE_BRANCH, &d, sizeof (d),
          (m_comparison_fn_t) int_eq);
 
-      int room_out = roomd (level->link, level->room_nmemb, room, d);
+      int room_out = roomd (level->rlink, level->room_nmemb, room, d);
       get_or_put_tree_branch_child
         (tree, dir_id, TREE_NODE_TYPE_LEAF, &room_out, sizeof (room_out),
          (m_comparison_fn_t) int_eq);
 
       for (int room_in = 1; room_in < level->room_nmemb; room_in++)
-        if (roomd (level->link, level->room_nmemb, room_in, opposite_dir (d))
+        if (roomd (level->rlink, level->room_nmemb, room_in, opposite_dir (d))
             == room)
           get_or_put_tree_branch_child
             (tree, dir_id, TREE_NODE_TYPE_LEAF, &room_in, sizeof (room_in),
@@ -900,7 +900,7 @@ populate_room_tree_ctrl (Ihandle *tree_ctrl, struct tree *tree)
       IupSetAttributeId
         (tree_ctrl, "IMAGE", id, dir_icon_name (d));
 
-      if (is_broken_link (level->link, level->room_nmemb, src_room, d))
+      if (is_broken_link (level->rlink, level->room_nmemb, src_room, d))
         IupSetAttributeId (tree_ctrl, "COLOR", id, first
                            ? ACTIVELY_BROKEN_COLOR
                            : PASSIVELY_BROKEN_COLOR);
@@ -940,7 +940,7 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   last->total_rooms = level->room_nmemb - 1;
   last->isolated_rooms = count_isolated_rooms (level);
-  last->broken_rooms = count_broken_rooms (level->link, level->room_nmemb);
+  last->broken_rooms = count_broken_rooms (level->rlink, level->room_nmemb);
   last->fragmented_rooms = count_fragmented_rooms (level);
   struct pos p; npos (&level->start_pos, &p);
   last->start_room = p.room;
@@ -997,9 +997,9 @@ next_broken_link_id (struct level *level, struct tree *tree,
       int *room = tree->node[parent_id].data;
       enum dir *dir = tree->node[id].data;
       if ((passive &&
-           is_passively_broken_link (level->link, level->room_nmemb, *room, *dir))
+           is_passively_broken_link (level->rlink, level->room_nmemb, *room, *dir))
           || (! passive
-              && is_broken_link (level->link, level->room_nmemb, *room, *dir)))
+              && is_broken_link (level->rlink, level->room_nmemb, *room, *dir)))
         return id;
   }
   return -1;
@@ -1087,7 +1087,7 @@ isolate_button_cb (Ihandle *button)
   switch (depth) {
   case ROOM_DEPTH: {
     struct room_linking *rlink =
-      copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
+      copy_array (level->rlink, level->room_nmemb, NULL, sizeof (*rlink));
     for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++)
       editor_link (rlink, level->room_nmemb, room, 0, d);
     char *desc = xasprintf ("ISOLATE ROOM %i", room);
@@ -1098,7 +1098,7 @@ isolate_button_cb (Ihandle *button)
   }
   case DIR_DEPTH: {
     struct room_linking *rlink =
-      copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
+      copy_array (level->rlink, level->room_nmemb, NULL, sizeof (*rlink));
     struct tree *tree = (void *) IupGetAttribute (button, "_TREE");
     enum dir *d = tree->node[id].data;
     editor_link (rlink, level->room_nmemb, room, 0, *d);
@@ -1140,7 +1140,7 @@ new_button_cb (Ihandle *button)
   switch (depth) {
   case ROOM_DEPTH: {
     for (d = FIRST_DIR; d <= LAST_DIR; d++)
-      if (! roomd (level->link, level->room_nmemb, room, d)) break;
+      if (! roomd (level->rlink, level->room_nmemb, room, d)) break;
     break;
   }
   case DIR_DEPTH: {
@@ -1156,9 +1156,10 @@ new_button_cb (Ihandle *button)
   register_new_room_undo (&undo, NULL);
   int new_room = level->room_nmemb - 1;
   struct room_linking *rlink =
-    copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
+    copy_array (level->rlink, level->room_nmemb, NULL, sizeof (*rlink));
 
-  closure_link_room (rlink, level->room_nmemb, new_room, room, opposite_dir (d));
+  closure_link_room (rlink, level->room_nmemb, new_room, room,
+                     opposite_dir (d));
 
   char *desc = xasprintf ("NEW ROOM %i %s %i", new_room,
                           direction_string (d), room);
@@ -1250,17 +1251,20 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
   if (! status) return IUP_DEFAULT;
 
   struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
+  struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
 
   switch (tree->node[id].depth) {
   case ROOM_DEPTH: {
     int *room = tree->node[id].data;
-    mr_simple_center_room (&global_mr, *room);
+    mr_simple_center_room (&global_mr, *room, level->rlink,
+                           level->room_nmemb);
     break;
   }
   case DIR_DEPTH: {
     int parent_id = tree_node_parent_id (tree, id);
     int *room = tree->node[parent_id].data;
-    mr_simple_center_room (&global_mr, *room);
+    mr_simple_center_room (&global_mr, *room, level->rlink,
+                           level->room_nmemb);
     break;
   }
   case ADJACENT_DEPTH: {
@@ -1302,10 +1306,11 @@ _select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
   Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct pos np; npos (p, &np);
   select_room_node (ih, np.room);
   mr_set_origin (&global_mr, np.room, mc->x, mc->y,
-                 global_level.link, global_level.room_nmemb);
+                 level->rlink, level->room_nmemb);
 
   return IUP_DEFAULT;
 }
@@ -1320,8 +1325,9 @@ _swap_origin_selection_cb (Ihandle *ih)
   int x = global_mr.x, y = global_mr.y;
   mr_coord (&global_mr, selection_pos.room, -1, &x, &y);
   select_room_node (ih, selection_pos.room);
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   mr_set_origin (&global_mr, selection_pos.room, x, y,
-                 global_level.link, global_level.room_nmemb);
+                 level->rlink, level->room_nmemb);
   selection_pos.room = room;
 
   return IUP_DEFAULT;

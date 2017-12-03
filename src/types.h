@@ -303,7 +303,7 @@ struct level {
 
   struct room_linking {
     int l, r, a, b;
-  } *link;
+  } *rlink;
 
   struct level_event {
     struct pos p;

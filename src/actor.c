@@ -99,9 +99,11 @@ select_controllable_by_id (int id)
     last_fellow_shadow_id = id;
   }
   if (! is_frame_visible (&global_mr, &k->f))
-    mr_restore_origin (&global_mr, &k->mr_origin);
+    mr_restore_origin (&global_mr, &k->mr_origin, global_level.rlink,
+                       global_level.room_nmemb);
   if (k->f.c.room != old_k->f.c.room)
-    mr_focus_room (&global_mr, k->f.c.room);
+    mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
+                   global_level.room_nmemb);
   k->selection_cycle = anim_cycle;
 }
 

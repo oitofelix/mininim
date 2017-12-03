@@ -257,16 +257,16 @@ ncoord (struct coord *c, struct coord *nc)
     m = allow_weak = allow_zero = false;
 
     int ra, rb, rl, rr;
-    ra = roomd (nc->l->link, nc->l->room_nmemb, nc->room, ABOVE);
-    rb = roomd (nc->l->link, nc->l->room_nmemb, nc->room, BELOW);
-    rl = roomd (nc->l->link, nc->l->room_nmemb, nc->room, LEFT);
-    rr = roomd (nc->l->link, nc->l->room_nmemb, nc->room, RIGHT);
+    ra = roomd (nc->l->rlink, nc->l->room_nmemb, nc->room, ABOVE);
+    rb = roomd (nc->l->rlink, nc->l->room_nmemb, nc->room, BELOW);
+    rl = roomd (nc->l->rlink, nc->l->room_nmemb, nc->room, LEFT);
+    rr = roomd (nc->l->rlink, nc->l->room_nmemb, nc->room, RIGHT);
 
     int rab, rba, rlr, rrl;
-    rab = roomd (nc->l->link, nc->l->room_nmemb, ra, BELOW);
-    rba = roomd (nc->l->link, nc->l->room_nmemb, rb, ABOVE);
-    rlr = roomd (nc->l->link, nc->l->room_nmemb, rl, RIGHT);
-    rrl = roomd (nc->l->link, nc->l->room_nmemb, rr, LEFT);
+    rab = roomd (nc->l->rlink, nc->l->room_nmemb, ra, BELOW);
+    rba = roomd (nc->l->rlink, nc->l->room_nmemb, rb, ABOVE);
+    rlr = roomd (nc->l->rlink, nc->l->room_nmemb, rl, RIGHT);
+    rrl = roomd (nc->l->rlink, nc->l->room_nmemb, rr, LEFT);
 
   retry:
     if (nl && (rlr == nc->room || allow_weak)
@@ -353,19 +353,19 @@ npos (struct pos *p, struct pos *np)
 
     if (np->floor < 0) {
       np->floor += FLOORS;
-      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, ABOVE);
+      np->room = roomd (np->l->rlink, np->l->room_nmemb, np->room, ABOVE);
       m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
-      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, BELOW);
+      np->room = roomd (np->l->rlink, np->l->room_nmemb, np->room, BELOW);
       m = true;
     } else if (np->place < 0) {
       np->place += PLACES;
-      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, LEFT);
+      np->room = roomd (np->l->rlink, np->l->room_nmemb, np->room, LEFT);
       m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
-      np->room = roomd (np->l->link, np->l->room_nmemb, np->room, RIGHT);
+      np->room = roomd (np->l->rlink, np->l->room_nmemb, np->room, RIGHT);
       m = true;
     }
   } while (m);
@@ -419,10 +419,10 @@ pos2room (struct pos *p, int room, struct pos *pv)
 
   int ra, rb, rl, rr;
 
-  ra = roomd (pv->l->link, pv->l->room_nmemb, room, ABOVE);
-  rb = roomd (pv->l->link, pv->l->room_nmemb, room, BELOW);
-  rl = roomd (pv->l->link, pv->l->room_nmemb, room, LEFT);
-  rr = roomd (pv->l->link, pv->l->room_nmemb, room, RIGHT);
+  ra = roomd (pv->l->rlink, pv->l->room_nmemb, room, ABOVE);
+  rb = roomd (pv->l->rlink, pv->l->room_nmemb, room, BELOW);
+  rl = roomd (pv->l->rlink, pv->l->room_nmemb, room, LEFT);
+  rr = roomd (pv->l->rlink, pv->l->room_nmemb, room, RIGHT);
 
   if (rb == pv->room) {
     pb.floor += FLOORS;
@@ -479,15 +479,15 @@ coord2room (struct coord *c, int room, struct coord *cv)
   int ra, rb, rl, rr;
   int rab, rba, rlr, rrl;
 
-  ra = roomd (cv->l->link, cv->l->room_nmemb, room, ABOVE);
-  rb = roomd (cv->l->link, cv->l->room_nmemb, room, BELOW);
-  rl = roomd (cv->l->link, cv->l->room_nmemb, room, LEFT);
-  rr = roomd (cv->l->link, cv->l->room_nmemb, room, RIGHT);
+  ra = roomd (cv->l->rlink, cv->l->room_nmemb, room, ABOVE);
+  rb = roomd (cv->l->rlink, cv->l->room_nmemb, room, BELOW);
+  rl = roomd (cv->l->rlink, cv->l->room_nmemb, room, LEFT);
+  rr = roomd (cv->l->rlink, cv->l->room_nmemb, room, RIGHT);
 
-  rab = roomd (cv->l->link, cv->l->room_nmemb, ra, BELOW);
-  rba = roomd (cv->l->link, cv->l->room_nmemb, rb, ABOVE);
-  rlr = roomd (cv->l->link, cv->l->room_nmemb, rl, RIGHT);
-  rrl = roomd (cv->l->link, cv->l->room_nmemb, rr, LEFT);
+  rab = roomd (cv->l->rlink, cv->l->room_nmemb, ra, BELOW);
+  rba = roomd (cv->l->rlink, cv->l->room_nmemb, rb, ABOVE);
+  rlr = roomd (cv->l->rlink, cv->l->room_nmemb, rl, RIGHT);
+  rrl = roomd (cv->l->rlink, cv->l->room_nmemb, rr, LEFT);
 
   if (rb == cv->room
       && rba == room) {
@@ -647,13 +647,13 @@ coord4draw (struct coord *c, int room, struct coord *cv)
   bool m = false;
 
   if (cv->y < 11 &&
-      roomd (cv->l->link, cv->l->room_nmemb, room, BELOW) == cv->room
+      roomd (cv->l->rlink, cv->l->room_nmemb, room, BELOW) == cv->room
       && room != cv->room) {
     cv->y += PLACE_HEIGHT * FLOORS;
     cv->room = room;
     m = true;
   } else if (cv->y >= PLACE_HEIGHT * FLOORS
-             && roomd (cv->l->link, cv->l->room_nmemb, room, ABOVE)
+             && roomd (cv->l->rlink, cv->l->room_nmemb, room, ABOVE)
              == cv->room
              && room != cv->room) {
     cv->y -= PLACE_HEIGHT * FLOORS;
@@ -1489,7 +1489,7 @@ bool
 is_room_accessible_from_kid_start (struct level *l, int room)
 {
   struct pos p; npos (&l->start_pos, &p);
-  return is_room_accessible (l->link, l->room_nmemb, p.room, room);
+  return is_room_accessible (l->rlink, l->room_nmemb, p.room, room);
 }
 
 bool
