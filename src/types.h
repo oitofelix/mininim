@@ -217,7 +217,6 @@ struct mr {
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
     ALLEGRO_BITMAP *cache;
-    bool done;
     int room;
   } **cell;
 

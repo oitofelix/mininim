@@ -209,33 +209,6 @@ mr_get_resolution (struct mr *mr, int *ret_w, int *ret_h)
   *ret_h = h;
 }
 
-void
-mr_clear_cells (struct mr *mr)
-{
-  int x, y;
-  for (x = 0; x < mr->w; x++)
-    for (y = 0; y < mr->h; y++) {
-      mr->cell[x][y].done = false;
-      mr->cell[x][y].room = -1;
-    }
-}
-
-bool
-mr_next_cell (struct mr *mr, int *rx, int *ry)
-{
-  int x, y;
-  for (x = 0; x < mr->w; x++)
-    for (y = 0; y < mr->h; y++)
-      if (mr->cell[x][y].room > 0
-          && ! mr->cell[x][y].done) {
-        *rx = x;
-        *ry = y;
-        return true;
-      }
-
-  return false;
-}
-
 int
 mr_count_rooms (struct mr *mr)
 {
@@ -311,7 +284,7 @@ mr_center_room (struct mr *mr, int room)
   int ly = mr->y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++) {
-      mr_set_origin (mr, room, x, y);
+      mr_set_origin (mr, room, x, y, global_level.link, global_level.room_nmemb);
       c = mr_count_rooms (mr);
       int cx, cy;
       mr_topmost_cell (mr, &cx, &cy);
@@ -335,34 +308,14 @@ mr_center_room (struct mr *mr, int room)
       }
     }
 
-  mr_set_origin (mr, room, lx, ly);
+  mr_set_origin (mr, room, lx, ly, global_level.link, global_level.room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
 mr_simple_center_room (struct mr *mr, int room)
 {
-  mr_set_origin (mr, room, mr->w / 2, mr->h / 2);
-}
-
-void
-mr_map_room (struct mr *mr, int r, int x, int y)
-{
-  int rl = roomd (global_level.link, global_level.room_nmemb, r, LEFT);
-  int rr = roomd (global_level.link, global_level.room_nmemb, r, RIGHT);
-  int ra = roomd (global_level.link, global_level.room_nmemb, r, ABOVE);
-  int rb = roomd (global_level.link, global_level.room_nmemb, r, BELOW);
-
-  mr->cell[x][y].room = r;
-  mr->cell[x][y].done = true;
-  if (x > 0 && mr->cell[x - 1][y].room == -1)
-    mr->cell[x - 1][y].room = rl;
-  if (x < mr->w - 1 && mr->cell[x + 1][y].room == -1)
-    mr->cell[x + 1][y].room = rr;
-  if (y > 0 && mr->cell[x][y - 1].room == -1)
-    mr->cell[x][y - 1].room = ra;
-  if (y < mr->h - 1 && mr->cell[x][y + 1].room == -1)
-    mr->cell[x][y + 1].room = rb;
+  mr_set_origin (mr, room, mr->w / 2, mr->h / 2, global_level.link, global_level.room_nmemb);
 }
 
 struct mr_origin *
@@ -388,26 +341,50 @@ void
 mr_restore_origin (struct mr *mr, struct mr_origin *o)
 {
   if (o->w == mr->w && o->h == mr->h)
-    mr_set_origin (mr, o->room, o->x, o->y);
+    mr_set_origin (mr, o->room, o->x, o->y, global_level.link, global_level.room_nmemb);
   else mr_center_room (mr, o->room);
 }
 
 void
-mr_set_origin (struct mr *mr, int room, int rx, int ry)
+mr_set_origin (struct mr *mr, int room, int x, int y,
+               struct room_linking *rlink, size_t room_nmemb)
 {
   mr->room = room;
-  mr->x = rx;
-  mr->y = ry;
+  mr->x = x;
+  mr->y = y;
 
-  int x, y;
-  mr_clear_cells (mr);
-  mr_map_room (mr, mr->room, mr->x, mr->y);
-  while (mr_next_cell (mr, &x, &y))
-    mr_map_room (mr, mr->cell[x][y].room, x, y);
-  for (x = 0; x < mr->w; x++)
-    for (y = 0; y < mr->h; y++) {
-      if (mr->cell[x][y].room < 0) mr->cell[x][y].room = 0;
-    }
+  bool visited[room_nmemb];
+  memset (visited, 0, sizeof (visited));
+
+  for (int x = 0; x < mr->w; x++)
+    for (int y = 0; y < mr->h; y++)
+      mr->cell[x][y].room = 0;
+
+  mr_map_rooms (mr, room, x, y, rlink, room_nmemb, visited);
+}
+
+void
+mr_map_rooms (struct mr *mr, int room, int x, int y,
+              struct room_linking *rlink, size_t room_nmemb,
+              bool visited[room_nmemb])
+{
+  if (0 <= x && x < mr->w && 0 <= y && y < mr->h) {
+    if (mr->cell[x][y].room) return;
+    mr->cell[x][y].room = room;
+  } else {
+    if (visited[room]) return;
+    visited[room] = true;
+  }
+
+  int l = roomd (rlink, room_nmemb, room, LEFT);
+  int r = roomd (rlink, room_nmemb, room, RIGHT);
+  int a = roomd (rlink, room_nmemb, room, ABOVE);
+  int b = roomd (rlink, room_nmemb, room, BELOW);
+
+  if (l) mr_map_rooms (mr, l, x - 1, y, rlink, room_nmemb, visited);
+  if (r) mr_map_rooms (mr, r, x + 1, y, rlink, room_nmemb, visited);
+  if (a) mr_map_rooms (mr, a, x, y - 1, rlink, room_nmemb, visited);
+  if (b) mr_map_rooms (mr, b, x, y + 1, rlink, room_nmemb, visited);
 }
 
 void
@@ -426,7 +403,8 @@ mr_stabilize_origin (struct mr *mr, struct mr_origin *o)
         }
       }
 
-  mr_set_origin (mr, mr->cell[tx][ty].room, tx, ty);
+  mr_set_origin (mr, mr->cell[tx][ty].room, tx, ty,
+                 global_level.link, global_level.room_nmemb);
 }
 
 void
@@ -434,7 +412,8 @@ mr_focus_room (struct mr *mr, int room)
 {
   int x, y;
   if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y);
+    mr_set_origin (mr, room, x, y, global_level.link,
+                   global_level.room_nmemb);
   else mr_center_room (mr, room);
   mr->select_cycles = SELECT_CYCLES;
 }
@@ -444,7 +423,8 @@ mr_focus_cell (struct mr *mr, int x, int y)
 {
   if (x < 0 || y < 0) return;
   if (! mr->cell[x][y].room) return;
-  mr_set_origin (mr, mr->cell[x][y].room, x, y);
+  mr_set_origin (mr, mr->cell[x][y].room, x, y,
+                 global_level.link, global_level.room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
 }
 
@@ -470,7 +450,9 @@ mr_room_trans (struct mr *mr, enum dir d)
   int r = roomd (global_level.link, global_level.room_nmemb, mr->room, d);
   if (r) {
     nmr_coord (mr, mr->x + dx, mr->y + dy, &mr->x, &mr->y);
-    mr_set_origin (mr, r, mr->x, mr->y);
+    mr_set_origin (mr, r, mr->x, mr->y,
+                   global_level.link,
+                   global_level.room_nmemb);
   }
 
   mr->select_cycles = SELECT_CYCLES;
@@ -544,7 +526,8 @@ mr_row_trans (struct mr *mr, enum dir d)
   }
 
   mr->select_cycles = SELECT_CYCLES;
-  mr_set_origin (mr, room, x + dx, y + dy);
+  mr_set_origin (mr, room, x + dx, y + dy,
+                 global_level.link, global_level.room_nmemb);
 }
 
 void
@@ -838,7 +821,8 @@ mr_draw (struct mr *mr)
 {
   int x, y;
 
-  mr_set_origin (mr, mr->room, mr->x, mr->y);
+  mr_set_origin (mr, mr->room, mr->x, mr->y,
+                 global_level.link, global_level.room_nmemb);
 
   bool mr_full_update = has_mr_view_changed (mr)
     || mr->full_update;

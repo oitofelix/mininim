@@ -1158,7 +1158,7 @@ new_button_cb (Ihandle *button)
   struct room_linking *rlink =
     copy_array (level->link, level->room_nmemb, NULL, sizeof (*rlink));
 
-  closure_link_room (rlink, level->room_nmemb, room, new_room, d);
+  closure_link_room (rlink, level->room_nmemb, new_room, room, opposite_dir (d));
 
   char *desc = xasprintf ("NEW ROOM %i %s %i", new_room,
                           direction_string (d), room);
@@ -1269,7 +1269,6 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
     else {
       int pid = tree_node_parent_id (tree, id);
       select_node_by_id (tree_ctrl, pid);
-      gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
     }
     break;
   }
@@ -1305,7 +1304,8 @@ _select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
 
   struct pos np; npos (p, &np);
   select_room_node (ih, np.room);
-  mr_set_origin (&global_mr, np.room, mc->x, mc->y);
+  mr_set_origin (&global_mr, np.room, mc->x, mc->y,
+                 global_level.link, global_level.room_nmemb);
 
   return IUP_DEFAULT;
 }
@@ -1320,7 +1320,8 @@ _swap_origin_selection_cb (Ihandle *ih)
   int x = global_mr.x, y = global_mr.y;
   mr_coord (&global_mr, selection_pos.room, -1, &x, &y);
   select_room_node (ih, selection_pos.room);
-  mr_set_origin (&global_mr, selection_pos.room, x, y);
+  mr_set_origin (&global_mr, selection_pos.room, x, y,
+                 global_level.link, global_level.room_nmemb);
   selection_pos.room = room;
 
   return IUP_DEFAULT;

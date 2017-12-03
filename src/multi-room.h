@@ -47,8 +47,11 @@ bool mr_rightmost_cell (struct mr *mr, int *rx, int *ry);
 struct mr_origin *mr_save_origin (struct mr *mr, struct mr_origin *o);
 bool mr_origin_eq (struct mr_origin *a, struct mr_origin *b);
 void mr_restore_origin (struct mr *mr, struct mr_origin *o);
-void mr_map_room (struct mr *mr, int r, int x, int y);
-void mr_set_origin (struct mr *mr, int room, int x, int y);
+void mr_map_rooms (struct mr *mr, int room, int x, int y,
+                   struct room_linking *rlink, size_t room_nmemb,
+                   bool visited[room_nmemb]);
+void mr_set_origin (struct mr *mr, int room, int x, int y,
+                    struct room_linking *rlink, size_t room_nmemb);
 void mr_center_room (struct mr *mr, int room);
 void mr_simple_center_room (struct mr *mr, int room);
 void mr_focus_room (struct mr *mr, int room);

@@ -219,7 +219,8 @@ set_mouse_room (struct mr *mr, int room)
 
   int x, y;
   if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y);
+    mr_set_origin (mr, room, x, y, global_level.link,
+                   global_level.room_nmemb);
 
   mr_save_origin (mr, &m.o);
   new_coord (&m.c, &global_level, room,

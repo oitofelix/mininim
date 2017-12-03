@@ -795,7 +795,8 @@ compute_level (void)
     if (! is_room_visible (&global_mr, k->f.c.room)) {
       mr_coord (&global_mr, k->f.c.prev_room,
                 k->f.c.xd, &global_mr.x, &global_mr.y);
-      mr_set_origin (&global_mr, k->f.c.room, global_mr.x, global_mr.y);
+      mr_set_origin (&global_mr, k->f.c.room, global_mr.x, global_mr.y,
+                     global_level.link, global_level.room_nmemb);
     } else mr_focus_room (&global_mr, k->f.c.room);
     global_mr.select_cycles = 0;
   }
