@@ -40,8 +40,49 @@ gui_create_tile_clipboard_control (struct pos *p,
                                    struct sel_ring *sr,
                                    char *norm_group)
 {
-  Ihandle *ih, *vbox, *button, *radio, *place_toggle, *room_toggle,
-    *level_toggle;
+  Ihandle *ih, *vbox, *copy_button, *paste_button, *sel_ring_toggle,
+    *radio, *place_toggle, *room_toggle, *level_toggle;
+
+  copy_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = NOIMAGE,"
+      "TIP = \"Click to copy\""),
+     "ACTION", copy_button_action_cb,
+     "DESTROY_CB", gui_destroy_image_cb,
+     NULL);
+
+  paste_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton ("&Paste", NULL),
+      "PADDING = 8,"
+      "TIP = \"Paste tile at selected scope\""),
+     "ACTION", paste_button_action_cb,
+     NULL);
+
+  sel_ring_toggle = IupSetAttributes
+    (IupToggle ("S", NULL),
+     "VALUE = YES,"
+     "TIP = \"Apply to selection set\",");
+
+  place_toggle = IupSetAttributes
+    (IupToggle ("P", NULL),
+     "TIP = \"Place pasting scope\"");
+
+  room_toggle = IupSetAttributes
+    (IupToggle ("R", NULL),
+     "TIP = \"Room pasting scope\"");
+
+  level_toggle = IupSetAttributes
+    (IupToggle ("L", NULL),
+     "TIP = \"Level pasting scope\"");
+
+  radio = IupRadio
+    (IupHbox
+     (place_toggle,
+      room_toggle,
+      level_toggle,
+      NULL));
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -49,36 +90,15 @@ gui_create_tile_clipboard_control (struct pos *p,
       (vbox = IupSetAttributes
        (IupVbox
         (IupFill (),
-         button = IupSetCallbacks
-          (IupSetAttributes
-           (IupButton (NULL, NULL),
-            "IMAGE = NOIMAGE,"
-            "TIP = \"Click to copy\""),
-           "ACTION", copy_button_action_cb,
-           "DESTROY_CB", gui_destroy_image_cb,
-           NULL),
-         IupSetCallbacks
-         (IupSetAttributes
-          (IupButton ("&Paste", NULL),
-           "PADDING = 8,"
-           "TIP = \"Paste tile at selected scope\""),
-          "ACTION", paste_button_action_cb,
-          NULL),
-         radio = IupRadio
-         (IupHbox
-          (place_toggle = IupSetAttributes
-           (IupToggle ("P", NULL),
-            "TIP = \"Place pasting scope\""),
-           room_toggle = IupSetAttributes
-           (IupToggle ("R", NULL),
-            "TIP = \"Room pasting scope\""),
-           level_toggle = IupSetAttributes
-           (IupToggle ("L", NULL),
-            "TIP = \"Level pasting scope\""),
-           NULL)),
+         copy_button,
+         paste_button,
+         sel_ring_toggle,
+         radio,
          IupFill (),
          NULL),
-        "ALIGNMENT = ACENTER,")),
+        "ALIGNMENT = ACENTER,"
+        "MARGIN = 0,"
+        "GAṔ = 0,")),
       "TITLE = Clipboard"),
      "DESTROY_CB", destroy_cb,
      "_UPDATE_CB", _update_cb,
@@ -86,7 +106,8 @@ gui_create_tile_clipboard_control (struct pos *p,
 
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
-  IupSetAttribute (ih, "_BUTTON", (void *) button);
+  IupSetAttribute (ih, "_COPY_BUTTON", (void *) copy_button);
+  IupSetAttribute (ih, "_SEL_RING_TOGGLE", (void *) sel_ring_toggle);
   IupSetAttribute (ih, "_RADIO", (void *) radio);
   IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
   IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
@@ -122,8 +143,8 @@ _update_cb (Ihandle *ih)
   gui_control_active
     (ih, is_valid_pos (p) || sel_ring_ss_c_nmemb (sr) > 0);
 
-  Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
-  gui_control_active (button, is_valid_pos (p));
+  Ihandle *copy_button = (void *) IupGetAttribute (ih, "_COPY_BUTTON");
+  gui_control_active (copy_button, is_valid_pos (p));
 
   if (! is_valid_pos (p) && ! sel_ring_ss_c_nmemb (sr))
     return IUP_DEFAULT;
@@ -149,10 +170,10 @@ update (Ihandle *ih)
   last->em = em;
   last->hue = hue;
 
-  Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
+  Ihandle *copy_button = (void *) IupGetAttribute (ih, "_COPY_BUTTON");
   ALLEGRO_BITMAP *b = get_tile_bitmap
     (&last->tile_copy.c, &last->tile_copy.cs, 1, TILE_ALL);
-  gui_set_image (button, b, transp_to_black);
+  gui_set_image (copy_button, b, transp_to_black);
   al_destroy_bitmap (b);
 }
 

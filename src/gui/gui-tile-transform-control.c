@@ -28,12 +28,99 @@ Ihandle *
 gui_create_tile_transform_control
 (struct pos *p, struct sel_ring *sr, char *norm_group)
 {
-  Ihandle *ih, *vbox;
+  Ihandle *ih, *vbox, *gridbox;
 
   Ihandle *clear_button, *randomize_button, *decorate_button, *fix_button,
     *unfake_button, *fg_fake_button;
 
-  Ihandle *radio, *place_toggle, *room_toggle, *level_toggle;
+  Ihandle *sel_ring_toggle, *radio, *place_toggle, *room_toggle, *level_toggle;
+
+  clear_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = CLEAR_ICON,"
+      "TIP = \"Clear\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  randomize_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = RANDOM_ICON,"
+      "TIP = \"Randomize\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  decorate_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = DECORATION_ICON,"
+      "TIP = \"Decorate\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  fix_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = FIX_ICON,"
+      "TIP = \"Fix\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  unfake_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = UNMASK_ICON,"
+      "TIP = \"Unfake\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  fg_fake_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = MASK_EXCHANGE_ICON,"
+      "TIP = \"Foreground <-> Fake\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  gridbox = IupSetAttributes
+    (IupGridBox
+     (clear_button,
+      randomize_button,
+      decorate_button,
+      fix_button,
+      unfake_button,
+      fg_fake_button,
+      NULL),
+     "ORIENTATION = HORIZONTAL,"
+     "NUMDIV = 3,"
+     "SIZECOL = -1,"
+     "SIZELIN = -1,"
+     "NORMALIZESIZE = BOTH,");
+
+  sel_ring_toggle = IupSetAttributes
+    (IupToggle ("S", NULL),
+     "VALUE = YES,"
+     "TIP = \"Apply to selection set\",");
+
+  place_toggle = IupSetAttributes
+    (IupToggle ("P", NULL),
+     "TIP = \"Place scope\"");
+
+  room_toggle = IupSetAttributes
+    (IupToggle ("R", NULL),
+     "TIP = \"Room scope\"");
+
+  level_toggle = IupSetAttributes
+    (IupToggle ("L", NULL),
+     "TIP = \"Level scope\"");
+
+  radio = IupRadio
+    (IupHbox
+     (place_toggle,
+      room_toggle,
+      level_toggle,
+      NULL));
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -41,79 +128,10 @@ gui_create_tile_transform_control
       (vbox = IupSetAttributes
        (IupVbox
         (IupFill (),
-
-         IupSetAttributes
-         (IupGridBox
-          (clear_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = CLEAR_ICON,"
-             "TIP = \"Clear\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           randomize_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = RANDOM_ICON,"
-             "TIP = \"Randomize\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           decorate_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = DECORATION_ICON,"
-             "TIP = \"Decorate\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           fix_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = FIX_ICON,"
-             "TIP = \"Fix\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           unfake_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = UNMASK_ICON,"
-             "TIP = \"Unfake\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           fg_fake_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = MASK_EXCHANGE_ICON,"
-             "TIP = \"Foreground <-> Fake\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           NULL),
-          "ORIENTATION = HORIZONTAL,"
-          "NUMDIV = 3,"
-          "SIZECOL = -1,"
-          "SIZELIN = -1,"
-          "NORMALIZESIZE = BOTH,"),
-
-         radio = IupRadio
-         (IupHbox
-          (place_toggle = IupSetAttributes
-           (IupToggle ("P", NULL),
-            "TIP = \"Place scope\""),
-           room_toggle = IupSetAttributes
-           (IupToggle ("R", NULL),
-            "TIP = \"Room scope\""),
-           level_toggle = IupSetAttributes
-           (IupToggle ("L", NULL),
-            "TIP = \"Level scope\""),
-           NULL)),
-
+         gridbox,
+         sel_ring_toggle,
+         radio,
          IupFill (),
-
          NULL),
         "ALIGNMENT = ACENTER")),
       "TITLE = Transform"),
@@ -122,6 +140,7 @@ gui_create_tile_transform_control
 
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
+  IupSetAttribute (ih, "_GRIDBOX", (void *) gridbox);
   IupSetAttribute (ih, "_CLEAR_BUTTON", (void *) clear_button);
   IupSetAttribute (ih, "_RANDOMIZE_BUTTON", (void *) randomize_button);
   IupSetAttribute (ih, "_DECORATE_BUTTON", (void *) decorate_button);
@@ -129,6 +148,7 @@ gui_create_tile_transform_control
   IupSetAttribute (ih, "_UNFAKE_BUTTON", (void *) unfake_button);
   IupSetAttribute (ih, "_FG_FAKE_BUTTON", (void *) fg_fake_button);
 
+  IupSetAttribute (ih, "_SEL_RING_TOGGLE", (void *) sel_ring_toggle);
   IupSetAttribute (ih, "_RADIO", (void *) radio);
   IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
   IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
@@ -157,8 +177,19 @@ _update_cb (Ihandle *ih)
   Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
 
-  gui_control_active (unfake_button, is_fake (p) || selected != place_toggle);
-  gui_control_active (fg_fake_button, is_fake (p) || selected != place_toggle);
+  Ihandle *sel_ring_toggle = (void *) IupGetAttribute (ih, "_SEL_RING_TOGGLE");
+  gui_control_active (sel_ring_toggle, sel_ring_ss_c_nmemb (sr));
+  bool use_sel_ring = IupGetInt (sel_ring_toggle, "VALUE");
+
+  Ihandle *gridbox = (void *) IupGetAttribute (ih, "_GRIDBOX");
+  gui_control_active (gridbox, is_valid_pos (p)
+                      || (sel_ring_ss_c_nmemb (sr) && use_sel_ring));
+
+  bool enable_fake =
+    (is_valid_pos (p) && (is_fake (p) || selected != place_toggle))
+    || (sel_ring_ss_c_nmemb (sr) && use_sel_ring);
+  gui_control_active (unfake_button, enable_fake);
+  gui_control_active (fg_fake_button, enable_fake);
 
   return IUP_DEFAULT;
 }
@@ -181,15 +212,18 @@ button_action_cb (Ihandle *ih)
   Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
 
+  Ihandle *sel_ring_toggle = (void *) IupGetAttribute (ih, "_SEL_RING_TOGGLE");
+  bool use_sel_ring = IupGetInt (sel_ring_toggle, "VALUE");
+
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   struct sel_ring *sr = (void *) IupGetAttribute (ih, "_SEL_RING");
 
   enum scope scope;
   if (selected == place_toggle)
-    scope = sel_ring_ss_c_nmemb (sr)
+    scope = sel_ring_ss_c_nmemb (sr) && use_sel_ring
       ? PLACE_SEL_RING_SCOPE : PLACE_SCOPE;
   else if (selected == room_toggle)
-    scope = sel_ring_ss_c_nmemb (sr)
+    scope = sel_ring_ss_c_nmemb (sr) && use_sel_ring
       ? ROOM_SEL_RING_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);

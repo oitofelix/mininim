@@ -41,10 +41,106 @@ Ihandle *
 gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
                                 char *norm_group)
 {
-  Ihandle *ih, *vbox, *radio, *tiles_toggle, *links_toggle,
+  Ihandle *ih, *vbox, *sel_ring_toggle, *radio, *tiles_toggle, *links_toggle,
     *place_toggle, *room_toggle, *level_toggle;
 
-  Ihandle *v_button, *vh_button, *h_button, *r_button;
+  Ihandle *gridbox, *v_button, *vh_button, *h_button, *r_button;
+
+  v_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = V_ICON,"
+      "TIP = \"Vertical\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  vh_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = VH_ICON,"
+      "TIP = \"Vertical+Horizontal\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  h_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = H_ICON,"
+      "TIP = \"Horizontal\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  r_button = IupSetCallbacks
+    (IupSetAttributes
+     (IupButton (NULL, NULL),
+      "IMAGE = SHUFFLE_ICON,"
+      "TIP = \"Random\""),
+     "ACTION", button_action_cb,
+     NULL);
+
+  gridbox = IupSetAttributes
+    (IupGridBox
+     (v_button,
+      vh_button,
+      h_button,
+      r_button,
+      NULL),
+     "ORIENTATION = HORIZONTAL,"
+     "NUMDIV = 4,"
+     "SIZECOL = -1,"
+     "SIZELIN = -1,"
+     "NORMALIZESIZE = BOTH,");
+
+  sel_ring_toggle = IupSetAttributes
+    (IupToggle ("S", NULL),
+     "VALUE = YES,"
+     "TIP = \"Apply to selection set\",");
+
+  place_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("P", NULL),
+      "TIP = \"Place scope\""),
+     "ACTION", (Icallback) toggle_action_cb,
+     NULL);
+
+  room_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("R", NULL),
+      "TIP = \"Room scope\""),
+     "ACTION", (Icallback) toggle_action_cb,
+     NULL);
+
+  level_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("L", NULL),
+      "TIP = \"Level scope\""),
+     "ACTION", (Icallback) toggle_action_cb,
+     NULL);
+
+  radio = IupRadio
+    (IupHbox
+     (place_toggle,
+      room_toggle,
+      level_toggle,
+      NULL));
+
+  tiles_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("T", NULL),
+      "VALUE = YES,"
+      "ACTIVE = NO,"
+      "TIP = \"Tiles\""),
+     "ACTION", (Icallback) toggle_action_cb,
+     NULL);
+
+  links_toggle = IupSetCallbacks
+    (IupSetAttributes
+     (IupToggle ("L", NULL),
+      "VALUE = YES,"
+      "ACTIVE = NO,"
+      "TIP = \"Links\""),
+     "ACTION", (Icallback) toggle_action_cb,
+     NULL);
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -52,90 +148,14 @@ gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
       (vbox = IupSetAttributes
        (IupVbox
         (IupFill (),
-
-         IupSetAttributes
-         (IupGridBox
-          (v_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = V_ICON,"
-             "TIP = \"Vertical\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           vh_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = VH_ICON,"
-             "TIP = \"Vertical+Horizontal\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           h_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = H_ICON,"
-             "TIP = \"Horizontal\""),
-            "ACTION", button_action_cb,
-            NULL),
-
-           r_button = IupSetCallbacks
-           (IupSetAttributes
-            (IupButton (NULL, NULL),
-             "IMAGE = SHUFFLE_ICON,"
-             "TIP = \"Random\""),
-            "ACTION", button_action_cb,
-            NULL),
-           NULL),
-          "ORIENTATION = HORIZONTAL,"
-          "NUMDIV = 4,"
-          "SIZECOL = -1,"
-          "SIZELIN = -1,"
-          "NORMALIZESIZE = BOTH,"),
-
-         radio = IupRadio
-         (IupHbox
-          (IupSetCallbacks
-           (IupSetAttributes
-            (place_toggle = IupToggle ("P", NULL),
-             "TIP = \"Place scope\""),
-            "ACTION", (Icallback) toggle_action_cb,
-            NULL),
-           IupSetCallbacks
-           (IupSetAttributes
-            (room_toggle = IupToggle ("R", NULL),
-             "TIP = \"Room scope\""),
-            "ACTION", (Icallback) toggle_action_cb,
-            NULL),
-           IupSetCallbacks
-           (IupSetAttributes
-            (level_toggle = IupToggle ("L", NULL),
-             "TIP = \"Level scope\""),
-            "ACTION", (Icallback) toggle_action_cb,
-            NULL),
-           NULL)),
-
+         gridbox,
+         sel_ring_toggle,
+         radio,
          IupHbox
-         (tiles_toggle = IupSetCallbacks
-          (IupSetAttributes
-           (IupToggle ("T", NULL),
-            "VALUE = YES,"
-            "ACTIVE = NO,"
-            "TIP = \"Tiles\""),
-           "ACTION", (Icallback) toggle_action_cb,
-           NULL),
-          links_toggle = IupSetCallbacks
-          (IupSetAttributes
-           (IupToggle ("L", NULL),
-            "VALUE = YES,"
-            "ACTIVE = NO,"
-            "TIP = \"Links\""),
-           "ACTION", (Icallback) toggle_action_cb,
-           NULL),
+         (tiles_toggle,
+          links_toggle,
           NULL),
-
          IupFill (),
-
          NULL),
         "ALIGNMENT = ACENTER")),
       "TITLE = Mirror"),
@@ -148,6 +168,7 @@ gui_create_tile_mirror_control (struct pos *p, struct sel_ring *sr,
   IupSetAttribute (ih, "_VH_BUTTON", (void *) vh_button);
   IupSetAttribute (ih, "_H_BUTTON", (void *) h_button);
   IupSetAttribute (ih, "_R_BUTTON", (void *) r_button);
+  IupSetAttribute (ih, "_SEL_RING_TOGGLE", (void *) sel_ring_toggle);
   IupSetAttribute (ih, "_RADIO", (void *) radio);
   IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
   IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
