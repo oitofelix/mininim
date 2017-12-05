@@ -901,6 +901,19 @@ perpendicular_dir (enum dir dir, int n)
   return LEFT;
 }
 
+void
+dir_dx_dy (enum dir d, int *dx, int *dy)
+{
+  if (dx) *dx = +0;
+  if (dy) *dy = +0;
+  switch (d) {
+  case LEFT: if (dx) *dx = -1; break;
+  case RIGHT: if (dx) *dx = +1; break;
+  case ABOVE: if (dy) *dy = -1; break;
+  case BELOW: if (dy) *dy = +1; break;
+  }
+}
+
 struct dim *
 dim (struct frame *f, struct dim *d)
 {

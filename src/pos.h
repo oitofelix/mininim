@@ -94,6 +94,7 @@ struct frame *place_frame (struct frame *f, struct frame *nf,
 coord_f opposite_cf (coord_f cf);
 enum dir opposite_dir (enum dir dir);
 enum dir perpendicular_dir (enum dir dir, int n);
+void dir_dx_dy (enum dir d, int *dx, int *dy);
 
 struct coord *
 tile_coord (struct pos *p, coord_f cf, struct coord *c);

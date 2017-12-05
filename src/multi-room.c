@@ -355,6 +355,10 @@ mr_set_origin (struct mr *mr, int room, int x, int y,
   mr->room = room;
   mr->x = x;
   mr->y = y;
+  mr->min_x = INT_MAX;
+  mr->max_x = INT_MIN;
+  mr->min_y = INT_MAX;
+  mr->max_y = INT_MIN;
 
   bool visited[room_nmemb];
   memset (visited, 0, sizeof (visited));
@@ -378,6 +382,11 @@ mr_map_rooms (struct mr *mr, int room, int x, int y,
     if (visited[room]) return;
     visited[room] = true;
   }
+
+  mr->min_x = min_int (mr->min_x, x);
+  mr->max_x = max_int (mr->max_x, x);
+  mr->min_y = min_int (mr->min_y, y);
+  mr->max_y = max_int (mr->max_y, y);
 
   int l = roomd (rlink, room_nmemb, room, LEFT);
   int r = roomd (rlink, room_nmemb, room, RIGHT);
@@ -449,20 +458,12 @@ void
 mr_room_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
                size_t room_nmemb)
 {
-  int dx = +0, dy = +0;
-  switch (d) {
-  case LEFT: dx = -1; break;
-  case RIGHT: dx = +1; break;
-  case ABOVE: dy = -1; break;
-  case BELOW: dy = +1; break;
-  }
-
+  int dx, dy; dir_dx_dy (d, &dx, &dy);
   int r = roomd (rlink, room_nmemb, mr->room, d);
   if (r) {
     nmr_coord (mr, mr->x + dx, mr->y + dy, &mr->x, &mr->y);
     mr_set_origin (mr, r, mr->x, mr->y, rlink, room_nmemb);
   }
-
   mr->select_cycles = SELECT_CYCLES;
 }
 
@@ -470,72 +471,16 @@ void
 mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
               size_t room_nmemb)
 {
-  int dx = +0, dy = +0, r = 0, i0 = 1, i1 = 1;
+  int dx, dy; dir_dx_dy (d, &dx, &dy);
 
-  int x = mr->x;
-  int y = mr->y;
-  int room = mr->room;
+  if ((d == LEFT && mr->min_x >= mr->w - 1)
+      || (d == RIGHT && mr->max_x <= 0)
+      || (d == ABOVE && mr->min_y >= mr->h - 1)
+      || (d == BELOW && mr->max_y <= 0))
+    return;
 
- retry:
-  switch (d) {
-  case RIGHT:
-    if (x > 0) dx = -1;
-    r = roomd (rlink, room_nmemb, room, RIGHT);
-    break;
-  case LEFT:
-    if (x < mr->w - 1) dx = +1;
-    r = roomd (rlink, room_nmemb, room, LEFT);
-    break;
-  case BELOW:
-    if (y > 0) dy = -1;
-    r = roomd (rlink, room_nmemb, room, BELOW);
-    break;
-  case ABOVE:
-    if (y < mr->h - 1) dy = +1;
-    r = roomd (rlink, room_nmemb, room, ABOVE);
-    break;
-  }
-
-  if (! dx && ! dy) {
-    if (r) room = r;
-    else {
-      switch (d) {
-      case RIGHT: case LEFT:
-        if (mr->y - i0 >= 0 && (i0 <= i1 || mr->y + i1 > mr->h - 1)) {
-          y = mr->y - i0++;
-          room = mr->cell[x][y].room;
-          goto retry;
-        }
-
-        if (mr->y + i1 <= mr->h - 1 && (i1 <= i0 || mr->y - i0 < 0)) {
-          y = mr->y + i1++;
-          room = mr->cell[x][y].room;
-          goto retry;
-        }
-        break;
-      case BELOW: case ABOVE:
-        if (mr->x - i0 >= 0 && (i0 <= i1 || mr->x + i1 > mr->w - 1)) {
-          x = mr->x - i0++;
-          room = mr->cell[x][y].room;
-          goto retry;
-        }
-
-        if (mr->x + i1 <= mr->w - 1 && (i1 <= i0 || mr->x - i0 < 0)) {
-          x = mr->x + i1++;
-          room = mr->cell[x][y].room;
-          goto retry;
-        }
-        break;
-      }
-
-      room = mr->room;
-      x = mr->x;
-      y = mr->y;
-    }
-  }
-
+  mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, rlink, room_nmemb);
   mr->select_cycles = SELECT_CYCLES;
-  mr_set_origin (mr, room, x + dx, y + dy, rlink, room_nmemb);
 }
 
 void

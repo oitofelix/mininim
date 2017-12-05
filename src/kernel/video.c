@@ -885,6 +885,9 @@ void
 draw_mr_select_rect (struct mr *mr, int x, int y, ALLEGRO_COLOR color,
                      int flags)
 {
+  if (0 > x || x >= mr->w || 0 > y || y >= mr->h)
+    return;
+
   int rx = x, ry = y;
   if (flags & ALLEGRO_FLIP_HORIZONTAL)
     rx = (mr->w - 1) - x;

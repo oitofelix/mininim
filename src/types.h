@@ -201,6 +201,7 @@ enum edit {
 struct mr {
   int w, h;
   int x, y;
+  int min_x, max_x, min_y, max_y;
   int dx, dy;
   int room;
   int select_cycles;
