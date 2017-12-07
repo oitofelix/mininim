@@ -53,6 +53,7 @@ void mr_map_rooms (struct mr *mr, int room, int x, int y,
                    bool visited[room_nmemb]);
 void mr_set_origin (struct mr *mr, int room, int x, int y,
                     struct room_linking *rlink, size_t room_nmemb);
+bool mr_is_within_bounds (struct mr *mr);
 void mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
                      size_t room_nmemb);
 void mr_simple_center_room (struct mr *mr, int room,

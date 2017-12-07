@@ -1936,8 +1936,7 @@ aux_menu (void)
   menu_sep (NULL);
 
   item.aux.select_mr_origin_room_tab =
-    menu_sitem (is_valid_pos (&aux_pos)
-                && naux_pos.room != global_mr.room,
+    menu_sitem (is_valid_pos (&aux_pos),
                 select_mr_origin_room_tab_icon,
                 "Select as origin in room &tab");
 

@@ -473,13 +473,13 @@ mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
 {
   int dx, dy; dir_dx_dy (d, &dx, &dy);
 
-  if ((d == LEFT && mr->min_x >= mr->w - 1)
-      || (d == RIGHT && mr->max_x <= 0)
-      || (d == ABOVE && mr->min_y >= mr->h - 1)
-      || (d == BELOW && mr->max_y <= 0))
-    return;
-
+  struct mr_origin o;
+  mr_save_origin (mr, &o);
   mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, rlink, room_nmemb);
+
+  if (mr_is_within_bounds (mr)) return;
+  else mr_restore_origin (mr, &o, rlink, room_nmemb);
+
   mr->select_cycles = SELECT_CYCLES;
 }
 
@@ -491,27 +491,61 @@ mr_page_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
   for (int i = 0; i < n; i++) mr_row_trans (mr, d, rlink, room_nmemb);
 }
 
+bool
+mr_is_within_bounds (struct mr *mr)
+{
+  return mr->min_x < mr->w
+    && mr->max_x >= 0
+    && mr->min_y < mr->h
+    && mr->max_y >= 0;
+}
+
 void
 mr_scroll_into_view (struct mr *mr, int room, struct room_linking *rlink,
                      size_t room_nmemb)
 {
-  if (is_room_visible (mr, room)) return;
-
   struct mr_origin o;
   mr_save_origin (mr, &o);
 
-  enum dir dir;
-  for (dir = FIRST_DIR; dir <= LAST_DIR; dir++) {
-    mr_restore_origin (mr, &o, rlink, room_nmemb);
-    struct mr_origin a, b;
-    do {
-      mr_save_origin (mr, &a);
-      mr_row_trans (mr, dir, rlink, room_nmemb);
-      mr_save_origin (mr, &b);
-      if (is_room_visible (mr, room)) return;
-    } while (! mr_origin_eq (&a, &b));
-  }
+  int w = mr->max_x - mr->min_x + 1;
+  int h = mr->max_y - mr->min_y + 1;
 
+  for (int dx = 0; dx < w; dx++)
+    for (int dy = 0; dy < h; dy++) {
+      bool end = true;
+
+      mr_restore_origin (mr, &o, rlink, room_nmemb);
+      mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, rlink, room_nmemb);
+      if (mr_is_within_bounds (mr)) {
+        if (is_room_visible (mr, room)) return;
+        end = false;
+      }
+
+      mr_restore_origin (mr, &o, rlink, room_nmemb);
+      mr_set_origin (mr, mr->room, mr->x - dx, mr->y + dy, rlink, room_nmemb);
+      if (mr_is_within_bounds (mr)) {
+        if (is_room_visible (mr, room)) return;
+        end = false;
+      }
+
+      mr_restore_origin (mr, &o, rlink, room_nmemb);
+      mr_set_origin (mr, mr->room, mr->x + dx, mr->y - dy, rlink, room_nmemb);
+      if (mr_is_within_bounds (mr)) {
+        if (is_room_visible (mr, room)) return;
+        end = false;
+      }
+
+      mr_restore_origin (mr, &o, rlink, room_nmemb);
+      mr_set_origin (mr, mr->room, mr->x + dx, mr->y + dy, rlink, room_nmemb);
+      if (mr_is_within_bounds (mr)) {
+        if (is_room_visible (mr, room)) return;
+        end = false;
+      }
+
+      if (end) goto end;
+    }
+
+ end:
   mr_center_room (mr, room, rlink, room_nmemb);
 }
 
