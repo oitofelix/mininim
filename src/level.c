@@ -273,8 +273,10 @@ play_level (struct level *lv)
 
   normalize_level (&global_level);
 
-  apply_mr_fit_mode (&global_mr, global_level.rlink,
-                     global_level.room_nmemb);
+  mr_set_origin (&global_mr, global_level.start_pos.room, 0, 0,
+                 global_level.rlink, global_level.room_nmemb);
+  global_mr.fit_room = global_level.start_pos.room;
+  apply_mr_fit_mode (&global_mr, mr_fit_mode);
 
   register_tiles ();
   register_actors ();
@@ -793,13 +795,9 @@ compute_level (void)
   if (k->f.c.room != prev_room
       && k->f.c.room != 0
       && camera_follow_kid == k->id)  {
-    if (! is_room_visible (&global_mr, k->f.c.room)) {
-      mr_coord (&global_mr, k->f.c.prev_room,
-                k->f.c.xd, &global_mr.x, &global_mr.y);
-      mr_set_origin (&global_mr, k->f.c.room, global_mr.x, global_mr.y,
-                     global_level.rlink, global_level.room_nmemb);
-    } else mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
-                          global_level.room_nmemb);
+    if (! is_room_visible (&global_mr, k->f.c.room))
+      mr_page_trans (&global_mr, k->f.c.xd);
+    mr_focus_room (&global_mr, k->f.c.room);
     global_mr.select_cycles = 0;
   }
 
@@ -808,21 +806,19 @@ compute_level (void)
       && k->f.c.room != 0
       && camera_follow_kid == k->id
       && (ke = get_reciprocal_enemy (k))
+      && global_mr.room_select != ke->f.c.room
+      && is_room_visible (&global_mr, k->f.c.room)
       && ! is_room_visible (&global_mr, ke->f.c.room)) {
     if (ke->f.c.room == roomd (global_level.rlink, global_level.room_nmemb,
                                k->f.c.room, LEFT)) {
-      mr_row_trans (&global_mr, LEFT, global_level.rlink,
-                    global_level.room_nmemb);
-      mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_row_trans (&global_mr, LEFT);
+      mr_focus_room (&global_mr, k->f.c.room);
       global_mr.room_select = ke->f.c.room;
     } else if (ke->f.c.room ==
                roomd (global_level.rlink, global_level.room_nmemb,
                       k->f.c.room, RIGHT)) {
-      mr_row_trans (&global_mr, RIGHT, global_level.rlink,
-                    global_level.room_nmemb);
-      mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_row_trans (&global_mr, RIGHT);
+      mr_focus_room (&global_mr, k->f.c.room);
       global_mr.room_select = ke->f.c.room;
     }
   } else if (global_mr.room_select > 0

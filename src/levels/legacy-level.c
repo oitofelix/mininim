@@ -73,11 +73,10 @@ legacy_level_start (void)
 
   /* define camera's starting room */
   if (global_level.n == 7) {
-    mr_center_room (&global_mr, 1, global_level.rlink, global_level.room_nmemb);
+    mr_best_view (&global_mr, 1);
     camera_follow_kid = -1;
   } else {
-    mr_center_room (&global_mr, k->f.c.room, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_best_view (&global_mr, k->f.c.room);
     camera_follow_kid = k->id;
   }
 
@@ -103,8 +102,7 @@ legacy_level_start (void)
       int dy = +15;
       place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
 
-      mr_center_room (&global_mr, 2, global_level.rlink,
-                      global_level.room_nmemb);
+      mr_best_view (&global_mr, 2);
       k->total_hp = checkpoint_total_hp;
       k->current_hp = checkpoint_current_hp;
       k->skill = checkpoint_skill;

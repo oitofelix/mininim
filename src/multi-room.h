@@ -22,11 +22,30 @@
 #define MININIM_MULTI_ROOM_H
 
 /* variables */
-extern ALLEGRO_BITMAP *room0;
-extern bool tile_caching;
 extern struct mr global_mr;
-extern int room_view;
-extern int mr_room, mr_x, mr_y;
+
+/* destruction */
+void destroy_mr (struct mr *mr);
+
+/* dimension */
+void mr_set_dim (struct mr *mr, int w, int h);
+void apply_mr_fit_mode (struct mr *mr, enum mr_fit_mode mode);
+
+/* query info */
+void mr_get_resolution (struct mr *mr, int *w, int *h);
+int mr_central_room (struct mr *mr);
+
+/* view */
+void mr_set_origin (struct mr *mr, int room, int x, int y,
+                    struct room_linking *rlink, size_t room_nmemb);
+void mr_set_room (struct mr *mr, int room, int x, int y);
+void mr_best_view (struct mr *mr, int room);
+void mr_center_room (struct mr *mr, int room);
+
+void mr_focus_room (struct mr *mr, int room);
+void mr_focus_mouse (struct mr *mr);
+void mr_scroll_into_view (struct mr *mr, int room);
+
 
 /* visibility functions */
 bool is_pos_visible (struct mr *mr, struct pos *p);
@@ -36,68 +55,24 @@ bool is_room_visible (struct mr *mr, int room);
 
 /* functions */
 bool has_mr_view_changed (struct mr *mr);
-void mr_redim (struct mr *mr, int w, int h);
-void mr_create_bitmaps (struct mr *mr);
-void mr_set_dim (struct mr *mr, int w, int h);
-void mr_get_resolution (struct mr *mr, int *w, int *h);
-bool mr_topmost_cell (struct mr *mr, int *rx, int *ry);
-bool mr_leftmost_cell (struct mr *mr, int *rx, int *ry);
-bool mr_bottommost_cell (struct mr *mr, int *rx, int *ry);
-bool mr_rightmost_cell (struct mr *mr, int *rx, int *ry);
 struct mr_origin *mr_save_origin (struct mr *mr, struct mr_origin *o);
 bool mr_origin_eq (struct mr_origin *a, struct mr_origin *b);
-void mr_restore_origin (struct mr *mr, struct mr_origin *o,
-                        struct room_linking *rlink, size_t room_nmemb);
-void mr_map_rooms (struct mr *mr, int room, int x, int y,
-                   struct room_linking *rlink, size_t room_nmemb,
-                   bool visited[room_nmemb]);
-void mr_set_origin (struct mr *mr, int room, int x, int y,
-                    struct room_linking *rlink, size_t room_nmemb);
-bool mr_is_within_bounds (struct mr *mr);
-void mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
-                     size_t room_nmemb);
-void mr_simple_center_room (struct mr *mr, int room,
-                            struct room_linking *rlink, size_t room_nmemb);
-void mr_focus_room (struct mr *mr, int room, struct room_linking *rlink,
-                    size_t room_nmemb);
-void mr_focus_cell (struct mr *mr, int x, int y,
-                    struct room_linking *rlink, size_t room_nmemb);
-void mr_focus_mouse (struct mr *mr, struct room_linking *rlink,
-                     size_t room_nmemb);
-void mr_scroll_into_view (struct mr *mr, int room,
-                          struct room_linking *rlink, size_t room_nmemb);
-void mr_room_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-                    size_t room_nmemb);
-void mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-                   size_t room_nmemb);
-void mr_page_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-                    size_t room_nmemb);
+void mr_restore_origin (struct mr *mr, struct mr_origin *o);
+bool mr_is_view_within_bounds (struct mr *mr);
+void mr_room_trans (struct mr *mr, enum dir d);
+void mr_row_trans (struct mr *mr, enum dir d);
+void mr_page_trans (struct mr *mr, enum dir d);
 void mr_draw (struct mr *mr);
-void nmr_coord (struct mr *mr, int x, int y, int *rx, int *ry);
-bool mr_coord (struct mr *mr, int room0, enum dir dir, int *rx, int *ry);
-void update_room0_cache (void);
-void update_cache (struct mr *mr);
-void update_cache_pos (struct mr *mr, struct pos *p);
-void register_changed_pos (struct pos *p);
-struct pos *get_changed_pos (struct pos *p);
-struct pos *get_changed_pos_by_room (int room);
-void optimize_changed_pos (void);
-void remove_changed_pos (struct pos *pos);
-void register_changed_room (int room);
-bool has_room_changed (int room);
+
+bool mr_is_coord_visible (struct mr *mr, int x, int y);
+bool mr_room_coord (struct mr *mr, int room, int *rx, int *ry);
+int mr_coord_room (struct mr *mr, int x, int y);
+
 void mr_update_last_settings (struct mr *mr);
-void mr_fit_stretch (struct mr *mr, struct room_linking *rlink,
-                     size_t room_nmemb);
-void mr_fit_ratio (struct mr *mr, struct room_linking *rlink,
-                   size_t room_nmemb);
-void apply_mr_fit_mode (struct mr *mr, struct room_linking *rlink,
-                        size_t room_nmemb);
 bool mr_room_list_has_room (struct mr_room_list *l, int room);
 struct mr_room_list *mr_get_room_list (struct mr *mr, struct mr_room_list *l);
 void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (struct mr *mr);
-void mr_stabilize_origin (struct mr *mr, struct mr_origin *o,
-                          struct room_linking *rlink, size_t room_nmemb);
 void mr_busy (struct mr *mr);
 
 #endif	/* MININIM_MULTI_ROOM_H */

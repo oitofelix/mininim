@@ -43,19 +43,13 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   struct pos nb;
   npos (b, &nb);
 
-  struct mr nmr;
-  memset (&nmr, 0, sizeof (nmr));
-  nmr.room = mr->room;
-
-  mr_fit_stretch (&nmr, a->l->rlink, a->l->room_nmemb);
-
   int ax, ay;
-  bool a_visible = mr_coord (&nmr, na.room, -1, &ax, &ay);
+  bool a_accessible = mr_room_coord (mr, na.room, &ax, &ay);
 
   int bx, by;
-  bool b_visible = mr_coord (&nmr, nb.room, -1, &bx, &by);
+  bool b_accessible = mr_room_coord (mr, nb.room, &bx, &by);
 
-  if (! a_visible || ! b_visible) return NULL;
+  if (! a_accessible || ! b_accessible) return NULL;
 
   int tlx = min_int (ax, bx);
   int tly = min_int (ay, by);
@@ -94,24 +88,25 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   rs->c = xcalloc (rs->c_nmemb, sizeof (*rs->c));
 
   /* fill in rooms */
-  rs->tl = nmr.cell[tlx][tly].room;
-  rs->br = nmr.cell[brx][bry].room;
-  rs->tr = nmr.cell[trx][try].room;
-  rs->bl = nmr.cell[blx][bly].room;
+  rs->tl = mr_coord_room (mr, tlx, tly);
+  rs->br = mr_coord_room (mr, brx, bry);
+  rs->tr = mr_coord_room (mr, trx, try);
+  rs->bl = mr_coord_room (mr, blx, bly);
 
   for (int i = 0; i < rs->w_nmemb; i++) {
-    rs->t[i] = nmr.cell[tlx + 1 + i][tly].room;
-    rs->b[i] = nmr.cell[tlx + 1 + i][bry].room;
+    rs->t[i] = mr_coord_room (mr, tlx + 1 + i, tly);
+    rs->b[i] = mr_coord_room (mr, tlx + 1 + i, bry);
   }
 
   for (int i = 0; i < rs->h_nmemb; i++) {
-    rs->l[i] = nmr.cell[tlx][tly + 1 + i].room;
-    rs->r[i] = nmr.cell[brx][tly + 1 + i].room;
+    rs->l[i] = mr_coord_room (mr, tlx, tly + 1 + i);
+    rs->r[i] = mr_coord_room (mr, brx, tly + 1 + i);
   }
 
   for (int i = 0; i < rs->w_nmemb; i++)
     for (int j = 0; j < rs->h_nmemb; j++)
-      rs->c[i * rs->h_nmemb + j] = nmr.cell[tlx + 1 + i][tly + 1 + j].room;
+      rs->c[i * rs->h_nmemb + j] =
+        mr_coord_room (mr, tlx + 1 + i, tly + 1 + j);
 
   /* compute corner in-room coordinates */
   int afloor = na.floor, aplace = na.place;

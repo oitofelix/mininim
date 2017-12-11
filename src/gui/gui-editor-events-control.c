@@ -727,7 +727,7 @@ next_button_cb (Ihandle *button)
   int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &next);
   if (id < 0) return IUP_DEFAULT;
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+  selection_cb (tree_ctrl, id, true);
   return IUP_DEFAULT;
 }
 
@@ -824,7 +824,7 @@ new_event (Ihandle *ih, struct pos *p, bool next)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, EVENT_DEPTH, &e);
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+  selection_cb (tree_ctrl, id, true);
 
   return e;
 }
@@ -959,7 +959,7 @@ _select_target_cb (Ihandle *ih, struct pos *p)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, TARGET_DEPTH, p);
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+  selection_cb (tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }
@@ -979,7 +979,7 @@ _select_source_cb (Ihandle *ih, struct pos *p)
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   int id = get_tree_node_id_by_data (tree, SOURCE_DEPTH, p);
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+  selection_cb (tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }

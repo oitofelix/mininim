@@ -306,6 +306,7 @@ extern enum movements movements;
 extern bool title_demo;
 extern enum rendering rendering;
 extern bool inhibit_screensaver;
+extern enum mr_fit_mode mr_fit_mode;
 
 /* screams */
 extern bool scream;

@@ -472,6 +472,9 @@ link_undo (struct link_undo *d, int dir)
   global_level.rlink = copy_array
     ((dir >= 0) ? d->f : d->b, global_level.room_nmemb,
      NULL, sizeof (*global_level.rlink));
+
+  mr_set_origin (&global_mr, global_mr.room, global_mr.x, global_mr.y,
+                 global_level.rlink, global_level.room_nmemb);
 }
 
 void
@@ -509,8 +512,7 @@ new_room_undo (struct new_room_undo *d, int dir)
                     global_level.room_nmemb, sizeof (*global_level.rlink));
   } else {
     if (global_mr.room == global_level.room_nmemb - 1)
-      mr_focus_room (&global_mr, d->mr_room, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_focus_room (&global_mr, d->mr_room);
     if (selection_pos.room == global_level.room_nmemb - 1) {
       invalid_pos (&selection_pos);
       selection_locked = false;
@@ -525,6 +527,9 @@ new_room_undo (struct new_room_undo *d, int dir)
                          global_level.room_nmemb - 1, 1,
                          sizeof (*global_level.rlink));
   }
+
+  mr_set_origin (&global_mr, global_mr.room, global_mr.x, global_mr.y,
+                 global_level.rlink, global_level.room_nmemb);
 }
 
 /******************/

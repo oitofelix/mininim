@@ -174,8 +174,7 @@ valuechanged_cb (Ihandle *ih)
   if (room > 0) {
     struct pos np; new_pos (&np, p->l, room, floor, place);
     *p = np;
-    mr_scroll_into_view (&global_mr, np.room, global_level.rlink,
-                         global_level.room_nmemb);
+    mr_scroll_into_view (&global_mr, np.room);
   }
 
   return IUP_DEFAULT;

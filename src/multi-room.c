@@ -20,163 +20,77 @@
 
 #include "mininim.h"
 
-ALLEGRO_BITMAP *room0;
-bool tile_caching;
-
 struct mr global_mr;
-int room_view;
 
-struct pos *changed_pos = NULL;
-size_t changed_pos_nmemb = 0;
+/* destruction */
+static void destroy_mr_cells (struct mr *mr);
 
-int *changed_room = NULL;
-size_t changed_room_nmemb = 0;
+/* dimension */
+static void mr_redim (struct mr *mr, int w, int h);
+static void mr_fit_stretch (struct mr *mr);
+static void mr_fit_ratio (struct mr *mr);
 
-void
-optimize_changed_pos (void)
-{
-  if (changed_pos_nmemb < FLOORS * PLACES) return;
-  size_t total = 0;
-  struct pos p; new_pos (&p, &global_level, -1, -1, -1);
-  for (p.room = 1; p.room < global_level.room_nmemb; p.room++) {
-    int per_room = 0;
-    if (has_room_changed (p.room)) continue;
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = 0; p.place < PLACES; p.place++) {
-        if (get_changed_pos (&p)
-            && ++per_room > OPTIMIZE_CHANGED_POS_THRESHOLD) {
-          register_changed_room (p.room);
-          goto next_room;
-        }
-        if (++total > changed_pos_nmemb) return;
-      }
-  next_room:;
-  }
-}
+/* query info */
+static int mr_count_rooms (struct mr *mr);
+static bool mr_topmost_cell (struct mr *mr, int *rx, int *ry);
+static bool mr_leftmost_cell (struct mr *mr, int *rx, int *ry);
+static bool mr_bottommost_cell (struct mr *mr, int *rx, int *ry);
+static bool mr_rightmost_cell (struct mr *mr, int *rx, int *ry);
+
+/* view */
+static bool is_valid_mr_coord (int x, int y);
+static void mr_map_rooms (struct mr *mr, int room, int x, int y);
+static void mr_focus_cell (struct mr *mr, int x, int y);
+
+
+
+/*******************************************************************
+ * destruction
+ *******************************************************************/
 
 void
-register_changed_pos (struct pos *p)
+destroy_mr_cells (struct mr *mr)
 {
-  struct pos np; npos (p, &np);
-
-  if (get_changed_pos (&np)) return;
-
-  changed_pos =
-    add_to_array (&np, 1, changed_pos, &changed_pos_nmemb,
-                  changed_pos_nmemb, sizeof (*changed_pos));
-
-  qsort (changed_pos, changed_pos_nmemb, sizeof (*changed_pos),
-         (m_comparison_fn_t) cpos);
-}
-
-struct pos *
-get_changed_pos (struct pos *p)
-{
-  return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (*p),
-                  (m_comparison_fn_t) cpos);
-}
-
-struct pos *
-get_changed_pos_by_room (int room)
-{
-  struct pos p;
-  p.room = room;
-
-  return bsearch (&p, changed_pos, changed_pos_nmemb, sizeof (p),
-                  (m_comparison_fn_t) cpos_by_room);
-}
-
-void
-remove_changed_pos (struct pos *p)
-{
-  size_t i =  p - changed_pos;
-  changed_pos =
-    remove_from_array (changed_pos, &changed_pos_nmemb, i, 1, sizeof (*p));
-}
-
-void
-register_changed_room (int room)
-{
-  if (has_room_changed (room)) return;
-
-  changed_room =
-    add_to_array (&room, 1, changed_room, &changed_room_nmemb,
-                  changed_room_nmemb, sizeof (room));
-
-  qsort (changed_room, changed_room_nmemb, sizeof (room),
-         (m_comparison_fn_t) cint);
-
-  struct pos p;
-  new_pos (&p, &global_level, room, -1, -1);
-
-  p.place = 0;
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    register_changed_pos (&p);
-
-  p.place = PLACES - 1;
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    register_changed_pos (&p);
-
-}
-
-bool
-has_room_changed (int room)
-{
-  return bsearch (&room, changed_room, changed_room_nmemb, sizeof (room),
-                  (m_comparison_fn_t) cint);
-}
-
-static void
-destroy_mr (struct mr *mr)
-{
-  int x, y;
-
   if (mr->cell) {
-    for (x = 0; x < mr->w; x++) {
-      for (y = 0; y < mr->h; y++) {
+    for (int x = 0; x < mr->w; x++) {
+      for (int y = 0; y < mr->h; y++) {
         al_destroy_bitmap (mr->cell[x][y].screen);
         al_destroy_bitmap (mr->cell[x][y].cache);
       }
       al_free (mr->cell[x]);
       al_free (mr->last.cell[x]);
     }
-    al_free (mr->cell);
-    al_free (mr->last.cell);
-  };
+  }
+
+  al_free (mr->cell);
+  al_free (mr->last.cell);
 }
 
 void
-mr_redim (struct mr *mr, int w, int h)
+destroy_mr (struct mr *mr)
 {
-  destroy_mr (mr);
-
-  mr->w = w;
-  mr->h = h;
-
-  if (! cutscene && mr->fit_mode == MR_FIT_NONE) {
-    mr->fit_w = mr->w;
-    mr->fit_h = mr->h;
-  }
-
-  int x, y;
-  mr->cell = xcalloc (w, sizeof (* mr->cell));
-  mr->last.cell = xcalloc (w, sizeof (* mr->last.cell));
-  for (x = 0; x < w; x++) {
-    mr->cell[x] = xcalloc (h, sizeof (** mr->cell));
-    mr->last.cell[x] = xcalloc (h, sizeof (** mr->last.cell));
-    for (y = 0; y < h; y++) {
-      mr->cell[x][y].screen = NULL;
-      mr->cell[x][y].cache = NULL;
-    }
-  }
+  destroy_mr_cells (mr);
+  al_free (mr->rlink);
+  al_free (mr->coord);
 }
 
+
+
+
+
+/*******************************************************************
+ * dimension
+ *******************************************************************/
+
 void
-mr_create_bitmaps (struct mr *mr)
+mr_set_dim (struct mr *mr, int w, int h)
 {
-  int x, y;
-  for (x = 0; x < mr->w; x++)
-    for (y = 0; y < mr->h; y++) {
+  if (w < 1 || h < 1) return;
+
+  mr_redim (mr, w, h);
+
+  for (int x = 0; x < mr->w; x++)
+    for (int y = 0; y < mr->h; y++) {
       int sw = cutscene ? CUTSCENE_WIDTH : ORIGINAL_WIDTH;
       int sh = cutscene ? CUTSCENE_HEIGHT : ORIGINAL_HEIGHT
         - (y < mr->h - 1 ? 8 : 0);
@@ -192,12 +106,105 @@ mr_create_bitmaps (struct mr *mr)
 }
 
 void
-mr_set_dim (struct mr *mr, int w, int h)
+mr_redim (struct mr *mr, int w, int h)
 {
-  if (w < 1 || h < 1) return;
-  mr_redim (mr, w, h);
-  mr_create_bitmaps (mr);
+  destroy_mr_cells (mr);
+
+  int x, y;
+  mr->cell = xcalloc (w, sizeof (* mr->cell));
+  mr->last.cell = xcalloc (w, sizeof (* mr->last.cell));
+  for (x = 0; x < w; x++) {
+    mr->cell[x] = xcalloc (h, sizeof (** mr->cell));
+    mr->last.cell[x] = xcalloc (h, sizeof (** mr->last.cell));
+    for (y = 0; y < h; y++) {
+      mr->cell[x][y].screen = NULL;
+      mr->cell[x][y].cache = NULL;
+    }
+  }
+
+  mr->w = w;
+  mr->h = h;
+
+  mr_set_origin (mr, mr->room, mr->x, mr->y, NULL, 0);
 }
+
+void
+mr_fit_stretch (struct mr *mr)
+{
+  int w = mr->max_x - mr->min_x + 1;
+  int h = mr->max_y - mr->min_y + 1;
+
+  int tl = mr_coord_room (mr, mr->min_x, mr->min_y);
+  int tr = mr_coord_room (mr, mr->max_x, mr->min_y);
+  int bl = mr_coord_room (mr, mr->min_x, mr->max_y);
+  int br = mr_coord_room (mr, mr->max_x, mr->max_y);
+
+  if (tl) mr_set_room (mr, tl, 0, 0);
+  else if (tr) mr_set_room (mr, tr, w - 1, 0);
+  else if (bl) mr_set_room (mr, bl, 0, h - 1);
+  else if (br) mr_set_room (mr, br, w - 1, h - 1);
+  else assert (false);
+
+  mr_redim (mr, w, h);
+}
+
+void
+mr_fit_ratio (struct mr *mr)
+{
+  mr_fit_stretch (mr);
+  if (mr->w < mr->h) mr_redim (mr, mr->h, mr->h);
+  else if (mr->w > mr->h) mr_redim (mr, mr->w, mr->w);
+}
+
+void
+apply_mr_fit_mode (struct mr *mr, enum mr_fit_mode mode)
+{
+  mr_busy (mr);
+
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
+    mr->fit_w = 1;
+    mr->fit_h = 1;
+    mode = MR_FIT_NONE;
+  }
+
+  if (! mr->room) {
+    struct pos p; get_kid_start_pos (&p);
+    mr_best_view (mr, p.room);
+  }
+
+  if (! cutscene && mr->fit_mode == MR_FIT_NONE) {
+    mr->fit_w = mr->w;
+    mr->fit_h = mr->h;
+    mr->fit_room = mr_central_room (mr);
+  }
+
+  switch (mode) {
+  case MR_FIT_NONE:
+    mr_set_dim (mr, mr->fit_w, mr->fit_h);
+    mr_center_room (mr, mr->fit_room);
+    break;
+  case MR_FIT_STRETCH:
+    mr_fit_stretch (mr);
+    mr_set_dim (mr, mr->w, mr->h);
+    break;
+  case MR_FIT_RATIO:
+    mr_fit_ratio (mr);
+    mr_set_dim (mr, mr->w, mr->h);
+    mr_best_view (mr, mr_central_room (mr));
+    break;
+  }
+
+  mr->fit_mode = mode;
+}
+
+
+
+
+
+
+/*******************************************************************
+ * query info
+ *******************************************************************/
 
 void
 mr_get_resolution (struct mr *mr, int *ret_w, int *ret_h)
@@ -210,12 +217,40 @@ mr_get_resolution (struct mr *mr, int *ret_w, int *ret_h)
 }
 
 int
+mr_central_room (struct mr *mr)
+{
+  for (int r = 0; ; r++) {
+    for (int i = 0; i <= r; i++) {
+      int room = mr_coord_room (mr, mr->w / 2 - i, mr->h / 2 - r);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 + i, mr->h / 2 - r);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 - i, mr->h / 2 + r);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 + i, mr->h / 2 + r);
+      if (room) return room;
+    }
+
+    for (int i = 0; i <= r; i++) {
+      int room = mr_coord_room (mr, mr->w / 2 - r, mr->h / 2 - i);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 + r, mr->h / 2 - i);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 - r, mr->h / 2 + i);
+      if (room) return room;
+      room = mr_coord_room (mr, mr->w / 2 + r, mr->h / 2 + i);
+      if (room) return room;
+    }
+  }
+}
+
+int
 mr_count_rooms (struct mr *mr)
 {
   int x, y, c = 0;
   for (x = 0; x < mr->w; x++)
     for (y = 0; y < mr->h; y++)
-      c += (mr->cell[x][y].room > 0) ? 1 : 0;
+      c += mr_coord_room (mr, x, y) ? 1 : 0;
   return c;
 }
 
@@ -225,7 +260,7 @@ mr_topmost_cell (struct mr *mr, int *rx, int *ry)
   int x, y;
   for (y = 0; y < mr->h; y++)
     for (x = 0; x < mr->w; x++)
-      if (mr->cell[x][y].room > 0) {
+      if (mr_coord_room (mr, x, y)) {
         *rx = x, *ry = y;
         return true;
       }
@@ -239,7 +274,7 @@ mr_leftmost_cell (struct mr *mr, int *rx, int *ry)
   int x, y;
   for (x = 0; x < mr->w; x++)
     for (y = 0; y < mr->h; y++)
-      if (mr->cell[x][y].room > 0) {
+      if (mr_coord_room (mr, x, y)) {
         *rx = x, *ry = y;
         return true;
       }
@@ -253,7 +288,7 @@ mr_bottommost_cell (struct mr *mr, int *rx, int *ry)
   int x, y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = mr->w - 1; x >= 0; x--)
-      if (mr->cell[x][y].room > 0) {
+      if (mr_coord_room (mr, x, y)) {
         *rx = x, *ry = y;
         return true;
       }
@@ -267,7 +302,7 @@ mr_rightmost_cell (struct mr *mr, int *rx, int *ry)
   int x, y;
   for (x = mr->w - 1; x >= 0; x--)
     for (y = mr->h - 1; y >= 0; y--)
-      if (mr->cell[x][y].room > 0) {
+      if (mr_coord_room (mr, x, y)) {
         *rx = x, *ry = y;
         return true;
       }
@@ -275,9 +310,92 @@ mr_rightmost_cell (struct mr *mr, int *rx, int *ry)
   return false;
 }
 
+
+
+
+
+
+/*******************************************************************
+ * view
+ *******************************************************************/
+
+bool
+is_valid_mr_coord (int x, int y)
+{
+  return x != INT_MIN && y != INT_MIN;
+}
+
 void
-mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
-                size_t room_nmemb)
+mr_set_origin (struct mr *mr, int room, int x, int y,
+               struct room_linking *rlink, size_t room_nmemb)
+{
+  if (! room) return;
+
+  mr->room = room;
+  mr->x = x;
+  mr->y = y;
+  mr->min_x = INT_MAX;
+  mr->max_x = INT_MIN;
+  mr->min_y = INT_MAX;
+  mr->max_y = INT_MIN;
+
+  if (rlink && room_nmemb && mr->rlink != rlink) {
+    al_free (mr->rlink);
+    mr->rlink = copy_array
+      (rlink, room_nmemb, &mr->room_nmemb, sizeof (* mr->rlink));
+
+    al_free (mr->coord);
+    mr->coord = xcalloc (mr->room_nmemb, sizeof (* mr->coord));
+  }
+
+  for (int r = 0; r < mr->room_nmemb; r++)
+    mr->coord[r].x = INT_MIN, mr->coord[r].y = INT_MIN;
+
+  for (int x = 0; x < mr->w; x++)
+    for (int y = 0; y < mr->h; y++)
+      mr->cell[x][y].room = 0;
+
+  mr_map_rooms (mr, room, x, y);
+}
+
+void
+mr_map_rooms (struct mr *mr, int room, int x, int y)
+{
+  if (is_valid_mr_coord (mr->coord[room].x, mr->coord[room].y))
+    return;
+
+  if (mr_is_coord_visible (mr, x, y)) {
+    if (mr->cell[x][y].room) return;
+    else mr->cell[x][y].room = room;
+  }
+
+  mr->coord[room].x = x;
+  mr->coord[room].y = y;
+
+  mr->min_x = min_int (mr->min_x, x);
+  mr->max_x = max_int (mr->max_x, x);
+  mr->min_y = min_int (mr->min_y, y);
+  mr->max_y = max_int (mr->max_y, y);
+
+  for (enum dir d = FIRST_DIR; d <= LAST_DIR; d++) {
+    int dx, dy; dir_dx_dy (d, &dx, &dy);
+    int r = roomd (mr->rlink, mr->room_nmemb, room, d);
+    if (r) mr_map_rooms (mr, r, x + dx, y + dy);
+  }
+}
+
+void
+mr_set_room (struct mr *mr, int room, int x, int y)
+{
+  int rx, ry;
+  if (mr_room_coord (mr, room, &rx, &ry))
+    mr_set_origin (mr, mr->room, mr->x + (x - rx),
+                   mr->y + (y - ry), NULL, 0);
+  else mr_set_origin (mr, room, x, y, NULL, 0);
+}
+
+void
+mr_best_view (struct mr *mr, int room)
 {
   int x, y, lc = 0, c = 0, ld = INT_MAX;
   float ldc = INFINITY;
@@ -285,7 +403,7 @@ mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
   int ly = mr->y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++) {
-      mr_set_origin (mr, room, x, y, rlink, room_nmemb);
+      mr_set_room (mr, room, x, y);
       c = mr_count_rooms (mr);
       int cx, cy;
       mr_topmost_cell (mr, &cx, &cy);
@@ -309,17 +427,64 @@ mr_center_room (struct mr *mr, int room, struct room_linking *rlink,
       }
     }
 
-  mr_set_origin (mr, room, lx, ly, rlink, room_nmemb);
+  mr_set_room (mr, room, lx, ly);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_simple_center_room (struct mr *mr, int room, struct room_linking *rlink,
-                       size_t room_nmemb)
+mr_center_room (struct mr *mr, int room)
 {
-  mr_set_origin (mr, room, mr->w / 2, mr->h / 2, rlink, room_nmemb);
+  mr_set_room (mr, room, mr->w / 2, mr->h / 2);
 }
 
+void
+mr_focus_room (struct mr *mr, int room)
+{
+  mr_scroll_into_view (mr, room);
+  int x, y; mr_room_coord (mr, room, &x, &y);
+  mr_set_origin (mr, room, x, y, NULL, 0);
+  mr->select_cycles = SELECT_CYCLES;
+}
+
+void
+mr_focus_cell (struct mr *mr, int x, int y)
+{
+  if (x < 0 || y < 0) return;
+  int room = mr_coord_room (mr, x, y);
+  if (! room) return;
+  mr_focus_room (mr, room);
+  mr->select_cycles = SELECT_CYCLES;
+}
+
+void
+mr_focus_mouse (struct mr *mr)
+{
+  struct mouse_coord m;
+  get_mouse_coord (mr, &m);
+  mr_focus_cell (mr, m.x, m.y);
+}
+
+void
+mr_scroll_into_view (struct mr *mr, int room)
+{
+  /* optimization */
+  if (is_room_visible (mr, room)) return;
+
+  int x, y;
+  if (mr_room_coord (mr, room, &x, &y)) {
+    if (x < 0) x = 0;
+    if (x > mr->w - 1) x = mr->w - 1;
+    if (y < 0) y = 0;
+    if (y > mr->h - 1) y = mr->h - 1;
+    mr_set_room (mr, room, x, y);
+  } else mr_best_view (mr, room);
+}
+
+
+
+
+
+
 struct mr_origin *
 mr_save_origin (struct mr *mr, struct mr_origin *o)
 {
@@ -340,213 +505,52 @@ mr_origin_eq (struct mr_origin *a, struct mr_origin *b)
 }
 
 void
-mr_restore_origin (struct mr *mr, struct mr_origin *o,
-                   struct room_linking *rlink, size_t room_nmemb)
+mr_restore_origin (struct mr *mr, struct mr_origin *o)
 {
   if (o->w == mr->w && o->h == mr->h)
-    mr_set_origin (mr, o->room, o->x, o->y, rlink, room_nmemb);
-  else mr_center_room (mr, o->room, rlink, room_nmemb);
+    mr_set_origin (mr, o->room, o->x, o->y, NULL, 0);
+  else mr_best_view (mr, o->room);
 }
 
 void
-mr_set_origin (struct mr *mr, int room, int x, int y,
-               struct room_linking *rlink, size_t room_nmemb)
-{
-  mr->room = room;
-  mr->x = x;
-  mr->y = y;
-  mr->min_x = INT_MAX;
-  mr->max_x = INT_MIN;
-  mr->min_y = INT_MAX;
-  mr->max_y = INT_MIN;
-
-  bool visited[room_nmemb];
-  memset (visited, 0, sizeof (visited));
-
-  for (int x = 0; x < mr->w; x++)
-    for (int y = 0; y < mr->h; y++)
-      mr->cell[x][y].room = 0;
-
-  mr_map_rooms (mr, room, x, y, rlink, room_nmemb, visited);
-}
-
-void
-mr_map_rooms (struct mr *mr, int room, int x, int y,
-              struct room_linking *rlink, size_t room_nmemb,
-              bool visited[room_nmemb])
-{
-  if (0 <= x && x < mr->w && 0 <= y && y < mr->h) {
-    if (mr->cell[x][y].room) return;
-    mr->cell[x][y].room = room;
-  } else {
-    if (visited[room]) return;
-    visited[room] = true;
-  }
-
-  mr->min_x = min_int (mr->min_x, x);
-  mr->max_x = max_int (mr->max_x, x);
-  mr->min_y = min_int (mr->min_y, y);
-  mr->max_y = max_int (mr->max_y, y);
-
-  int l = roomd (rlink, room_nmemb, room, LEFT);
-  int r = roomd (rlink, room_nmemb, room, RIGHT);
-  int a = roomd (rlink, room_nmemb, room, ABOVE);
-  int b = roomd (rlink, room_nmemb, room, BELOW);
-
-  if (l) mr_map_rooms (mr, l, x - 1, y, rlink, room_nmemb, visited);
-  if (r) mr_map_rooms (mr, r, x + 1, y, rlink, room_nmemb, visited);
-  if (a) mr_map_rooms (mr, a, x, y - 1, rlink, room_nmemb, visited);
-  if (b) mr_map_rooms (mr, b, x, y + 1, rlink, room_nmemb, visited);
-}
-
-void
-mr_stabilize_origin (struct mr *mr, struct mr_origin *o,
-                     struct room_linking *rlink, size_t room_nmemb)
-{
-  int x, y, tx, ty;
-  float ld, cd = INFINITY;
-  for (x = 0; x < mr->w; x++)
-    for (y = 0; y < mr->h; y++)
-      if (mr->cell[x][y].room) {
-        ld = dist_cart (x, y, o->x, o->y);
-        if (ld < cd) {
-          tx = x;
-          ty = y;
-          cd = ld;
-        }
-      }
-
-  mr_set_origin (mr, mr->cell[tx][ty].room, tx, ty, rlink, room_nmemb);
-}
-
-void
-mr_focus_room (struct mr *mr, int room, struct room_linking *rlink,
-               size_t room_nmemb)
-{
-  if (room >= room_nmemb) return;
-
-  int x, y;
-  if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y, rlink, room_nmemb);
-  else {
-    mr_scroll_into_view (mr, room, rlink, room_nmemb);
-    mr_focus_room (mr, room, rlink, room_nmemb);
-  }
-  mr->select_cycles = SELECT_CYCLES;
-}
-
-void
-mr_focus_cell (struct mr *mr, int x, int y, struct room_linking *rlink,
-               size_t room_nmemb)
-{
-  if (x < 0 || y < 0) return;
-  if (! mr->cell[x][y].room) return;
-  mr_set_origin (mr, mr->cell[x][y].room, x, y, rlink, room_nmemb);
-  mr->select_cycles = SELECT_CYCLES;
-}
-
-void
-mr_focus_mouse (struct mr *mr, struct room_linking *rlink,
-                size_t room_nmemb)
-{
-  struct mouse_coord m;
-  get_mouse_coord (mr, &m);
-  mr_focus_cell (mr, m.x, m.y, rlink, room_nmemb);
-}
-
-void
-mr_room_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-               size_t room_nmemb)
+mr_room_trans (struct mr *mr, enum dir d)
 {
   int dx, dy; dir_dx_dy (d, &dx, &dy);
-  int r = roomd (rlink, room_nmemb, mr->room, d);
-  if (r) {
-    nmr_coord (mr, mr->x + dx, mr->y + dy, &mr->x, &mr->y);
-    mr_set_origin (mr, r, mr->x, mr->y, rlink, room_nmemb);
-  }
+  int room = roomd (mr->rlink, mr->room_nmemb, mr->room, d);
+  if (room && ! is_room_visible (mr, room)) mr_page_trans (mr, d);
+  mr_focus_room (mr, room);
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_row_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-              size_t room_nmemb)
+mr_row_trans (struct mr *mr, enum dir d)
 {
   int dx, dy; dir_dx_dy (d, &dx, &dy);
 
   struct mr_origin o;
   mr_save_origin (mr, &o);
-  mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, rlink, room_nmemb);
+  mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, NULL, 0);
 
-  if (mr_is_within_bounds (mr)) return;
-  else mr_restore_origin (mr, &o, rlink, room_nmemb);
+  if (mr_is_view_within_bounds (mr)) return;
+  else mr_restore_origin (mr, &o);
 
   mr->select_cycles = SELECT_CYCLES;
 }
 
 void
-mr_page_trans (struct mr *mr, enum dir d, struct room_linking *rlink,
-               size_t room_nmemb)
+mr_page_trans (struct mr *mr, enum dir d)
 {
   int n = (d == LEFT || d == RIGHT) ? mr->w : mr->h;
-  for (int i = 0; i < n; i++) mr_row_trans (mr, d, rlink, room_nmemb);
+  for (int i = 0; i < n; i++) mr_row_trans (mr, d);
 }
 
 bool
-mr_is_within_bounds (struct mr *mr)
+mr_is_view_within_bounds (struct mr *mr)
 {
   return mr->min_x < mr->w
     && mr->max_x >= 0
     && mr->min_y < mr->h
     && mr->max_y >= 0;
-}
-
-void
-mr_scroll_into_view (struct mr *mr, int room, struct room_linking *rlink,
-                     size_t room_nmemb)
-{
-  struct mr_origin o;
-  mr_save_origin (mr, &o);
-
-  int w = mr->max_x - mr->min_x + 1;
-  int h = mr->max_y - mr->min_y + 1;
-
-  for (int dx = 0; dx < w; dx++)
-    for (int dy = 0; dy < h; dy++) {
-      bool end = true;
-
-      mr_restore_origin (mr, &o, rlink, room_nmemb);
-      mr_set_origin (mr, mr->room, mr->x - dx, mr->y - dy, rlink, room_nmemb);
-      if (mr_is_within_bounds (mr)) {
-        if (is_room_visible (mr, room)) return;
-        end = false;
-      }
-
-      mr_restore_origin (mr, &o, rlink, room_nmemb);
-      mr_set_origin (mr, mr->room, mr->x - dx, mr->y + dy, rlink, room_nmemb);
-      if (mr_is_within_bounds (mr)) {
-        if (is_room_visible (mr, room)) return;
-        end = false;
-      }
-
-      mr_restore_origin (mr, &o, rlink, room_nmemb);
-      mr_set_origin (mr, mr->room, mr->x + dx, mr->y - dy, rlink, room_nmemb);
-      if (mr_is_within_bounds (mr)) {
-        if (is_room_visible (mr, room)) return;
-        end = false;
-      }
-
-      mr_restore_origin (mr, &o, rlink, room_nmemb);
-      mr_set_origin (mr, mr->room, mr->x + dx, mr->y + dy, rlink, room_nmemb);
-      if (mr_is_within_bounds (mr)) {
-        if (is_room_visible (mr, room)) return;
-        end = false;
-      }
-
-      if (end) goto end;
-    }
-
- end:
-  mr_center_room (mr, room, rlink, room_nmemb);
 }
 
 bool
@@ -557,7 +561,7 @@ has_mr_view_changed (struct mr *mr)
   int x, y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++)
-      if (mr->last.cell[x][y].room != mr->cell[x][y].room)
+      if (mr->last.cell[x][y].room != mr_coord_room (mr, x, y))
         return true;
 
   return false;
@@ -569,7 +573,7 @@ mr_update_last_settings (struct mr *mr)
   int x, y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++)
-      mr->last.cell[x][y].room = mr->cell[x][y].room;
+      mr->last.cell[x][y].room = mr_coord_room (mr, x, y);
 
   mr->last.w = mr->w;
   mr->last.h = mr->h;
@@ -597,207 +601,6 @@ mr_update_last_settings (struct mr *mr)
 }
 
 void
-draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
-{
-  room_view = room;
-
-  struct pos p; new_pos (&p, &global_level, room, -1, -1);
-
-  for (p.floor = FLOORS; p.floor >= 0; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      if (edit != EDIT_NONE
-          && (peq (&p, &selection_pos) || peq (&p, &mouse_pos)))
-        draw_object (bitmap, "BACKGROUND_SELECTION", &p);
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (fake (&p) == WALL) continue;
-      if (bg (&p) == TORCH)
-        draw_object (bitmap, "FIRE", &p);
-      if (bg (&p) == BALCONY)
-        draw_object (bitmap, "STARS", &p);
-    }
-}
-
-void
-draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
-{
-  room_view = room;
-
-  struct pos p; new_pos (&p, &global_level, room, -1, -1);
-
-  /* loose_floor_fall_debug (); */
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_falling_loose_floor (bitmap, &p);
-    }
-
-  draw_actors (bitmap);
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (is_potion (&p)) draw_potion (bitmap, &p);
-      else if (is_sword (&p)) draw_sword (bitmap, &p);
-    }
-
-  /* editor graphics */
-  switch (edit) {
-  case EDIT_GUARD:
-  case EDIT_GUARD_SELECT:
-  case EDIT_GUARD_SKILL:
-  case EDIT_SKILL_LEGACY_TEMPLATES:
-  case EDIT_GUARD_TYPE:
-  case EDIT_GUARD_STYLE:
-  case EDIT_GUARD_SKILL_ATTACK:
-  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
-  case EDIT_GUARD_SKILL_DEFENSE:
-  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
-  case EDIT_GUARD_SKILL_ADVANCE:
-  case EDIT_GUARD_SKILL_RETURN:
-  case EDIT_GUARD_SKILL_REFRACTION:
-  case EDIT_GUARD_SKILL_EXTRA_HP:
-  case EDIT_GUARD_HP:
-    draw_start_guards (bitmap);
-    break;
-  case EDIT_KID:
-    draw_start_kid (bitmap);
-    break;
-  default: break;
-  }
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      if (edit != EDIT_NONE) {
-        int part = 0;
-        bool s1 = peq (&mouse_pos, &p);
-        bool s2 = peq (&selection_pos, &p) && selection_locked;
-        bool s3 = sel_ring_ss_c_nmemb (&global_sel_ring) > 0
-          && is_pos_in_sel_ring (&global_sel_ring, &p);
-
-        if (s1 && s2 && s3) part = anim_tick % 3 + 1;
-        else if (s1 && s2) part = anim_tick % 2 ? 1 : 2;
-        else if (s2 && s3) part = anim_tick % 2 ? 2 : 3;
-        else if (s1 && s3) part = anim_tick % 2 ? 1 : 3;
-        else if (s1) part = 1;
-        else if (s2) part = 2;
-        else if (s3) part = 3;
-
-        if (part) draw_object_part (bitmap, "BOX", part, &p);
-      }
-}
-
-void
-update_room0_cache (void)
-{
-  room_view = 0;
-  struct pos mouse_pos_bkp = mouse_pos;
-  struct pos selection_pos_bkp = selection_pos;
-  invalid_pos (&mouse_pos);
-  invalid_pos (&selection_pos);
-  tile_caching = true;
-
-  al_destroy_bitmap (room0);
-  room0 = create_bitmap (OW (ORIGINAL_WIDTH), OH (ORIGINAL_HEIGHT));
-
-  clear_bitmap (room0, TRANSPARENT_COLOR);
-
-  global_mr.dx = 0;
-  global_mr.dy = 0;
-  draw_room (room0, 0);
-
-  tile_caching = false;
-  mouse_pos = mouse_pos_bkp;
-  selection_pos = selection_pos_bkp;
-}
-
-void
-update_cache_room (struct mr *mr, int room)
-{
-  int x, y;
-  tile_caching = true;
-
-  for (y = mr->h - 1; y >= 0; y--)
-    for (x = 0; x < mr->w; x++)
-      if (mr->cell[x][y].room == room) {
-        if (room) {
-        room_view = mr->cell[x][y].room;
-        mr->dx = x;
-        mr->dy = y;
-        clear_bitmap (mr->cell[x][y].cache, TRANSPARENT_COLOR);
-        draw_room (mr->cell[x][y].cache, mr->cell[x][y].room);
-        break;
-        } else draw_bitmap (room0, mr->cell[x][y].cache, 0, 0, 0);
-      }
-  tile_caching = false;
-}
-
-void
-update_cache (struct mr *mr)
-{
-  struct mr_room_list l;
-  mr_get_room_list (mr, &l);
-
-  update_cache_room (mr, 0);
-
-  size_t i;
-  for (i = 0; i < l.nmemb; i++)
-    update_cache_room (mr, l.room[i]);
-
-  mr_destroy_room_list (&l);
-}
-
-void
-update_cache_pos (struct mr *mr, struct pos *p)
-{
-  struct pos q = *p;
-  int x, y;
-
-  for (q.room = 1; q.room < p->l->room_nmemb; q.room++) {
-    for (y = mr->h - 1; y >= 0; y--)
-      for (x = 0; x < mr->w; x++)
-        if (mr->cell[x][y].room == q.room)
-          for (q.floor = FLOORS; q.floor >= -1; q.floor--)
-            for (q.place = -1; q.place < PLACES; q.place++)
-              if (peq (&q, p) && ! has_room_changed (q.room)) {
-                ALLEGRO_BITMAP *bitmap = mr->cell[x][y].cache;
-
-                room_view = q.room;
-                mr->dx = x;
-                mr->dy = y;
-                tile_caching = true;
-
-                push_clipping_rectangle
-                  (bitmap,
-                   OW (PLACE_WIDTH * q.place - 1),
-                   OH (PLACE_HEIGHT * q.floor - 17),
-                   OW (2 * PLACE_WIDTH + 1), OH (PLACE_HEIGHT + 3 + 17));
-
-                clear_bitmap (bitmap, TRANSPARENT_COLOR);
-
-                struct pos p0 = q;
-                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
-                     p0.floor--)
-                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
-                       p0.place++)
-                    draw_tile_bg (bitmap, &p0);
-
-                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
-                     p0.floor--)
-                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
-                       p0.place++)
-                    draw_tile_fg (bitmap, &p0);
-
-                pop_clipping_rectangle ();
-
-                tile_caching = false;
-                goto next_room;
-              }
-  next_room:;
-  }
-}
-
-void
 mr_busy (struct mr *mr)
 {
   if (mr->busy) return;
@@ -805,190 +608,33 @@ mr_busy (struct mr *mr)
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
 }
 
-void
-mr_draw (struct mr *mr)
+bool mr_is_coord_visible (struct mr *mr, int x, int y)
 {
-  int x, y;
-
-  mr_set_origin (mr, mr->room, mr->x, mr->y,
-                 global_level.rlink, global_level.room_nmemb);
-
-  bool mr_full_update = has_mr_view_changed (mr)
-    || mr->full_update;
-
-  if (mr_full_update) {
-    mr_busy (mr);
-    force_full_redraw = true;
-  }
-
-  /* mouse */
-  if (mouse_pos.room != mr->last.mouse_pos.room
-      || mouse_pos.floor != mr->last.mouse_pos.floor
-      || mouse_pos.place != mr->last.mouse_pos.place
-      || edit != mr->last.edit) {
-    if (is_valid_pos (&mouse_pos))
-      register_changed_pos (&mouse_pos);
-
-    if (is_valid_pos (&mr->last.mouse_pos))
-      register_changed_pos (&mr->last.mouse_pos);
-  }
-
-  /* selection */
-  if (selection_pos.room != mr->last.selection_pos.room
-      || selection_pos.floor != mr->last.selection_pos.floor
-      || selection_pos.place != mr->last.selection_pos.place
-      || edit != mr->last.edit) {
-    if (is_valid_pos (&selection_pos))
-      register_changed_pos (&selection_pos);
-
-    if (is_valid_pos (&mr->last.selection_pos))
-      register_changed_pos (&mr->last.selection_pos);
-  }
-
-  if (anim_cycle == 0
-      || em != mr->last.em
-      /* || vm != mr->last.vm */
-      /* || hgc != mr->last.hgc */
-      || hue != mr->last.hue) {
-    update_room0_cache ();
-    force_full_redraw = true;
-  }
-
-  size_t i;
-
-  if (anim_cycle == 0
-      || mr_full_update
-      || em != mr->last.em
-      /* || vm != mr->last.vm */
-      /* || hgc != mr->last.hgc */
-      || hue != mr->last.hue
-      || global_level.n != mr->last.level) {
-    update_cache (mr);
-  } else {
-    bool depedv =
-      /* ((em == DUNGEON && vm == VGA) */
-      /*  || (em == DUNGEON && vm == EGA) */
-      /*  || (em == PALACE && vm == EGA)) */
-      true;
-
-    /* optmize changed pos list */
-    optimize_changed_pos ();
-
-    /* update cache pos */
-    for (i = 0; i < changed_pos_nmemb; i++) {
-      update_cache_pos (mr, &changed_pos[i]);
-      struct pos pl; prel (&changed_pos[i], &pl, +0, -1);
-      if (depedv && fake (&pl) == WALL)
-        update_cache_pos (mr, &pl);
-    }
-
-    /* update cache room */
-    for (i = 0; i < changed_room_nmemb; i++)
-      update_cache_room (mr, changed_room[i]);
-
-    /* kept together so update_cache_pos and update_cache_room can
-       access each other's arrays */
-    destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
-    destroy_array ((void **) &changed_room, &changed_room_nmemb);
-  }
-
-  for (y = mr->h - 1; y >= 0; y--)
-    for (x = 0; x < mr->w; x++) {
-      clear_bitmap (mr->cell[x][y].screen,
-                    (mr->flicker > 0 && mr->flicker % 2)
-                    ? mr->color : BLACK);
-
-      if (! mr->cell[x][y].room) continue;
-      mr->dx = x;
-      mr->dy = y;
-      draw_animated_background (mr->cell[x][y].screen,
-                                mr->cell[x][y].room);
-    }
-
-  if (mr->flicker > 0) mr->flicker--;
-
-  struct mr_room_list l;
-  mr_get_room_list (mr, &l);
-
-  int xm, ym;
-  if (! no_room_drawing)
-    for (i = 0; i < l.nmemb; i++) {
-      mr_coord (mr, l.room[i], -1, &xm, &ym);
-      for (y = mr->h - 1; y >= 0; y--)
-        for (x = 0; x < mr->w; x++)
-          if (mr->cell[x][y].room == l.room[i])
-            draw_bitmap (mr->cell[xm][ym].cache,
-                         mr->cell[x][y].screen, 0, 0, 0);
-    }
-
-  mr_destroy_room_list (&l);
-
-  for (y = mr->h - 1; y >= 0; y--)
-    for (x = 0; x < mr->w; x++) {
-      if (! mr->cell[x][y].room) continue;
-      mr->dx = x;
-      mr->dy = y;
-      draw_animated_foreground (mr->cell[x][y].screen, mr->cell[x][y].room);
-    }
-
-  mr_update_last_settings (mr);
-}
-
-void
-nmr_coord (struct mr *mr, int x, int y, int *rx, int *ry)
-{
-  *rx = x;
-  *ry = y;
-
-  bool m;
-
-  do {
-    m = false;
-
-    if (*ry < 0) {
-      *ry += mr->h;
-      m = true;
-    } else if (*ry >= mr->h) {
-      *ry -= mr->h;
-      m = true;
-    } else if (*rx < 0) {
-      *rx += mr->w;
-      m = true;
-    } else if (*rx >= mr->w) {
-      *rx -= mr->w;
-      m = true;
-    }
-  } while (m);
+  return 0 <= x && x < mr->w && 0 <= y && y < mr->h;
 }
 
 bool
-mr_coord (struct mr *mr, int room, enum dir dir, int *rx, int *ry)
+mr_room_coord (struct mr *mr, int room, int *rx, int *ry)
 {
-  int x, y;
-  for (y = mr->h - 1; y >= 0; y--)
-    for (x = 0; x < mr->w; x++)
-      if (room && mr->cell[x][y].room == room) {
-        switch (dir) {
-        case LEFT:
-          nmr_coord (mr, x - 1, y, rx, ry);
-          return true;
-        case RIGHT:
-          nmr_coord (mr, x + 1, y, rx, ry);
-          return true;
-        case ABOVE:
-          nmr_coord (mr, x, y - 1, rx, ry);
-          return true;
-        case BELOW:
-          nmr_coord (mr, x, y + 1, rx, ry);
-          return true;
-        default:
-          if (rx) *rx = x;
-          if (ry) *ry = y;
-          return true;
-        }
-      }
+  if (! is_valid_mr_coord (mr->coord[room].x, mr->coord[room].y))
+    return false;
+  if (rx) *rx = mr->coord[room].x;
+  if (ry) *ry = mr->coord[room].y;
+  return true;
+}
 
-  return false;
+int
+mr_coord_room (struct mr *mr, int x, int y)
+{
+  /* optimization */
+  if (mr_is_coord_visible (mr, x, y))
+    return mr->cell[x][y].room;
+
+  for (int r = 1; r < mr->room_nmemb; r++)
+    if (mr->coord[r].x == x && mr->coord[r].y == y)
+      return r;
+
+  return 0;
 }
 
 bool
@@ -1007,7 +653,7 @@ mr_get_room_list (struct mr *mr, struct mr_room_list *l)
   int x, y;
   for (x = 0; x < mr->w; x++)
     for (y = 0; y < mr->h; y++) {
-      int room = mr->cell[x][y].room;
+      int room = mr_coord_room (mr, x, y);
       if (room && ! mr_room_list_has_room (l, room)) {
         l->room = add_to_array (&room, 1, l->room, &l->nmemb,
                                 l->nmemb, sizeof (*l->room));
@@ -1034,100 +680,14 @@ mr_count_uniq_rooms (struct mr *mr)
   return c;
 }
 
-void
-mr_fit_stretch (struct mr *mr, struct room_linking *rlink,
-                size_t room_nmemb)
-{
-  int w = 1;
-  int h = 1;
-  int lc = 1, c = 1;
-  int wc = 1, hc = 1;
-
- repeat:
-  do {
-    lc = c;
-    mr_redim (mr, ++w, h);
-    mr_center_room (mr, mr->room, rlink, room_nmemb);
-    c = mr_count_uniq_rooms (mr);
-    /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", */
-    /*         mr->room, mr->w, mr->h, c); */
-  } while (c > lc);
-  mr_redim (mr, --w, h);
-  mr_center_room (mr, mr->room, rlink, room_nmemb);
-
-  if (c < hc) return;
-  wc = c;
-
-  do {
-    lc = c;
-    mr_redim (mr, w, ++h);
-    mr_center_room (mr, mr->room, rlink, room_nmemb);
-    c = mr_count_uniq_rooms (mr);
-    /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", */
-    /*         mr->room, mr->w, mr->h, c); */
-  } while (c > lc);
-  mr_redim (mr, w, --h);
-  mr_center_room (mr, mr->room, rlink, room_nmemb);
-
-  hc = c;
-
-  if (hc > wc) goto repeat;
-}
-
-void
-mr_fit_ratio (struct mr *mr, struct room_linking *rlink,
-              size_t room_nmemb)
-{
-  mr_fit_stretch (mr, rlink, room_nmemb);
-  if (mr->w < mr->h) mr_redim (mr, mr->h, mr->h);
-  else if (mr->w > mr->h) mr_redim (mr, mr->w, mr->w);
-}
-
-void
-apply_mr_fit_mode (struct mr *mr, struct room_linking *rlink,
-                   size_t room_nmemb)
-{
-  int w, h;
-
-  mr_busy (mr);
-
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
-    mr->fit_w = 1;
-    mr->fit_h = 1;
-    mr->fit_mode = MR_FIT_NONE;
-  }
-
-  if (! mr->room) {
-    struct pos p; get_kid_start_pos (&p);
-    mr_center_room (mr, p.room, rlink, room_nmemb);
-  }
-
-  switch (mr->fit_mode) {
-  case MR_FIT_NONE:
-    w = mr->fit_w;
-    h = mr->fit_h;
-    break;
-  case MR_FIT_STRETCH:
-    mr_fit_stretch (mr, rlink, room_nmemb);
-    w = mr->w;
-    h = mr->h;
-    break;
-  case MR_FIT_RATIO:
-    mr_fit_ratio (mr, rlink, room_nmemb);
-    w = mr->w;
-    h = mr->h;
-    break;
-  }
-
-  mr_set_dim (mr, w, h);
-  mr_center_room (mr, mr->room, rlink, room_nmemb);
-}
-
 bool
 is_room_visible (struct mr *mr, int room)
 {
-  int x, y;
-  return mr_coord (mr, room, -1, &x, &y);
+  for (int x = 0; x < mr->w; x++)
+    for (int y = 0; y < mr->h; y++)
+      if (room && mr_coord_room (mr, x, y) == room)
+        return true;
+  return false;
 }
 
 bool
@@ -1162,10 +722,11 @@ is_frame_visible (struct mr *mr, struct frame *f)
 {
   int x, y;
   for (y = mr->h - 1; y >= 0; y--)
-    for (x = 0; x < mr->w; x++)
-      if (mr->cell[x][y].room
-          && is_frame_visible_at_room (f, mr->cell[x][y].room))
+    for (x = 0; x < mr->w; x++) {
+      int room = mr_coord_room (mr, x, y);
+      if (room && is_frame_visible_at_room (f, room))
         return true;
+    }
   return false;
 }
 
@@ -1177,14 +738,15 @@ is_pos_visible (struct mr *mr, struct pos *p)
   if (is_room_visible (mr, np.room)) return true;
 
   int y;
-  for (y = mr->h - 1; y >= 0; y--)
-    if (mr->cell[0][y].room) {
+  for (y = mr->h - 1; y >= 0; y--) {
+    int room = mr_coord_room (mr, 0, y);
+    if (room) {
       struct pos p1;
-      new_pos (&p1, p->l, mr->cell[0][y].room, -1, -1);
+      new_pos (&p1, p->l, room, -1, -1);
       p1.place = -1;
       for (p1.floor = 0; p1.floor < FLOORS; p1.floor++)
         if (peq (p, &p1)) return true;
     }
-
+  }
   return false;
 }

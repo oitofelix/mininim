@@ -376,8 +376,7 @@ update_link (Ihandle *ih, int room)
 int
 action_cb (Ihandle *ih)
 {
-  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   int room = IupGetInt (ih, "TITLE");
-  mr_focus_room (&global_mr, room, level->rlink, level->room_nmemb);
+  mr_focus_room (&global_mr, room);
   return IUP_DEFAULT;
 }

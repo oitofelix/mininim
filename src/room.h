@@ -23,6 +23,9 @@
 
 /* variables */
 extern bool no_recursive_links_continuity;
+extern ALLEGRO_BITMAP *room0;
+extern bool tile_caching;
+extern int room_view;
 
 /* functions */
 void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -60,5 +63,16 @@ ALLEGRO_BITMAP *get_tile_bitmap (struct tile *tile_ref,
 ALLEGRO_BITMAP *apply_hue_palette (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_COLOR apply_hue_color (ALLEGRO_COLOR c);
 ALLEGRO_COLOR selection_palette (ALLEGRO_COLOR c);
+
+void update_room0_cache (void);
+void update_cache (struct mr *mr);
+void update_cache_pos (struct mr *mr, struct pos *p);
+void register_changed_pos (struct pos *p);
+struct pos *get_changed_pos (struct pos *p);
+struct pos *get_changed_pos_by_room (int room);
+void optimize_changed_pos (void);
+void remove_changed_pos (struct pos *pos);
+void register_changed_room (int room);
+bool has_room_changed (int room);
 
 #endif	/* MININIM_ROOM_H */

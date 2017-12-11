@@ -90,8 +90,7 @@ select_pos (struct mr *mr, struct pos *p)
 
   selection_locked = true;
   selection_pos = np;
-  mr_scroll_into_view (mr, np.room, global_level.rlink,
-                       global_level.room_nmemb);
+  mr_scroll_into_view (mr, np.room);
 }
 
 void
@@ -1125,8 +1124,7 @@ editor (void)
   case EDIT_ROOM:
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     switch (bmenu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
@@ -1168,8 +1166,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM_MIRROR:
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_menu, "RM>")) {
@@ -1180,8 +1177,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM_MIRROR_TILES:
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RMC>")) {
@@ -1207,8 +1203,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM_MIRROR_LINKS:
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RML>")) {
@@ -1245,8 +1240,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM_MIRROR_BOTH:
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (bmenu_enum (mirror_dir_menu, "RMB>")) {
@@ -1297,8 +1291,7 @@ editor (void)
   case EDIT_LINK:
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     switch (bmenu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
@@ -1359,8 +1352,7 @@ editor (void)
     } else if (r == -1) global_mr.room_select = -1;
     break;
   case EDIT_LINKING_SETTINGS:
-    mr_focus_mouse (&global_mr, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_focus_mouse (&global_mr);
     global_mr.select_cycles = SELECT_CYCLES;
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     switch (bmenu_bool (linking_settings_menu, "RS>", false, &b0,
@@ -2012,8 +2004,7 @@ bmenu_int_ext (struct pos *p, int steps, int fases,
 static char
 bmenu_select_room (enum edit up_edit, char *prefix)
 {
-  mr_focus_mouse (&global_mr, global_level.rlink,
-                  global_level.room_nmemb);
+  mr_focus_mouse (&global_mr);
   int room = global_mr.room;
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char r = bmenu_int (&room, NULL, 0, global_level.room_nmemb - 1,
@@ -2201,13 +2192,19 @@ closure_link_room (struct room_linking *rlink, size_t room_nmemb,
 
   struct mr mr;
   memset (&mr, 0, sizeof (mr));
-  mr_redim (&mr, 3, 3);
   mr_set_origin (&mr, room0, 1, 1, rlink, room_nmemb);
 
-  editor_link (rlink, room_nmemb, room0, mr.cell[0][1].room, LEFT);
-  editor_link (rlink, room_nmemb, room0, mr.cell[2][1].room, RIGHT);
-  editor_link (rlink, room_nmemb, room0, mr.cell[1][0].room, ABOVE);
-  editor_link (rlink, room_nmemb, room0, mr.cell[1][2].room, BELOW);
+  int l = mr_coord_room (&mr, 0, 1);
+  int r = mr_coord_room (&mr, 2, 1);
+  int a = mr_coord_room (&mr, 1, 0);
+  int b = mr_coord_room (&mr, 1, 2);
+
+  editor_link (rlink, room_nmemb, room0, l, LEFT);
+  editor_link (rlink, room_nmemb, room0, r, RIGHT);
+  editor_link (rlink, room_nmemb, room0, a, ABOVE);
+  editor_link (rlink, room_nmemb, room0, b, BELOW);
+
+  destroy_mr (&mr);
 }
 
 void

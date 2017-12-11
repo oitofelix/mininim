@@ -150,15 +150,15 @@ ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit)
 
   switch (fit) {
   case MR_FIT_NONE:
-    mr->fit_mode = MR_FIT_NONE;
+    mr_fit_mode = MR_FIT_NONE;
     value = "NONE";
     break;
   case MR_FIT_STRETCH:
-    mr->fit_mode = MR_FIT_STRETCH;
+    mr_fit_mode = MR_FIT_STRETCH;
     value = "STRETCH";
     break;
   case MR_FIT_RATIO:
-    mr->fit_mode = MR_FIT_RATIO;
+    mr_fit_mode = MR_FIT_RATIO;
     value = "RATIO";
     break;
   default:
@@ -166,7 +166,7 @@ ui_zoom_fit (struct mr *mr, enum mr_fit_mode fit)
     return;
   }
 
-  apply_mr_fit_mode (mr, global_level.rlink, global_level.room_nmemb);
+  apply_mr_fit_mode (mr, mr_fit_mode);
 
   ui_msg (1, "ZOOM FIT: %s", value);
 
@@ -187,12 +187,13 @@ ui_mr_set_dim (struct mr *mr, int w, int h, bool correct_mouse)
   struct mouse_coord m;
   get_mouse_coord (mr, &m);
 
+  int room = mr_central_room (&global_mr);
+
   if (w != mr->w || h != mr->h) mr_set_dim (mr, w, h);
 
-  mr_center_room (mr, mr->room, global_level.rlink,
-                  global_level.room_nmemb);
+  mr_center_room (mr, room);
 
-  if (mr_coord (mr, m.c.room, -1, NULL, NULL) && correct_mouse)
+  if (is_room_visible (mr, m.c.room) && correct_mouse)
     set_mouse_coord (mr, &m);
 
   ui_msg (1, "MULTI-ROOM %ix%i", mr->w, mr->h);
@@ -791,8 +792,7 @@ ui_change_kcd (int d)
 void
 ui_home (void)
 {
-  mr_focus_room (&global_mr, get_actor_by_id (current_kid_id)->f.c.room,
-                 global_level.rlink, global_level.room_nmemb);
+  mr_focus_room (&global_mr, get_actor_by_id (current_kid_id)->f.c.room);
 }
 
 

@@ -122,6 +122,7 @@ bool title_demo;
 enum rendering rendering = BOTH_RENDERING;
 bool inhibit_screensaver = true;
 int play_game_counter;
+enum mr_fit_mode mr_fit_mode;
 
 /* screams */
 bool scream;
@@ -826,16 +827,17 @@ Levels have been converted using module %s into native format at\n\
     case 0: screen_flags = 0; break;
     case 1: screen_flags = ALLEGRO_FLIP_VERTICAL; break;
     case 2: screen_flags = ALLEGRO_FLIP_HORIZONTAL; break;
-    case 3: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
+    case 3: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+      break;
     }
     break;
   case MULTI_ROOM_FIT_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, multi_room_fit_mode_enum, 0);
     if (e) return e;
     switch (i) {
-    case 0: global_mr.fit_mode = MR_FIT_NONE; break;
-    case 1: global_mr.fit_mode = MR_FIT_STRETCH; break;
-    case 2: global_mr.fit_mode = MR_FIT_RATIO; break;
+    case 0: mr_fit_mode = MR_FIT_NONE; break;
+    case 1: mr_fit_mode = MR_FIT_STRETCH; break;
+    case 2: mr_fit_mode = MR_FIT_RATIO; break;
     }
     break;
   case GAMEPAD_MODE_OPTION:

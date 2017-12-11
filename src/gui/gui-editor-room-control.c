@@ -77,12 +77,11 @@ static int fix_button_cb (Ihandle *button);
 static int defrag_button_cb (Ihandle *button);
 static int clean_button_cb (Ihandle *button);
 
-static void select_room_node (Ihandle *ih, int room);
+static int select_room_node (Ihandle *ih, int room);
 
 static int selection_cb (Ihandle *ih, int id, int status);
 
-static int _select_origin_cb (Ihandle *ih, struct mouse_coord *mc,
-                              struct pos *p);
+static int _select_origin_cb (Ihandle *ih, struct pos *p);
 static int _swap_origin_selection_cb (Ihandle *ih);
 static int _add_room_cb (Ihandle *ih, struct pos *p);
 
@@ -978,7 +977,8 @@ update_tree_ctrl (Ihandle *ih, struct tree *new_tree)
 
   /* Sync selection with MR origin */
   int room = selected_room (tree_ctrl);
-  if (room != global_mr.room) select_room_node (ih, global_mr.room);
+  if (room != global_mr.room)
+    select_room_node (ih, global_mr.room);
 }
 
 int
@@ -1031,7 +1031,7 @@ go_button_cb (Ihandle *button)
     int id = get_tree_node_id_by_data (tree, ROOM_DEPTH, &p.room);
     if (id < 0) return IUP_DEFAULT;
     select_node_by_id (tree_ctrl, id);
-    gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+    selection_cb (tree_ctrl, id, true);
     return IUP_DEFAULT;
   }
 
@@ -1066,7 +1066,7 @@ go_button_cb (Ihandle *button)
   else assert (false);
 
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+  selection_cb (tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }
@@ -1152,7 +1152,8 @@ new_button_cb (Ihandle *button)
 
   int new_room = editor_new_room (room, d);
   _update_tree_cb (button);
-  select_room_node (button, new_room);
+  int nid = select_room_node (button, new_room);
+  selection_cb (tree_ctrl, nid, true);
 
   return IUP_DEFAULT;
 }
@@ -1225,32 +1226,33 @@ clean_button_cb (Ihandle *button)
 int
 selection_cb (Ihandle *tree_ctrl, int id, int status)
 {
+  if (id < 0) return IUP_DEFAULT;
   if (! status) return IUP_DEFAULT;
 
   struct tree *tree = (void *) IupGetAttribute (tree_ctrl, "_TREE");
-  struct level *level = (void *) IupGetAttribute (tree_ctrl, "_LEVEL");
 
   switch (tree->node[id].depth) {
   case ROOM_DEPTH: {
     int *room = tree->node[id].data;
-    mr_simple_center_room (&global_mr, *room, level->rlink,
-                           level->room_nmemb);
+    mr_focus_room (&global_mr, *room);
     break;
   }
   case DIR_DEPTH: {
     int parent_id = tree_node_parent_id (tree, id);
     int *room = tree->node[parent_id].data;
-    mr_simple_center_room (&global_mr, *room, level->rlink,
-                           level->room_nmemb);
+    mr_focus_room (&global_mr, *room);
     break;
   }
   case ADJACENT_DEPTH: {
     int *room = tree->node[id].data;
-    if (*room) select_room_node (tree_ctrl, *room);
+    if (*room) {
+      int id = select_room_node (tree_ctrl, *room);
+      selection_cb (tree_ctrl, id, true);
+    }
     else {
       int pid = tree_node_parent_id (tree, id);
       select_node_by_id (tree_ctrl, pid);
-      gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, pid, true);
+      selection_cb (tree_ctrl, pid, true);
     }
     break;
   }
@@ -1260,7 +1262,7 @@ selection_cb (Ihandle *tree_ctrl, int id, int status)
   return IUP_DEFAULT;
 }
 
-void
+int
 select_room_node (Ihandle *ih, int room)
 {
   struct tree *tree = (void *) IupGetAttribute (ih, "_TREE");
@@ -1277,26 +1279,24 @@ select_room_node (Ihandle *ih, int room)
     }
   }
 
-  if (id < 0) return;
-
   Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
   select_node_by_id (tree_ctrl, id);
-  gui_run_callback_IFnii ("SELECTION_CB", tree_ctrl, id, true);
+
+  return id;
 }
 
 int
-_select_origin_cb (Ihandle *ih, struct mouse_coord *mc, struct pos *p)
+_select_origin_cb (Ihandle *ih, struct pos *p)
 {
   if (! is_valid_pos (p)) return IUP_DEFAULT;
 
   Ihandle *tabs = (void *) IupGetAttribute (ih, "_EDITOR_TABS");
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
-  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct pos np; npos (p, &np);
-  select_room_node (ih, np.room);
-  mr_set_origin (&global_mr, np.room, mc->x, mc->y,
-                 level->rlink, level->room_nmemb);
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  int id = select_room_node (ih, np.room);
+  selection_cb (tree_ctrl, id, true);
 
   return IUP_DEFAULT;
 }
@@ -1308,12 +1308,11 @@ _swap_origin_selection_cb (Ihandle *ih)
   IupSetAttribute (tabs, "VALUE_HANDLE", (void *) ih);
 
   int room = global_mr.room;
-  int x = global_mr.x, y = global_mr.y;
-  mr_coord (&global_mr, selection_pos.room, -1, &x, &y);
-  select_room_node (ih, selection_pos.room);
-  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
-  mr_set_origin (&global_mr, selection_pos.room, x, y,
-                 level->rlink, level->room_nmemb);
+
+  Ihandle *tree_ctrl = (void *) IupGetAttribute (ih, "_TREE_CTRL");
+  int id = select_room_node (ih, selection_pos.room);
+  selection_cb (tree_ctrl, id, true);
+
   selection_pos.room = room;
 
   return IUP_DEFAULT;

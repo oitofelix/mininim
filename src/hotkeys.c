@@ -302,8 +302,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_horizontal
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_J))
                    || c == K_j)))
-    mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, LEFT);
 
   /* J: select room at right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -312,8 +311,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_horizontal
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_H))
                    || c == K_h)))
-    mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, RIGHT);
 
   /* U: select room above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -322,8 +320,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_vertical
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_N))
                    || c == K_n)))
-    mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, ABOVE);
 
   /* N: select room below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -332,8 +329,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_vertical
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_U))
                    || c == K_u)))
-    mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, BELOW);
 
   /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -344,8 +340,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))
                    || c == K_J)))
-    mr_row_trans (&global_mr, LEFT, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, LEFT);
 
   /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -356,8 +351,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))
                    || c == K_H)))
-    mr_row_trans (&global_mr, RIGHT, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, RIGHT);
 
   /* SHIFT+U: multi-room view above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -368,8 +362,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))
                    || c == K_N)))
-    mr_row_trans (&global_mr, ABOVE, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, ABOVE);
 
   /* SHIFT+N: multi-room view below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -380,8 +373,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))
                    || c == K_U)))
-    mr_row_trans (&global_mr, BELOW, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, BELOW);
 
   /* ALT+H: multi-room page view to left (J if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -392,8 +384,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))
                    || c == K_mJ)))
-    mr_page_trans (&global_mr, LEFT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, LEFT);
 
   /* ALT+J: multi-room page view to right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -404,8 +395,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))
                    || c == K_mH)))
-    mr_page_trans (&global_mr, RIGHT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, RIGHT);
 
   /* ALT+U: multi-room page view above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -416,8 +406,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))
                    || c == K_mN)))
-    mr_page_trans (&global_mr, ABOVE, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, ABOVE);
 
   /* ALT+N: multi-room page view below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -428,22 +417,19 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))
                    || c == K_mU)))
-    mr_page_trans (&global_mr, BELOW, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, BELOW);
 
   /* HOME: focus multi-room view on kid */
   else if (was_key_pressed (0, ALLEGRO_KEY_HOME)
            || c == K_HOME) {
     struct actor *k = get_actor_by_id (current_kid_id);
-    mr_focus_room (&global_mr, k->f.c.room, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_focus_room (&global_mr, k->f.c.room);
   }
 
   /* SHIFT+HOME: center multi-room view */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_HOME)
            || c == K_sHOME)
-    mr_center_room (&global_mr, global_mr.room, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_best_view (&global_mr, mr_central_room (&global_mr));
 
   /* C: show direct coordinates */
   else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_C))

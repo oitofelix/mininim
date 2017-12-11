@@ -917,7 +917,7 @@ draw_room_select_rect (struct mr *mr, int room, ALLEGRO_COLOR color,
   int x, y;
   for (y = mr->h - 1; y >= 0; y--)
     for (x = 0; x < mr->w; x++)
-      if (mr->cell[x][y].room == room)
+      if (mr_coord_room (mr, x, y) == room)
         draw_mr_select_rect (mr, x, y, color, flags);
 }
 
@@ -966,7 +966,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
     for (y = mr->h - 1; y >= 0; y--)
       for (x = 0; x < mr->w; x++) {
         ALLEGRO_BITMAP *screen =
-          (mr->cell[x][y].room || no_room_drawing)
+          (mr_coord_room (mr, x, y) || no_room_drawing)
           ? mr->cell[x][y].screen : mr->cell[x][y].cache;
         int sw = get_bitmap_width (screen);
         int sh = get_bitmap_height (screen);
@@ -975,7 +975,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
 
-        if (mr->cell[x][y].room
+        if (mr_coord_room (mr, x, y)
             || mr->last.display_width != w
             || mr->last.display_height != h
             || force_full_redraw)
@@ -990,8 +990,8 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
       for (int y = mr->h - 1; y >= 0; y--)
         for (int x = 0; x < mr->w; x++)
           if (is_room_in_sel_ring
-              (&global_sel_ring, mr->cell[x][y].room))
-            draw_room_select_rect (mr, mr->cell[x][y].room, YELLOW, flags);
+              (&global_sel_ring, mr_coord_room (mr, x, y)))
+            draw_room_select_rect (mr, mr_coord_room (mr, x, y), YELLOW, flags);
 
       if (selection_locked && is_valid_pos (&selection_pos)) {
         struct pos p; npos (&selection_pos, &p);

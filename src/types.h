@@ -202,6 +202,11 @@ struct mr {
   int w, h;
   int x, y;
   int min_x, max_x, min_y, max_y;
+  struct room_linking *rlink;
+  size_t room_nmemb;
+  struct {
+    int x, y;
+  } *coord;
   int dx, dy;
   int room;
   int select_cycles;
@@ -210,7 +215,7 @@ struct mr {
   enum mr_fit_mode {
     MR_FIT_NONE, MR_FIT_STRETCH, MR_FIT_RATIO,
   } fit_mode;
-  int fit_w, fit_h;
+  int fit_w, fit_h, fit_room;
   int room_select;
   bool full_update;
   bool busy;

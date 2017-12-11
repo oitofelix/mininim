@@ -410,7 +410,6 @@ ALLEGRO_BITMAP *small_logo_icon,
   *event_target_icon, *event_source_icon, *event_add_icon,
   *select_mr_origin_room_tab_icon, *swap_origin_selection_icon;
 
-struct mouse_coord aux_mouse_coord;
 struct pos aux_pos, naux_pos;
 
 
@@ -2060,7 +2059,6 @@ void
 show_aux_menu (void)
 {
   if (edit == EDIT_NONE) return;
-  get_mouse_coord (&global_mr, &aux_mouse_coord);
   get_mouse_pos (&global_mr, &aux_pos);
   npos (&aux_pos, &naux_pos);
   aux_menu ();
@@ -2157,48 +2155,35 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.view.nav.home)
     ui_home ();
   else if (id == item.main.view.nav.center)
-    mr_center_room (&global_mr, global_mr.room, global_level.rlink,
-                    global_level.room_nmemb);
+    mr_best_view (&global_mr, mr_central_room (&global_mr));
   else if (id == item.main.view.nav.coord)
     ui_show_coordinates ();
   else if (id == item.main.view.nav.ind_coord)
     ui_show_indirect_coordinates ();
   else if (id == item.main.view.nav.select.left)
-    mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, LEFT);
   else if (id == item.main.view.nav.select.above)
-    mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, ABOVE);
   else if (id == item.main.view.nav.select.right)
-    mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, RIGHT);
   else if (id == item.main.view.nav.select.below)
-    mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, BELOW);
   else if (id == item.main.view.nav.cell.left)
-    mr_row_trans (&global_mr, LEFT, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, LEFT);
   else if (id == item.main.view.nav.cell.above)
-    mr_row_trans (&global_mr, ABOVE, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, ABOVE);
   else if (id == item.main.view.nav.cell.right)
-    mr_row_trans (&global_mr, RIGHT, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, RIGHT);
   else if (id == item.main.view.nav.cell.below)
-    mr_row_trans (&global_mr, BELOW, global_level.rlink,
-                  global_level.room_nmemb);
+    mr_row_trans (&global_mr, BELOW);
   else if (id == item.main.view.nav.page.left)
-    mr_page_trans (&global_mr, LEFT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, LEFT);
   else if (id == item.main.view.nav.page.above)
-    mr_page_trans (&global_mr, ABOVE, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, ABOVE);
   else if (id == item.main.view.nav.page.right)
-    mr_page_trans (&global_mr, RIGHT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, RIGHT);
   else if (id == item.main.view.nav.page.below)
-    mr_page_trans (&global_mr, BELOW, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_page_trans (&global_mr, BELOW);
   else if (id == item.main.view.em.original) ui_em (ORIGINAL_EM);
   else if (id == item.main.view.em.dungeon) ui_em (DUNGEON);
   else if (id == item.main.view.em.palace) ui_em (PALACE);
@@ -2318,8 +2303,7 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     del_sel_ring_entry (&global_sel_ring);
 
   else if (id == item.aux.view_ring.set_mr_origin)
-    mr_focus_room (&global_mr, naux_pos.room, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_focus_room (&global_mr, naux_pos.room);
   else if (id == item.aux.view_ring.prev)
     view_ring_go_next (&global_mr, &global_view_ring, -1);
   else if (id == item.aux.view_ring.next)
@@ -2344,9 +2328,8 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   } else if (id == item.aux.select_mr_origin_room_tab) {
     Ihandle *room_tab =
       IupGetDialogChild (gui_editor_dialog, "_ROOM_CTRL");
-    gui_run_callback_IFnss ("_SELECT_ORIGIN_CB", room_tab,
-                            (void *) &aux_mouse_coord,
-                            (void *) &aux_pos);
+    gui_run_callback_IFns ("_SELECT_ORIGIN_CB", room_tab,
+                           (void *) &aux_pos);
   } else if (id == item.aux.swap_origin_selection) {
     Ihandle *room_tab =
       IupGetDialogChild (gui_editor_dialog, "_ROOM_CTRL");

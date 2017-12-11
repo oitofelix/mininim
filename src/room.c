@@ -22,6 +22,16 @@
 
 bool no_recursive_links_continuity;
 
+ALLEGRO_BITMAP *room0;
+bool tile_caching;
+int room_view;
+
+static struct pos *changed_pos = NULL;
+static size_t changed_pos_nmemb = 0;
+
+static int *changed_room = NULL;
+static size_t changed_room_nmemb = 0;
+
 static void draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 static void draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
@@ -981,4 +991,429 @@ apply_hue_color (ALLEGRO_COLOR c)
   case HUE_YELLOW: return yellow_hue_palette (c, NULL);
   case HUE_BLUE: return blue_hue_palette (c, NULL);
   }
+}
+
+void
+optimize_changed_pos (void)
+{
+  if (changed_pos_nmemb < FLOORS * PLACES) return;
+  size_t total = 0;
+  struct pos p; new_pos (&p, &global_level, -1, -1, -1);
+  for (p.room = 1; p.room < global_level.room_nmemb; p.room++) {
+    int per_room = 0;
+    if (has_room_changed (p.room)) continue;
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++) {
+        if (get_changed_pos (&p)
+            && ++per_room > OPTIMIZE_CHANGED_POS_THRESHOLD) {
+          register_changed_room (p.room);
+          goto next_room;
+        }
+        if (++total > changed_pos_nmemb) return;
+      }
+  next_room:;
+  }
+}
+
+void
+register_changed_pos (struct pos *p)
+{
+  struct pos np; npos (p, &np);
+
+  if (get_changed_pos (&np)) return;
+
+  changed_pos =
+    add_to_array (&np, 1, changed_pos, &changed_pos_nmemb,
+                  changed_pos_nmemb, sizeof (*changed_pos));
+
+  qsort (changed_pos, changed_pos_nmemb, sizeof (*changed_pos),
+         (m_comparison_fn_t) cpos);
+}
+
+struct pos *
+get_changed_pos (struct pos *p)
+{
+  return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (*p),
+                  (m_comparison_fn_t) cpos);
+}
+
+struct pos *
+get_changed_pos_by_room (int room)
+{
+  struct pos p;
+  p.room = room;
+
+  return bsearch (&p, changed_pos, changed_pos_nmemb, sizeof (p),
+                  (m_comparison_fn_t) cpos_by_room);
+}
+
+void
+remove_changed_pos (struct pos *p)
+{
+  size_t i =  p - changed_pos;
+  changed_pos =
+    remove_from_array (changed_pos, &changed_pos_nmemb, i, 1, sizeof (*p));
+}
+
+void
+register_changed_room (int room)
+{
+  if (has_room_changed (room)) return;
+
+  changed_room =
+    add_to_array (&room, 1, changed_room, &changed_room_nmemb,
+                  changed_room_nmemb, sizeof (room));
+
+  qsort (changed_room, changed_room_nmemb, sizeof (room),
+         (m_comparison_fn_t) cint);
+
+  struct pos p;
+  new_pos (&p, &global_level, room, -1, -1);
+
+  p.place = 0;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    register_changed_pos (&p);
+
+  p.place = PLACES - 1;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    register_changed_pos (&p);
+
+}
+
+bool
+has_room_changed (int room)
+{
+  return bsearch (&room, changed_room, changed_room_nmemb, sizeof (room),
+                  (m_comparison_fn_t) cint);
+}
+
+void
+draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
+{
+  room_view = room;
+
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
+
+  for (p.floor = FLOORS; p.floor >= 0; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      if (edit != EDIT_NONE
+          && (peq (&p, &selection_pos) || peq (&p, &mouse_pos)))
+        draw_object (bitmap, "BACKGROUND_SELECTION", &p);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      if (fake (&p) == WALL) continue;
+      if (bg (&p) == TORCH)
+        draw_object (bitmap, "FIRE", &p);
+      if (bg (&p) == BALCONY)
+        draw_object (bitmap, "STARS", &p);
+    }
+}
+
+void
+draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
+{
+  room_view = room;
+
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
+
+  /* loose_floor_fall_debug (); */
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_falling_loose_floor (bitmap, &p);
+    }
+
+  draw_actors (bitmap);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      if (is_potion (&p)) draw_potion (bitmap, &p);
+      else if (is_sword (&p)) draw_sword (bitmap, &p);
+    }
+
+  /* editor graphics */
+  switch (edit) {
+  case EDIT_GUARD:
+  case EDIT_GUARD_SELECT:
+  case EDIT_GUARD_SKILL:
+  case EDIT_SKILL_LEGACY_TEMPLATES:
+  case EDIT_GUARD_TYPE:
+  case EDIT_GUARD_STYLE:
+  case EDIT_GUARD_SKILL_ATTACK:
+  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
+  case EDIT_GUARD_SKILL_DEFENSE:
+  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
+  case EDIT_GUARD_SKILL_ADVANCE:
+  case EDIT_GUARD_SKILL_RETURN:
+  case EDIT_GUARD_SKILL_REFRACTION:
+  case EDIT_GUARD_SKILL_EXTRA_HP:
+  case EDIT_GUARD_HP:
+    draw_start_guards (bitmap);
+    break;
+  case EDIT_KID:
+    draw_start_kid (bitmap);
+    break;
+  default: break;
+  }
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      if (edit != EDIT_NONE) {
+        int part = 0;
+        bool s1 = peq (&mouse_pos, &p);
+        bool s2 = peq (&selection_pos, &p) && selection_locked;
+        bool s3 = sel_ring_ss_c_nmemb (&global_sel_ring) > 0
+          && is_pos_in_sel_ring (&global_sel_ring, &p);
+
+        if (s1 && s2 && s3) part = anim_tick % 3 + 1;
+        else if (s1 && s2) part = anim_tick % 2 ? 1 : 2;
+        else if (s2 && s3) part = anim_tick % 2 ? 2 : 3;
+        else if (s1 && s3) part = anim_tick % 2 ? 1 : 3;
+        else if (s1) part = 1;
+        else if (s2) part = 2;
+        else if (s3) part = 3;
+
+        if (part) draw_object_part (bitmap, "BOX", part, &p);
+      }
+}
+
+void
+update_room0_cache (void)
+{
+  room_view = 0;
+  struct pos mouse_pos_bkp = mouse_pos;
+  struct pos selection_pos_bkp = selection_pos;
+  invalid_pos (&mouse_pos);
+  invalid_pos (&selection_pos);
+  tile_caching = true;
+
+  al_destroy_bitmap (room0);
+  room0 = create_bitmap (OW (ORIGINAL_WIDTH), OH (ORIGINAL_HEIGHT));
+
+  clear_bitmap (room0, TRANSPARENT_COLOR);
+
+  global_mr.dx = 0;
+  global_mr.dy = 0;
+  draw_room (room0, 0);
+
+  tile_caching = false;
+  mouse_pos = mouse_pos_bkp;
+  selection_pos = selection_pos_bkp;
+}
+
+void
+update_cache_room (struct mr *mr, int room)
+{
+  int x, y;
+  tile_caching = true;
+
+  for (y = mr->h - 1; y >= 0; y--)
+    for (x = 0; x < mr->w; x++)
+      if (mr_coord_room (mr, x, y) == room) {
+        if (room) {
+          room_view = room;
+          mr->dx = x;
+          mr->dy = y;
+          clear_bitmap (mr->cell[x][y].cache, TRANSPARENT_COLOR);
+          draw_room (mr->cell[x][y].cache, room);
+          break;
+        } else draw_bitmap (room0, mr->cell[x][y].cache, 0, 0, 0);
+      }
+  tile_caching = false;
+}
+
+void
+update_cache (struct mr *mr)
+{
+  struct mr_room_list l;
+  mr_get_room_list (mr, &l);
+
+  update_cache_room (mr, 0);
+
+  size_t i;
+  for (i = 0; i < l.nmemb; i++)
+    update_cache_room (mr, l.room[i]);
+
+  mr_destroy_room_list (&l);
+}
+
+void
+update_cache_pos (struct mr *mr, struct pos *p)
+{
+  struct pos q = *p;
+  int x, y;
+
+  for (q.room = 1; q.room < p->l->room_nmemb; q.room++) {
+    for (y = mr->h - 1; y >= 0; y--)
+      for (x = 0; x < mr->w; x++)
+        if (mr_coord_room (mr, x, y) == q.room)
+          for (q.floor = FLOORS; q.floor >= -1; q.floor--)
+            for (q.place = -1; q.place < PLACES; q.place++)
+              if (peq (&q, p) && ! has_room_changed (q.room)) {
+                ALLEGRO_BITMAP *bitmap = mr->cell[x][y].cache;
+
+                room_view = q.room;
+                mr->dx = x;
+                mr->dy = y;
+                tile_caching = true;
+
+                push_clipping_rectangle
+                  (bitmap,
+                   OW (PLACE_WIDTH * q.place - 1),
+                   OH (PLACE_HEIGHT * q.floor - 17),
+                   OW (2 * PLACE_WIDTH + 1), OH (PLACE_HEIGHT + 3 + 17));
+
+                clear_bitmap (bitmap, TRANSPARENT_COLOR);
+
+                struct pos p0 = q;
+                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
+                     p0.floor--)
+                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
+                       p0.place++)
+                    draw_tile_bg (bitmap, &p0);
+
+                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
+                     p0.floor--)
+                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
+                       p0.place++)
+                    draw_tile_fg (bitmap, &p0);
+
+                pop_clipping_rectangle ();
+
+                tile_caching = false;
+                goto next_room;
+              }
+  next_room:;
+  }
+}
+
+void
+mr_draw (struct mr *mr)
+{
+  int x, y;
+
+  /* mr_set_origin (mr, mr->room, mr->x, mr->y, */
+  /*                global_level.rlink, global_level.room_nmemb); */
+
+  bool mr_full_update = has_mr_view_changed (mr)
+    || mr->full_update;
+
+  if (mr_full_update) {
+    mr_busy (mr);
+    force_full_redraw = true;
+  }
+
+  /* mouse */
+  if (mouse_pos.room != mr->last.mouse_pos.room
+      || mouse_pos.floor != mr->last.mouse_pos.floor
+      || mouse_pos.place != mr->last.mouse_pos.place
+      || edit != mr->last.edit) {
+    if (is_valid_pos (&mouse_pos))
+      register_changed_pos (&mouse_pos);
+
+    if (is_valid_pos (&mr->last.mouse_pos))
+      register_changed_pos (&mr->last.mouse_pos);
+  }
+
+  /* selection */
+  if (selection_pos.room != mr->last.selection_pos.room
+      || selection_pos.floor != mr->last.selection_pos.floor
+      || selection_pos.place != mr->last.selection_pos.place
+      || edit != mr->last.edit) {
+    if (is_valid_pos (&selection_pos))
+      register_changed_pos (&selection_pos);
+
+    if (is_valid_pos (&mr->last.selection_pos))
+      register_changed_pos (&mr->last.selection_pos);
+  }
+
+  if (anim_cycle == 0
+      || em != mr->last.em
+      /* || vm != mr->last.vm */
+      /* || hgc != mr->last.hgc */
+      || hue != mr->last.hue) {
+    update_room0_cache ();
+    force_full_redraw = true;
+  }
+
+  size_t i;
+
+  if (anim_cycle == 0
+      || mr_full_update
+      || em != mr->last.em
+      /* || vm != mr->last.vm */
+      /* || hgc != mr->last.hgc */
+      || hue != mr->last.hue
+      || global_level.n != mr->last.level) {
+    update_cache (mr);
+  } else {
+    bool depedv =
+      /* ((em == DUNGEON && vm == VGA) */
+      /*  || (em == DUNGEON && vm == EGA) */
+      /*  || (em == PALACE && vm == EGA)) */
+      true;
+
+    /* optmize changed pos list */
+    optimize_changed_pos ();
+
+    /* update cache pos */
+    for (i = 0; i < changed_pos_nmemb; i++) {
+      update_cache_pos (mr, &changed_pos[i]);
+      struct pos pl; prel (&changed_pos[i], &pl, +0, -1);
+      if (depedv && fake (&pl) == WALL)
+        update_cache_pos (mr, &pl);
+    }
+
+    /* update cache room */
+    for (i = 0; i < changed_room_nmemb; i++)
+      update_cache_room (mr, changed_room[i]);
+
+    /* kept together so update_cache_pos and update_cache_room can
+       access each other's arrays */
+    destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
+    destroy_array ((void **) &changed_room, &changed_room_nmemb);
+  }
+
+  for (y = mr->h - 1; y >= 0; y--)
+    for (x = 0; x < mr->w; x++) {
+      clear_bitmap (mr->cell[x][y].screen,
+                    (mr->flicker > 0 && mr->flicker % 2)
+                    ? mr->color : BLACK);
+
+      if (! mr_coord_room (mr, x, y)) continue;
+      mr->dx = x;
+      mr->dy = y;
+      draw_animated_background (mr->cell[x][y].screen,
+                                mr_coord_room (mr, x, y));
+    }
+
+  if (mr->flicker > 0) mr->flicker--;
+
+  struct mr_room_list l;
+  mr_get_room_list (mr, &l);
+
+  int xm, ym;
+  if (! no_room_drawing)
+    for (i = 0; i < l.nmemb; i++) {
+      mr_room_coord (mr, l.room[i], &xm, &ym);
+      for (y = mr->h - 1; y >= 0; y--)
+        for (x = 0; x < mr->w; x++)
+          if (mr_coord_room (mr, x, y) == l.room[i])
+            draw_bitmap (mr->cell[xm][ym].cache,
+                         mr->cell[x][y].screen, 0, 0, 0);
+    }
+
+  mr_destroy_room_list (&l);
+
+  for (y = mr->h - 1; y >= 0; y--)
+    for (x = 0; x < mr->w; x++) {
+      int room = mr_coord_room (mr, x, y);
+      if (! room) continue;
+      mr->dx = x;
+      mr->dy = y;
+      draw_animated_foreground (mr->cell[x][y].screen, room);
+    }
+
+  mr_update_last_settings (mr);
 }

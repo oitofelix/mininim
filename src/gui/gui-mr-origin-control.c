@@ -95,67 +95,46 @@ button_action_cb (Ihandle *ih)
                global_mr.room);
 
   if (ih == c_button)
-    mr_center_room (&global_mr, global_mr.room,
-                    global_level.rlink, global_level.room_nmemb);
+    mr_best_view (&global_mr, global_mr.room);
   else if (ih == l_button)
-    mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, LEFT);
   else if (ih == r_button)
-    mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, RIGHT);
   else if (ih == a_button)
-    mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, ABOVE);
   else if (ih == b_button)
-    mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                   global_level.room_nmemb);
+    mr_room_trans (&global_mr, BELOW);
   else if (ih == al_button) {
     if (ls.al && (selected == v_toggle || ! ls.la)) {
-      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, ABOVE);
+      mr_room_trans (&global_mr, LEFT);
     } else if (ls.la) {
-      mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, LEFT);
+      mr_room_trans (&global_mr, ABOVE);
     }
   } else if (ih == ar_button) {
     if (ls.ar && (selected == v_toggle || ! ls.ra)) {
-      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, ABOVE);
+      mr_room_trans (&global_mr, RIGHT);
     } else if (ls.ra) {
-      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, ABOVE, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, RIGHT);
+      mr_room_trans (&global_mr, ABOVE);
     }
   } else if (ih == bl_button) {
     if (ls.bl && (selected == v_toggle || ! ls.lb)) {
-      mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, BELOW);
+      mr_room_trans (&global_mr, LEFT);
     } else if (ls.lb) {
-      mr_room_trans (&global_mr, LEFT, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, LEFT);
+      mr_room_trans (&global_mr, BELOW);
     }
   } else if (ih == br_button) {
     if (ls.br && (selected == v_toggle || ! ls.rb)) {
-      mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, BELOW);
+      mr_room_trans (&global_mr, RIGHT);
     } else if (ls.rb) {
-      mr_room_trans (&global_mr, RIGHT, global_level.rlink,
-                     global_level.room_nmemb);
-      mr_room_trans (&global_mr, BELOW, global_level.rlink,
-                     global_level.room_nmemb);
+      mr_room_trans (&global_mr, RIGHT);
+      mr_room_trans (&global_mr, BELOW);
     }
   }
 

@@ -71,7 +71,7 @@ get_mouse_coord (struct mr *mr, struct mouse_coord *m)
   } else {
     m->x = x / ORIGINAL_WIDTH;
     m->y = (y - 3) / ROOM_HEIGHT;
-    m->c.room = mr->cell[m->x][m->y].room;
+    m->c.room = mr_coord_room (mr, m->x, m->y);
     m->c.room = (m->c.room > 0) ? m->c.room : 0;
   }
 
@@ -134,27 +134,20 @@ set_mouse_coord (struct mr *mr, struct mouse_coord *m)
       || m->c.y < 0 || m->c.y >= ORIGINAL_HEIGHT)
     return;
 
-  int x, y;
-
-  mr_restore_origin (mr, &m->o, global_level.rlink,
-                     global_level.room_nmemb);
+  mr_restore_origin (mr, &m->o);
 
   if (! m->c.room) {
     al_set_mouse_xy (display, m->sx, m->sy);
     return;
   }
 
-  if (! mr_coord (mr, m->c.room, -1, &x, &y)) {
-    mr_center_room (mr, m->c.room, global_level.rlink,
-                    global_level.room_nmemb);
-    x = mr->x;
-    y = mr->y;
-  }
+  mr_scroll_into_view (mr, m->c.room);
+  int x, y; mr_room_coord (mr, m->c.room, &x, &y);
 
   struct mouse_coord m0;
   get_mouse_coord (mr, &m0);
   if (m0.x >= 0 && m0.y >= 0 &&
-      mr->cell[m0.x][m0.y].room == m->c.room) {
+      mr_coord_room (mr, m0.x, m0.y) == m->c.room) {
     x = m0.x;
     y = m0.y;
   }
@@ -201,13 +194,8 @@ set_mouse_pos (struct mr *mr, struct pos *p)
 
   tile_coord (&np, _m, &m.c);
 
-  int x, y;
-  if (! mr_coord (mr, np.room, -1, &x, &y)) {
-    mr_center_room (mr, np.room, global_level.rlink,
-                    global_level.room_nmemb);
-    x = mr->x;
-    y = mr->y;
-  }
+  mr_scroll_into_view (mr, np.room);
+  int x, y; mr_room_coord (mr, np.room, &x, &y);
 
   m.o.x = mr->x = x;
   m.o.y = mr->y = y;
@@ -219,22 +207,9 @@ void
 set_mouse_room (struct mr *mr, int room)
 {
   struct mouse_coord m;
-
-  int x, y;
-  if (mr_coord (mr, room, -1, &x, &y))
-    mr_set_origin (mr, room, x, y, global_level.rlink,
-                   global_level.room_nmemb);
-
+  mr_scroll_into_view (mr, room);
   mr_save_origin (mr, &m.o);
   new_coord (&m.c, &global_level, room,
              ORIGINAL_WIDTH / 2, ORIGINAL_HEIGHT / 2);
   set_mouse_coord (mr, &m);
-
-  if (! room) {
-    mr_center_room (mr, 0, global_level.rlink, global_level.room_nmemb);
-    mr->select_cycles = 0;
-    int w = al_get_display_width (display);
-    int h = al_get_display_height (display);
-    al_set_mouse_xy (display, w / 2, h / 2);
-  }
 }
