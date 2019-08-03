@@ -35,7 +35,7 @@ local function t (filename)
 end
 
 -- body
-setfenv (1, P)
+local _ENV = P
 
 function load ()
    MININIM.lua.audio_mode[package_name] =

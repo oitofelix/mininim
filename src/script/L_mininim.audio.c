@@ -117,7 +117,7 @@ L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id)
   lua_rawget (L, -2);
   lua_remove (L, -2);
 
-  struct audio_source *as = luaL_checkudata (L, -1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as = luaL_testudata (L, -1, L_MININIM_AUDIO_SOURCE);
 
   lua_pop (L, 1);
 

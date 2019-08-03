@@ -91,8 +91,8 @@ wall_correlation_string (enum wall_correlation wc)
 
 BEGIN_LUA (__eq)
 {
-  struct pos *p0 = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
-  struct pos *p1 = luaL_checkudata (L, 2, L_MININIM_LEVEL_POSITION);
+  struct pos *p0 = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
+  struct pos *p1 = luaL_testudata (L, 2, L_MININIM_LEVEL_POSITION);
   if (p0 && p1) lua_pushboolean (L, peq (p0, p1));
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -101,7 +101,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
 
   if (! p) return 0;
 
@@ -160,7 +160,7 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
 
   if (! p) return 0;
 
@@ -188,7 +188,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
   lua_pushfstring (L, L_MININIM_LEVEL_POSITION " (%d, %d, %d)",
                    p ? p->room : -1, p ? p->floor : -1, p ? p->place : -1);
   return 1;
@@ -198,7 +198,7 @@ END_LUA
 BEGIN_LUA (relative)
 {
   struct pos *p =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
   if (! p) return 0;
   struct pos pr; prel (p, &pr, lua_tonumber (L, 1), lua_tonumber (L, 2));
   L_pushposition (L, &pr);
@@ -209,7 +209,7 @@ END_LUA
 BEGIN_LUA (activate)
 {
   struct pos *p =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
   if (! p) return 0;
   activate_tile (p);
   return 0;
@@ -219,7 +219,7 @@ END_LUA
 BEGIN_LUA (is_hangable_at)
 {
   struct pos *p =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
   if (! p) return 0;
   const char *dir_str = luaL_checkstring (L, 1);
   enum dir dir = direction_enum (dir_str);
@@ -232,7 +232,7 @@ END_LUA
 BEGIN_LUA (is_free_at)
 {
   struct pos *p =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
   if (! p) return 0;
   const char *dir_str = luaL_checkstring (L, 1);
   enum dir dir = direction_enum (dir_str);

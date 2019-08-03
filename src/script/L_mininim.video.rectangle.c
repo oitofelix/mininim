@@ -90,8 +90,8 @@ END_LUA
 
 BEGIN_LUA (__eq)
 {
-  struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
-  struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
   if (r0 && r1) lua_pushboolean (L, rect_eq (r0, r1));
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -100,7 +100,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  struct rect *r = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
 
   if (! r) return 0;
 
@@ -138,7 +138,7 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  struct rect *r = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
 
   if (! r) return 0;
 
@@ -172,7 +172,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  struct rect *r = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   lua_pushfstring (L, L_MININIM_VIDEO_RECTANGLE " (%d, %f, %f, %f, %f)",
                    r ? r->c.room : -1,
                    r ? r->c.x : -1, r ? r->c.y : -1,
@@ -183,8 +183,8 @@ END_LUA
 
 BEGIN_LUA (__add)
 {
-  struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
-  struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
 
   if (! r0 || ! r1) return 0;
 
@@ -199,8 +199,8 @@ END_LUA
 
 BEGIN_LUA (__sub)
 {
-  struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
-  struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
 
   if (! r0 || ! r1) return 0;
 
@@ -218,7 +218,7 @@ BEGIN_LUA (draw)
   if (! L_target_bitmap) return 0;
 
   struct rect *r =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_RECTANGLE);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_RECTANGLE);
 
   if (! r) return 0;
 

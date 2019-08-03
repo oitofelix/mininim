@@ -107,7 +107,7 @@ END_LUA
 
 BEGIN_LUA (__gc)
 {
-  ALLEGRO_SHADER **s = luaL_checkudata (L, 1, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
   al_destroy_shader (*s);
   return 0;
 }
@@ -115,8 +115,8 @@ END_LUA
 
 BEGIN_LUA (__eq)
 {
-  ALLEGRO_SHADER **s0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_SHADER);
-  ALLEGRO_SHADER **s1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s0 = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s1 = luaL_testudata (L, 2, L_MININIM_VIDEO_SHADER);
   if (s0 && s1) lua_pushboolean (L, *s0 == *s1);
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -125,7 +125,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  ALLEGRO_SHADER **s_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
 
   ALLEGRO_SHADER *s;
   if (s_ptr) s = *s_ptr;
@@ -153,7 +153,7 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  ALLEGRO_SHADER **s_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
 
   ALLEGRO_SHADER *s;
   if (s_ptr) s = *s_ptr;
@@ -170,7 +170,7 @@ BEGIN_LUA (__newindex)
     int value_type = lua_type (L, 3);
     switch (value_type) {
     case LUA_TUSERDATA: {
-      ALLEGRO_BITMAP **value_ptr = luaL_checkudata (L, 3, L_MININIM_VIDEO_BITMAP);
+      ALLEGRO_BITMAP **value_ptr = luaL_testudata (L, 3, L_MININIM_VIDEO_BITMAP);
       /* QUESTION: Is assuming a fixed unit of 1 appropriate or
          enough? */
       if (value_ptr) al_set_shader_sampler (key, *value_ptr, 1);
@@ -252,7 +252,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  ALLEGRO_SHADER **s = luaL_checkudata (L, 1, L_MININIM_VIDEO_SHADER);
+  ALLEGRO_SHADER **s = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
   lua_pushfstring (L, L_MININIM_VIDEO_SHADER " (%s)",
                    get_shader_platform (*s));
   return 1;

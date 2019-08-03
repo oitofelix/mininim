@@ -381,8 +381,8 @@ actor_action_enum (const char *action, enum actor_type type)
 
 BEGIN_LUA (__eq)
 {
-  int *id0 = luaL_checkudata (L, 1, L_MININIM_ACTOR);
-  int *id1 = luaL_checkudata (L, 2, L_MININIM_ACTOR);
+  int *id0 = luaL_testudata (L, 1, L_MININIM_ACTOR);
+  int *id1 = luaL_testudata (L, 2, L_MININIM_ACTOR);
   if (id0 && id1) lua_pushboolean (L, *id0 == *id1);
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -391,7 +391,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  int *id_ptr = luaL_testudata (L, 1, L_MININIM_ACTOR);
 
   int id;
   if (id_ptr) id = *id_ptr;
@@ -503,7 +503,7 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  int *id_ptr = luaL_testudata (L, 1, L_MININIM_ACTOR);
 
   int id;
   if (id_ptr) id = *id_ptr;
@@ -564,17 +564,17 @@ BEGIN_LUA (__newindex)
       a->style = min_int (7, style);
       return 0;
     } else if (! strcasecmp (key, "top_left")) {
-      struct rect *r = luaL_checkudata (L, 3, L_MININIM_VIDEO_RECTANGLE);
+      struct rect *r = luaL_testudata (L, 3, L_MININIM_VIDEO_RECTANGLE);
       if (! r) return 0;
       a->f.c = r->c;
       return 0;
     } else if (! strcasecmp (key, "bitmap")) {
-      ALLEGRO_BITMAP **b = luaL_checkudata (L, 3, L_MININIM_VIDEO_BITMAP);
+      ALLEGRO_BITMAP **b = luaL_testudata (L, 3, L_MININIM_VIDEO_BITMAP);
       if (! b) return 0;
       a->f.b = *b;
       return 0;
     } else if (! strcasecmp (key, "xbitmap")) {
-      ALLEGRO_BITMAP **b = luaL_checkudata (L, 3, L_MININIM_VIDEO_BITMAP);
+      ALLEGRO_BITMAP **b = luaL_testudata (L, 3, L_MININIM_VIDEO_BITMAP);
       if (! b) return 0;
       a->xf.b = *b;
       return 0;
@@ -595,7 +595,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  int *id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  int *id = luaL_testudata (L, 1, L_MININIM_ACTOR);
   lua_pushfstring (L, L_MININIM_ACTOR " (%d)", id ? *id : -1);
   return 1;
 }
@@ -603,7 +603,7 @@ END_LUA
 
 BEGIN_LUA (draw)
 {
-  int *id_ptr = luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
+  int *id_ptr = luaL_testudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
 
   int id;
   if (id_ptr) id = *id_ptr;
@@ -615,16 +615,16 @@ BEGIN_LUA (draw)
   struct frame f = a->f;
   struct frame_offset xf = a->xf;
 
-  ALLEGRO_BITMAP **bitmap = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  ALLEGRO_BITMAP **bitmap = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
   if (bitmap) f.b = *bitmap;
 
-  ALLEGRO_BITMAP **xbitmap = luaL_checkudata (L, 2, L_MININIM_VIDEO_BITMAP);
+  ALLEGRO_BITMAP **xbitmap = luaL_testudata (L, 2, L_MININIM_VIDEO_BITMAP);
   if (xbitmap) xf.b = *xbitmap;
 
-  ALLEGRO_BITMAP **splash = luaL_checkudata (L, 3, L_MININIM_VIDEO_BITMAP);
+  ALLEGRO_BITMAP **splash = luaL_testudata (L, 3, L_MININIM_VIDEO_BITMAP);
 
   ALLEGRO_SHADER **s =
-    luaL_checkudata (L, lua_gettop (L), L_MININIM_VIDEO_SHADER);
+    luaL_testudata (L, lua_gettop (L), L_MININIM_VIDEO_SHADER);
 
   if (s) {
     al_set_target_bitmap (L_target_bitmap);
@@ -652,7 +652,7 @@ END_LUA
 
 BEGIN_LUA (position)
 {
-  int *id_ptr = luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
+  int *id_ptr = luaL_testudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
 
   int id;
   if (id_ptr) id = *id_ptr;

@@ -226,7 +226,15 @@ static char **mycomplete(const char *text, int start, int end)
   ml.idx = ml.allocated = ml.matchlen = 0;
 
   savetop = lua_gettop(repl_L);
-  lua_pushvalue(repl_L, LUA_GLOBALSINDEX);
+
+  /* Lua 5.0 */
+  /* lua_pushvalue(repl_L, LUA_GLOBALSINDEX); */
+  /* ------- */
+  /* Lua 5.3 */
+  lua_pushvalue(repl_L, LUA_REGISTRYINDEX);
+  lua_pushinteger(repl_L, LUA_RIDX_GLOBALS);
+  lua_gettable(repl_L, -2);
+  /* ------- */
   for (n = (size_t)(end-start), i = dot = 0; i < n; i++)
     if (text[i] == '.' || text[i] == ':') {
       if (!safegetfield(repl_L, text+dot, i-dot)) goto error; /* invalid prefix */
@@ -415,7 +423,7 @@ static int load_string (lua_State *L) {
   }
 
   for (;;) {  /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_rawlen(L, 1), "=stdin");
     if (!incomplete(L, status)) break;  /* cannot try to add lines? */
     char *prompt = get_prompt(L, 0);
     int rl_status = lua_readline(L, prompt);
@@ -490,7 +498,17 @@ repl (ALLEGRO_THREAD *thread, void *L)
   }
 
   int status;
-  status = lua_cpcall (L, &pmain, NULL);
+
+  /* Lua 5.0 */
+  /* status = lua_cpcall (L, &pmain, NULL); */
+  /* ------- */
+
+  /* Lua 5.3 */
+  lua_pushcfunction (L, &pmain);
+  lua_pushlightuserdata (L, NULL);
+  status = lua_pcall (L, 1, 0, 0);
+  /* ------- */
+
   report (L, status);
 
   rl_callback_handler_remove ();

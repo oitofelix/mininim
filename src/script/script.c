@@ -38,17 +38,31 @@ void
 init_script (void)
 {
   /* setup canonical environment */
-  lua_State *L = lua_open ();
+
+  /* Lua 5.0 */
+  /* lua_State *L = lua_open (); */
+  /* ------- */
+
+  /* Lua 5.3 */
+  lua_State *L = luaL_newstate ();
+  /* ------- */
+
   main_L = L;
 
   assert (L);
 
-  luaopen_base (L);
-  luaopen_table (L);
-  luaopen_io (L);
-  luaopen_string (L);
-  luaopen_math (L);
-  luaopen_loadlib (L);
+  /* Lua 5.0 */
+  /* luaopen_base (L); */
+  /* luaopen_table (L); */
+  /* luaopen_io (L); */
+  /* luaopen_string (L); */
+  /* luaopen_math (L); */
+  /* luaopen_loadlib (L); */
+  /* ------- */
+
+  /* Lua 5.3 */
+  luaL_openlibs (L);
+  /* ------- */
 
   /* path */
   lua_settop (L, 0);
@@ -62,7 +76,21 @@ init_script (void)
                    "",
                    resources_dir,
                    system_data_dir);
-  lua_setglobal (L, "LUA_PATH");
+
+  /* Lua 5.0 */
+  /* lua_setglobal (L, "LUA_PATH"); */
+  /* ------- */
+
+  /* Lua 5.3 */
+  lua_getglobal (L, "package");
+  lua_getfield (L, -1, "path");
+  lua_remove (L, -2);
+  lua_concat (L, 2);
+  lua_getglobal (L, "package");
+  lua_rotate (L, -2, 1);
+  lua_setfield (L, -2, "path");
+  lua_settop (L, 0);
+  /* ------- */
 
   /* mininim */
   define_L_mininim (L);
@@ -72,12 +100,19 @@ init_script (void)
   lua_setmetatable (L, -2);
   lua_setglobal (L, "MININIM");
 
+  /* Lua 5.0 */
   /* table.getn reference */
-  lua_pushstring(L, "table");
-  lua_gettable(L, LUA_GLOBALSINDEX);
-  lua_pushstring(L, "getn");
-  lua_gettable(L, -2);
+  /* lua_pushstring(L, "table"); */
+  /* lua_gettable(L, LUA_GLOBALSINDEX); */
+  /* lua_pushstring(L, "getn"); */
+  /* lua_gettable(L, -2); */
+  /* L_set_registry_by_ref (L, &table_getn_ref); */
+  /* ------- */
+  /* Lua 5.3 */
+  /* rawlen reference */
+  lua_getglobal (L, "rawlen");
   L_set_registry_by_ref (L, &table_getn_ref);
+  /* ------- */
 
   /* weak registry */
   lua_newtable (L);
@@ -143,7 +178,7 @@ finalize_script (void)
 void *
 L_check_type (lua_State *L, int index, const char *tname)
 {
-  void *ud = luaL_checkudata (L, index, tname);
+  void *ud = luaL_testudata (L, index, tname);
   if (! ud) L_error_expected_got (L, index, tname);
   return ud;
 }
@@ -240,9 +275,18 @@ L_get_weak_registry_by_ptr (lua_State *L, void *p)
 void
 L_gc (lua_State *L)
 {
-  int count = lua_getgccount (L);
-  int threshold = lua_getgcthreshold (L);
-  if (count < threshold) return;
+  /* Lua 5.0 */
+  /* int count = lua_getgccount (L); */
+  /* int threshold = lua_getgcthreshold (L); */
+  /* if (count < threshold) return; */
+  /* ------- */
+
+  /* Lua 5.3 */
+  /* int count = lua_gc (L, LUA_GCCOUNT, 0); */
+  /* int threshold = ? */
+  if (! lua_gc (L, LUA_GCISRUNNING, 0)) return;
+  /* ------- */
+
   palette_cache_gc (L);
 }
 

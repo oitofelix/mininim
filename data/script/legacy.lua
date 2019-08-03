@@ -28,7 +28,7 @@ local pos = MININIM.level.position
 local common = require "script/common"
 
 -- body
-setfenv (1, P)
+local _ENV = P
 
 -- level 1
 local function level_01_cycle_hook ()

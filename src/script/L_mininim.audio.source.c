@@ -79,7 +79,7 @@ END_LUA
 
 BEGIN_LUA (__gc)
 {
-  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
   if (as) destroy_audio (as);
   return 0;
 }
@@ -87,8 +87,8 @@ END_LUA
 
 BEGIN_LUA (__eq)
 {
-  struct audio_source *as0 = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
-  struct audio_source *as1 = luaL_checkudata (L, 2, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as0 = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as1 = luaL_testudata (L, 2, L_MININIM_AUDIO_SOURCE);
   if (as0 && as1) lua_pushboolean (L, audio_source_eq (as0, as1));
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -97,7 +97,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
   if (! as) return 0;
 
@@ -120,7 +120,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
   if (as)
     switch (as->type) {
@@ -145,12 +145,12 @@ END_LUA
 BEGIN_LUA (play)
 {
   struct audio_source *as =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_AUDIO_SOURCE);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_AUDIO_SOURCE);
   if (! as) return 0;
   int *id = NULL;
   struct pos *p = NULL;
-  id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
-  p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  id = luaL_testudata (L, 1, L_MININIM_ACTOR);
+  p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
   play_audio (as, p, (id && *id < actor_nmemb) ? *id : -1);
   return 0;
 }

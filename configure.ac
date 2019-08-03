@@ -264,7 +264,7 @@ AC_SUBST([mingw_ldadd])
 ### Check for Lua
 ######
 
-AX_PROG_LUA([5.0], [5.1], [],
+AX_PROG_LUA([5.0], [], [],
   AC_MSG_ERROR([MININIM requires Lua 5.0 (or superior)]))
 AX_LUA_HEADERS(, AC_MSG_ERROR([MININIM requires Lua headers]))
 AX_LUA_LIBS(, AC_MSG_ERROR([MININIM requires Lua libraries]))
@@ -272,7 +272,9 @@ AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
 
 AM_COND_IF([mingw_build],
            [LUA_LIB="-l:liblua50.a -l:liblualib50.a"],
-           [LUA_LIB="-ldl -llua50 -llualib50"])
+           dnl [LUA_LIB="-ldl -llua50 -llualib50"]
+           [LUA_LIB="-ldl -llua"]
+	   )
 
 
 

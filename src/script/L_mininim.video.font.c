@@ -73,7 +73,7 @@ L_pushfont (lua_State *L, ALLEGRO_FONT *f)
 BEGIN_LUA (L_mininim_video_font)
 {
   ALLEGRO_FONT *f = NULL;
-  ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  ALLEGRO_BITMAP **b = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
 
   if (b) {
     int *ranges = NULL;
@@ -105,7 +105,7 @@ END_LUA
 
 BEGIN_LUA (__gc)
 {
-  ALLEGRO_FONT **f = luaL_checkudata (L, 1, L_MININIM_VIDEO_FONT);
+  ALLEGRO_FONT **f = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
   al_destroy_font (*f);
   return 0;
 }
@@ -113,8 +113,8 @@ END_LUA
 
 BEGIN_LUA (__eq)
 {
-  ALLEGRO_FONT **f0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_FONT);
-  ALLEGRO_FONT **f1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_FONT);
+  ALLEGRO_FONT **f0 = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
+  ALLEGRO_FONT **f1 = luaL_testudata (L, 2, L_MININIM_VIDEO_FONT);
   if (f0 && f1) lua_pushboolean (L, *f0 == *f1);
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -123,7 +123,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  ALLEGRO_FONT **f_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_FONT);
+  ALLEGRO_FONT **f_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
 
   ALLEGRO_FONT *f;
   if (f_ptr) f = *f_ptr;
@@ -152,7 +152,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  ALLEGRO_FONT **f = luaL_checkudata (L, 1, L_MININIM_VIDEO_FONT);
+  ALLEGRO_FONT **f = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
   lua_pushfstring (L, L_MININIM_VIDEO_FONT " (%d ranges)",
                    f ? al_get_font_ranges (*f, 0, NULL) : 0);
   return 1;
@@ -162,7 +162,7 @@ END_LUA
 BEGIN_LUA (draw)
 {
   ALLEGRO_FONT **f =
-    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_FONT);
+    luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_FONT);
 
   if (! f) return 0;
 
@@ -175,8 +175,8 @@ BEGIN_LUA (draw)
 
   int i;
   for (i = 2; i <= lua_gettop (L); i++) {
-    ALLEGRO_BITMAP **b_ptr = luaL_checkudata (L, i, L_MININIM_VIDEO_BITMAP);
-    ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, i, L_MININIM_VIDEO_COLOR);
+    ALLEGRO_BITMAP **b_ptr = luaL_testudata (L, i, L_MININIM_VIDEO_BITMAP);
+    ALLEGRO_COLOR *c_ptr = luaL_testudata (L, i, L_MININIM_VIDEO_COLOR);
     if (b_ptr) target_bitmap = *b_ptr;
     else if (c_ptr) c = *c_ptr;
     else if (lua_isnumber (L, i)) {

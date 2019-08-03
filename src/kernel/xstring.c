@@ -125,17 +125,19 @@ fmt_row (const char *fmt, ...)
   return r;
 }
 
-int
+uint
 term_cols (void)
 {
+  static const uint MAX_TERM_COLS = 320, DEFAULT_TERM_COLS = 80;
 #if WINDOWS_PORT
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
-  return csbi.srWindow.Right - csbi.srWindow.Left + 1;
+  uint cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+  return cols <= MAX_TERM_COLS ? cols : DEFAULT_TERM_COLS;
 #else
   struct winsize win;
-  if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &win) < 0) return 80;
-  else return win.ws_col;
+  if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &win) < 0) return DEFAULT_TERM_COLS;
+  else return win.ws_col <= MAX_TERM_COLS ? win.ws_col : DEFAULT_TERM_COLS;
 #endif
 }
 

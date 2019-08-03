@@ -823,7 +823,7 @@ L_typename (lua_State *L, int index)
     if (! lua_getmetatable (L, index)) return xasprintf ("userdata");
     lua_rawget (L, LUA_REGISTRYINDEX);
     const char *str = lua_tostring (L, -1);
-    tname = xasprintf ("%s", str);
+    tname = xasprintf ("%s", str ? str : "userdata");
     lua_pop (L, 1);
     return tname;
   default: return xasprintf ("<unknown type>");
@@ -1123,7 +1123,12 @@ event_tostring (int event)
   case LUA_HOOKLINE: return "LINE";
   case LUA_HOOKCALL: return "CALL";
   case LUA_HOOKRET: return "RETURN";
-  case LUA_HOOKTAILRET: return "TAIL RETURN";
+    /* Lua 5.0 */
+    /* case LUA_HOOKTAILRET: return "TAIL RETURN"; */
+    /* ------- */
+    /* Lua 5.3 */
+  case LUA_HOOKTAILCALL: return "TAIL CALL";
+    /* ------- */
   case LUA_HOOKCOUNT: return "COUNT";
   case L_ERROR_EVENT: return "ERROR";
   case L_INVOKED_EVENT: return "INVOKED";
@@ -1314,7 +1319,15 @@ debugger_hook (lua_State *L, lua_Debug *ar)
         continue;
       }
       L_get_registry_by_ref (L, b->value_ref);
-      if (lua_equal (L, -1, -2)) {
+      if (
+	  /* LUA 5.0 */
+	  /* lua_equal (L, -1, -2) */
+	  /* ------- */
+
+	  /* LUA 5.3 */
+	  lua_compare (L, -1, -2, LUA_OPEQ)
+	  /* ------- */
+	  ) {
         lua_pop (L, 2);
         continue;
       }

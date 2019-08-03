@@ -42,9 +42,11 @@ local setmetatable = setmetatable
 local unpack = unpack
 local rawget = rawget
 local rawset = rawset
+local ipairs = ipairs
+local unpack = table.unpack
 
 -- body
-setfenv (1, P)
+local _ENV = P
 
 function merge_recursively (metatable, o)
    for k, v in pairs (metatable) do
@@ -88,7 +90,7 @@ function new (metatable, o, ...)
       merge_recursively (metatable, o)
 
       if metatable._new and not original_metatable then
-         metatable:_new (o, unpack (arg))
+         metatable:_new (o, ...)
       end
    end
 
@@ -111,40 +113,40 @@ end
 -- Resources
 
 function base_directory (filename)
-   return string.gsub (filename, "[/\][^/\]*$", "")
+   return string.gsub (filename, "[/\\][^/\\]*$", "")
 end
 
 function resource_filename (P, filename, ...)
    return base_directory (P.package_file) .. "/"
-      .. string.format (filename, unpack (arg))
+      .. string.format (filename, ...)
 end
 
 function load_shader (P, ...)
-   local function append_base_directory (i, filename)
+   local arg = {...}
+   for i, filename in ipairs (arg) do
       arg[i] = base_directory (P.package_file) .. "/" .. arg[i]
    end
-   table.foreachi (arg, append_base_directory)
    return MININIM.video.shader (unpack (arg))
 end
 
 function load_bitmap (P, filename, ...)
    return MININIM.video.bitmap (
-      resource_filename (P, filename, unpack (arg)))
+      resource_filename (P, filename, ...))
 end
 
 function load_font (P, filename, ...)
    return MININIM.video.font (
-      resource_filename (P, filename, unpack (arg)))
+      resource_filename (P, filename, ...))
 end
 
 function load_sample (P, filename, ...)
    return MININIM.audio.source (
-      resource_filename (P, filename, unpack (arg)), "SAMPLE")
+      resource_filename (P, filename, ...), "SAMPLE")
 end
 
 function load_stream (P, filename, ...)
    return MININIM.audio.source (
-      resource_filename (P, filename, unpack (arg)), "STREAM")
+      resource_filename (P, filename, ...), "STREAM")
 end
 
 function eval_clipboard ()
@@ -201,7 +203,7 @@ function palette_table_to_shader (t)
       table.insert (palette_table_in, i)
       table.insert (palette_table_out, o)
    end
-   if table.getn (palette_table_in) < 64
+   if #palette_table_in < 64
    then table.insert (palette_table_in, {-1, -1, -1, -1})
    end
    local p = string.lower (MININIM.video.shader_platform)

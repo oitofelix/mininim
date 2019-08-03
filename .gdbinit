@@ -1,1 +1,1 @@
-source tools/luagdb.txt
+source tools/lua-gdb.py

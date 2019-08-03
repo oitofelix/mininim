@@ -25,7 +25,7 @@ local P = {package_type = "VIDEO MODE", package_name = "VGA",
 -- imports
 local _debug = _debug
 local os = os
-local unpack = unpack
+local unpack = table.unpack
 local math = math
 local assert = assert
 local getmetatable = getmetatable
@@ -58,7 +58,7 @@ local to_color_range = common.to_color_range
 local palette_table_color = common.palette_table_color
 
 -- body
-setfenv (1, P)
+local _ENV = P
 
 local REAL_WIDTH = 320
 local REAL_HEIGHT = 200
@@ -81,11 +81,11 @@ local apply_palettes
 local draw
 
 function load_bitmap (filename, ...)
-   return common.load_bitmap (P, filename, unpack (arg))
+   return common.load_bitmap (P, filename, ...)
 end
 
 function load_font (filename, ...)
-   return common.load_font (P, filename, unpack (arg))
+   return common.load_font (P, filename, ...)
 end
 
 function coord (x, y, room)
@@ -481,16 +481,16 @@ function video.OBJECT:DRAW (p, width, ...)
          local b = apply_palettes (self.bitmap, p)
          b.draw (self:rect (p), 0, 0, width)
       end
-   else return self[p]:DRAW (width, unpack (arg)) end
+   else return self[p]:DRAW (width, ...) end
 end
 
 function video.OBJECT:RECTANGLE (p, ...)
    if type (p) == "userdata" then return self:rect (p)
-   else return self[p]:RECTANGLE (unpack (arg)) end
+   else return self[p]:RECTANGLE (...) end
 end
 
 function video.OBJECT:BITMAP (part, ...)
-   if part then return self[part]:BITMAP (unpack (arg))
+   if part then return self[part]:BITMAP (...)
    elseif not self.bitmap then
       self.bitmap = self:CREATE_BITMAP () end
    local b = apply_palettes (self.bitmap)
@@ -1279,10 +1279,12 @@ function video.DOOR.GRID:create_bitmap (i)
    local t = {17, 13, 13, 11, 7, 7, 5, 1}
 
    local function eraser (row, max_col)
-      for x = 0, max_col do b.set_pixel (x, row - 1, TRANSPARENT) end
+
    end
 
-   table.foreachi (t, eraser)
+   for row, max_col in ipairs (t)
+   do for x = 0, max_col do b.set_pixel (x, row - 1, TRANSPARENT) end
+   end
 
    return b
 end
@@ -1775,7 +1777,7 @@ end
 video.FRAME = new (video.OBJECT)
 
 function video.FRAME:BITMAP (part, ...)
-   if part then return self[part]:BITMAP (unpack (arg)) end
+   if part then return self[part]:BITMAP (...) end
    return self.bitmap
 end
 
@@ -2951,7 +2953,7 @@ function ASSET:load_actor (atype, action)
    type_dir = string.gsub (type_dir, "_", "-")
    local action_dir = string.lower (action)
    action_dir = string.gsub (action_dir, "_", "-")
-   local number_fmt = table.getn (o) >= 10 and "%02d" or "%i"
+   local number_fmt = #o >= 10 and "%02d" or "%i"
    for i, v in ipairs (o) do
       v.bitmap = load_bitmap ("%s/%s/" .. number_fmt .. ".png",
                               type_dir, action_dir, i, type_dir)
@@ -2969,6 +2971,8 @@ end
 
 -- VGA video mode interface
 MININIM.lua.video_mode["DOS VGA"] = function (command, object, ...)
+   local arg = {...}
+
    if command == "DEBUG" then
       local t = {video = video, asset = asset}
       return t[object]

@@ -85,8 +85,8 @@ END_LUA
 
 BEGIN_LUA (__eq)
 {
-  ALLEGRO_COLOR *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
-  ALLEGRO_COLOR *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c0 = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c1 = luaL_testudata (L, 2, L_MININIM_VIDEO_COLOR);
   if (c0 && c1) lua_pushboolean (L, color_eq (*c0, *c1));
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
@@ -95,7 +95,7 @@ END_LUA
 
 BEGIN_LUA (__index)
 {
-  ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
 
   ALLEGRO_COLOR c;
   if (c_ptr) c = *c_ptr;
@@ -150,7 +150,7 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  ALLEGRO_COLOR *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
   if (! c) return 0;
 
   const char *key;
@@ -204,7 +204,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  ALLEGRO_COLOR *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
   if (c) {
     unsigned char r, g, b, a;
     al_unmap_rgba (*c, &r, &g, &b, &a);

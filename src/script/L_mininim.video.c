@@ -291,7 +291,7 @@ _rect_object_index_part (struct rect *r_ret, const char *object,
                   actor_id, -1);
 
   struct rect *r_ptr =
-    luaL_checkudata (L, -1, L_MININIM_VIDEO_RECTANGLE);
+    luaL_testudata (L, -1, L_MININIM_VIDEO_RECTANGLE);
 
   lua_pop (L, 1);
 
@@ -314,7 +314,7 @@ _bitmap_object_index_part (const char *object, uintptr_t index,
   bool r = video (NULL, 1, "BITMAP", object, index, part, NULL, -1, -1);
 
   ALLEGRO_BITMAP **b_ptr =
-    luaL_checkudata (L, -1, L_MININIM_VIDEO_BITMAP);
+    luaL_testudata (L, -1, L_MININIM_VIDEO_BITMAP);
 
   lua_pop (L, 1);
 

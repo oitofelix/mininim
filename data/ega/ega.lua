@@ -41,7 +41,7 @@ local os = os
 
 
 -- body
-setfenv (1, P)
+local _ENV = P
 
 local PLACE_WIDTH = 32
 local PLACE_HEIGHT = 63
