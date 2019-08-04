@@ -29,147 +29,166 @@ include documentation.am
 ###########
 
 bin_PROGRAMS = mininim
-mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
-	  src/ui-command.c src/ui-command.h src/hotkeys.c src/hotkeys.h			\
-	  src/constants.h src/types.h src/colors.h src/anim.c src/anim.h		\
-	  src/actor.c src/actor.h src/pos.c src/pos.h src/physics.c					\
-	  src/physics.h src/level.c src/level.h src/fix.c src/fix.h					\
-	  src/loose-floor.c src/loose-floor.h src/opener-floor.c						\
-	  src/opener-floor.h src/closer-floor.c src/closer-floor.h					\
-	  src/spikes-floor.c src/spikes-floor.h src/door.c src/door.h				\
-	  src/level-door.c src/level-door.h src/chomper.c src/chomper.h			\
-	  src/carpet.c src/carpet.h src/mirror.c src/mirror.h src/room.c		\
-	  src/room.h src/fire.c src/fire.h src/potion.c src/potion.h				\
-	  src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c		\
-	  src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h	\
-	  src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h	\
-	  src/fight.c src/fight.h src/dat.c src/dat.h src/wall.c src/wall.h	\
-	  src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\
-	  src/kid/kid-normal.h src/kid/kid-walk.c src/kid/kid-walk.h				\
-	  src/kid/kid-start-run.c src/kid/kid-start-run.h src/kid/kid-run.c	\
-	  src/kid/kid-run.h src/kid/kid-stop-run.c src/kid/kid-stop-run.h		\
-	  src/kid/kid-turn-run.c src/kid/kid-turn-run.h											\
-	  src/kid/kid-crouch.c src/kid/kid-crouch.h src/kid/kid-turn.c			\
-	  src/kid/kid-turn.h src/kid/kid-stabilize.c												\
-	  src/kid/kid-stabilize.h src/kid/kid-jump.c src/kid/kid-jump.h			\
-	  src/kid/kid-vjump.c src/kid/kid-vjump.h src/kid/kid-run-jump.c		\
-	  src/kid/kid-run-jump.h src/kid/kid-misstep.c											\
-	  src/kid/kid-misstep.h src/kid/kid-hang.c src/kid/kid-hang.h				\
-	  src/kid/kid-hang-free.c src/kid/kid-hang-free.h										\
-	  src/kid/kid-hang-non-free.c src/kid/kid-hang-non-free.h						\
-	  src/kid/kid-climb.c src/kid/kid-climb.h src/kid/kid-unclimb.c			\
-	  src/kid/kid-unclimb.h src/kid/kid-fall.c src/kid/kid-fall.h				\
-	  src/kid/kid-drink.c src/kid/kid-drink.h src/kid/kid-raise-sword.c	\
-	  src/kid/kid-raise-sword.h src/kid/kid-keep-sword.c								\
-	  src/kid/kid-keep-sword.h src/kid/kid-take-sword.c									\
-	  src/kid/kid-take-sword.h src/kid/kid-sword-normal.c								\
-	  src/kid/kid-sword-normal.h src/kid/kid-sword-walkf.c							\
-	  src/kid/kid-sword-walkf.h src/kid/kid-sword-walkb.c								\
-	  src/kid/kid-sword-walkb.h src/kid/kid-sword-defense.c							\
-	  src/kid/kid-sword-defense.h src/kid/kid-sword-attack.c						\
-	  src/kid/kid-sword-attack.h src/kid/kid-sword-hit.c								\
-	  src/kid/kid-sword-hit.h src/kid/kid-die.c src/kid/kid-die.h				\
-	  src/kid/kid-stairs.c src/kid/kid-stairs.h src/guard/guard.c				\
-	  src/guard/guard.h src/guard/guard-normal.c												\
-	  src/guard/guard-normal.h src/guard/guard-sword-normal.c						\
-	  src/guard/guard-sword-normal.h src/guard/guard-sword-hit.c				\
-	  src/guard/guard-sword-hit.h src/guard/guard-die.c									\
-	  src/guard/guard-die.h src/guard/guard-fall.c											\
-	  src/guard/guard-fall.h src/guard/guard-sword-walkf.c							\
-	  src/guard/guard-sword-walkf.h src/guard/guard-sword-walkb.c				\
-	  src/guard/guard-sword-walkb.h src/guard/guard-sword-attack.c			\
-	  src/guard/guard-sword-attack.h src/guard/guard-sword-defense.c		\
-	  src/guard/guard-sword-defense.h src/levels/native-level.c					\
-	  src/levels/native-level.h src/levels/consistency-level.c					\
-	  src/levels/consistency-level.h src/levels/legacy-level.c					\
-	  src/levels/legacy-level.h src/levels/dat-level.c									\
-	  src/levels/dat-level.h src/levels/plv-level.c											\
-	  src/levels/plv-level.h src/kernel/event.c src/kernel/event.h			\
-	  src/kernel/video.c src/kernel/video.h src/kernel/audio.c					\
-	  src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h				\
-	  src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/pointer.c		\
-	  src/kernel/pointer.h src/kernel/random.c src/kernel/random.h			\
-	  src/kernel/array.c src/kernel/array.h src/kernel/file.c						\
-	  src/kernel/file.h src/kernel/dialog.c src/kernel/dialog.h					\
-	  src/kernel/xconfig.c src/kernel/xconfig.h src/kernel/diff.c				\
-	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
-	  src/kernel/xstring.c src/kernel/xstring.h src/kernel/tree.c				\
-	  src/kernel/tree.h src/bmenu.c src/bmenu.h src/editor.c						\
-	  src/editor.h src/debug.c src/debug.h src/undo.c src/undo.h				\
-	  src/multi-room.c src/multi-room.h src/sel-ring.c src/sel-ring.h		\
-	  src/view-ring.c src/view-ring.h src/replay.c src/replay.h					\
-	  src/script/repl.c src/script/repl.h src/script/script.c						\
-	  src/script/script.h src/script/L_mininim.c src/script/L_mininim.h	\
-	  src/script/L_mininim.level.c src/script/L_mininim.level.h					\
-	  src/script/L_mininim.level.position.c															\
-	  src/script/L_mininim.level.position.h															\
-	  src/script/L_mininim.actor.c src/script/L_mininim.actor.h					\
-	  src/script/L_mininim.audio.c src/script/L_mininim.audio.h					\
-	  src/script/L_mininim.audio.source.c																\
-	  src/script/L_mininim.audio.source.h src/script/L_mininim.video.c	\
-	  src/script/L_mininim.video.h src/script/L_mininim.video.bitmap.c	\
-	  src/script/L_mininim.video.bitmap.h																\
-	  src/script/L_mininim.video.font.c																	\
-	  src/script/L_mininim.video.font.h																	\
-	  src/script/L_mininim.video.color.c																\
-	  src/script/L_mininim.video.color.h																\
-	  src/script/L_mininim.video.rectangle.c														\
-	  src/script/L_mininim.video.rectangle.h														\
-	  src/script/L_mininim.video.shader.c																\
-	  src/script/L_mininim.video.shader.h																\
-	  src/script/L_mininim.settings.c src/script/L_mininim.settings.h		\
-	  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h					\
-	  src/script/L_mininim.multiroom.c src/script/L_mininim.multiroom.h	\
-	  src/script/L_mininim.profiler.c src/script/L_mininim.profiler.h		\
-	  src/script/L_mininim.debugger.c src/script/L_mininim.debugger.h		\
-	  src/script/L_mininim.math.c src/script/L_mininim.math.h						\
-	  src/gui/gui.c src/gui/gui.h src/gui/gui-icons.h										\
-	  src/gui/gui-menu.c src/gui/gui-menu.h src/gui/gui-editor-dialog.c	\
-	  src/gui/gui-editor-dialog.h src/gui/gui-undo-control.c						\
-	  src/gui/gui-undo-control.h src/gui/gui-tile-part-control.c				\
-	  src/gui/gui-tile-part-control.h src/gui/gui-tile-part-dialog.c		\
-	  src/gui/gui-tile-part-dialog.h																		\
-	  src/gui/gui-tile-clipboard-control.c															\
-	  src/gui/gui-tile-clipboard-control.h															\
-	  src/gui/gui-tile-transform-control.c															\
-	  src/gui/gui-tile-transform-control.h															\
-	  src/gui/gui-tile-mirror-control.c																	\
-	  src/gui/gui-tile-mirror-control.h src/gui/gui-tile-move-control.c	\
-	  src/gui/gui-tile-move-control.h src/gui/gui-position-control.c		\
-	  src/gui/gui-position-control.h																		\
-	  src/gui/gui-editor-events-control.c																\
-	  src/gui/gui-editor-events-control.h																\
-	  src/gui/gui-editor-room-control.c																	\
-	  src/gui/gui-editor-room-control.h																	\
-	  src/gui/gui-editor-toolbar-control.c															\
-	  src/gui/gui-editor-toolbar-control.h															\
-	  src/gui/gui-directional-control.c																	\
-	  src/gui/gui-directional-control.h																	\
-	  src/gui/gui-coordinates-control.c																	\
-	  src/gui/gui-coordinates-control.h src/gui/gui-zoom-control.c			\
-	  src/gui/gui-zoom-control.h src/gui/gui-place-control.c						\
-	  src/gui/gui-place-control.h src/gui/gui-mr-origin-control.c				\
-	  src/gui/gui-mr-origin-control.h src/gui/gui-row-control.c					\
-	  src/gui/gui-row-control.h src/gui/gui-page-control.c							\
-	  src/gui/gui-page-control.h src/gui/gui-editor-tabs.c							\
-	  src/gui/gui-editor-tabs.h src/gui/gui-editor-tile-control.c				\
-	  src/gui/gui-editor-tile-control.h																	\
-	  src/gui/gui-editor-view-nav-control.c															\
+mininim_SOURCES = src/mininim.c src/mininim.h src/test.c src/test.h	\
+	  src/settings.c src/settings.h src/compatibility.h		\
+	  src/ui-command.c src/ui-command.h src/hotkeys.c		\
+	  src/hotkeys.h src/constants.h src/types.h src/colors.h	\
+	  src/anim.c src/anim.h src/actor.c src/actor.h src/pos.c	\
+	  src/pos.h src/physics.c src/physics.h src/level.c		\
+	  src/level.h src/fix.c src/fix.h src/loose-floor.c		\
+	  src/loose-floor.h src/opener-floor.c src/opener-floor.h	\
+	  src/closer-floor.c src/closer-floor.h src/spikes-floor.c	\
+	  src/spikes-floor.h src/door.c src/door.h src/level-door.c	\
+	  src/level-door.h src/chomper.c src/chomper.h src/carpet.c	\
+	  src/carpet.h src/mirror.c src/mirror.h src/room.c		\
+	  src/room.h src/fire.c src/fire.h src/potion.c src/potion.h	\
+	  src/sword.c src/sword.h src/clock.c src/clock.h		\
+	  src/princess.c src/princess.h src/jaffar.c src/jaffar.h	\
+	  src/mouse.c src/mouse.h src/audio-data.c src/audio-data.h	\
+	  src/cutscenes.c src/cutscenes.h src/fight.c src/fight.h	\
+	  src/dat.c src/dat.h src/wall.c src/wall.h src/kid/kid.c	\
+	  src/kid/kid.h src/kid/kid-normal.c src/kid/kid-normal.h	\
+	  src/kid/kid-walk.c src/kid/kid-walk.h				\
+	  src/kid/kid-start-run.c src/kid/kid-start-run.h		\
+	  src/kid/kid-run.c src/kid/kid-run.h src/kid/kid-stop-run.c	\
+	  src/kid/kid-stop-run.h src/kid/kid-turn-run.c			\
+	  src/kid/kid-turn-run.h src/kid/kid-crouch.c			\
+	  src/kid/kid-crouch.h src/kid/kid-turn.c src/kid/kid-turn.h	\
+	  src/kid/kid-stabilize.c src/kid/kid-stabilize.h		\
+	  src/kid/kid-jump.c src/kid/kid-jump.h src/kid/kid-vjump.c	\
+	  src/kid/kid-vjump.h src/kid/kid-run-jump.c			\
+	  src/kid/kid-run-jump.h src/kid/kid-misstep.c			\
+	  src/kid/kid-misstep.h src/kid/kid-hang.c src/kid/kid-hang.h	\
+	  src/kid/kid-hang-free.c src/kid/kid-hang-free.h		\
+	  src/kid/kid-hang-non-free.c src/kid/kid-hang-non-free.h	\
+	  src/kid/kid-climb.c src/kid/kid-climb.h			\
+	  src/kid/kid-unclimb.c src/kid/kid-unclimb.h			\
+	  src/kid/kid-fall.c src/kid/kid-fall.h src/kid/kid-drink.c	\
+	  src/kid/kid-drink.h src/kid/kid-raise-sword.c			\
+	  src/kid/kid-raise-sword.h src/kid/kid-keep-sword.c		\
+	  src/kid/kid-keep-sword.h src/kid/kid-take-sword.c		\
+	  src/kid/kid-take-sword.h src/kid/kid-sword-normal.c		\
+	  src/kid/kid-sword-normal.h src/kid/kid-sword-walkf.c		\
+	  src/kid/kid-sword-walkf.h src/kid/kid-sword-walkb.c		\
+	  src/kid/kid-sword-walkb.h src/kid/kid-sword-defense.c		\
+	  src/kid/kid-sword-defense.h src/kid/kid-sword-attack.c	\
+	  src/kid/kid-sword-attack.h src/kid/kid-sword-hit.c		\
+	  src/kid/kid-sword-hit.h src/kid/kid-die.c src/kid/kid-die.h	\
+	  src/kid/kid-stairs.c src/kid/kid-stairs.h src/guard/guard.c	\
+	  src/guard/guard.h src/guard/guard-normal.c			\
+	  src/guard/guard-normal.h src/guard/guard-sword-normal.c	\
+	  src/guard/guard-sword-normal.h src/guard/guard-sword-hit.c	\
+	  src/guard/guard-sword-hit.h src/guard/guard-die.c		\
+	  src/guard/guard-die.h src/guard/guard-fall.c			\
+	  src/guard/guard-fall.h src/guard/guard-sword-walkf.c		\
+	  src/guard/guard-sword-walkf.h src/guard/guard-sword-walkb.c	\
+	  src/guard/guard-sword-walkb.h					\
+	  src/guard/guard-sword-attack.c				\
+	  src/guard/guard-sword-attack.h				\
+	  src/guard/guard-sword-defense.c				\
+	  src/guard/guard-sword-defense.h src/levels/native-level.c	\
+	  src/levels/native-level.h src/levels/consistency-level.c	\
+	  src/levels/consistency-level.h src/levels/legacy-level.c	\
+	  src/levels/legacy-level.h src/levels/dat-level.c		\
+	  src/levels/dat-level.h src/levels/plv-level.c			\
+	  src/levels/plv-level.h src/kernel/event.c			\
+	  src/kernel/event.h src/kernel/video.c src/kernel/video.h	\
+	  src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c	\
+	  src/kernel/memory.h src/kernel/gamepad.c			\
+	  src/kernel/gamepad.h src/kernel/pointer.c			\
+	  src/kernel/pointer.h src/kernel/random.c			\
+	  src/kernel/random.h src/kernel/array.c src/kernel/array.h	\
+	  src/kernel/file.c src/kernel/file.h src/kernel/dialog.c	\
+	  src/kernel/dialog.h src/kernel/xconfig.c			\
+	  src/kernel/xconfig.h src/kernel/diff.c src/kernel/diff.h	\
+	  src/kernel/xmath.c src/kernel/xmath.h src/kernel/xstring.c	\
+	  src/kernel/xstring.h src/kernel/tree.c src/kernel/tree.h	\
+	  src/bmenu.c src/bmenu.h src/editor.c src/editor.h		\
+	  src/debug.c src/debug.h src/undo.c src/undo.h			\
+	  src/multi-room.c src/multi-room.h src/sel-ring.c		\
+	  src/sel-ring.h src/view-ring.c src/view-ring.h src/replay.c	\
+	  src/replay.h src/script/repl.c src/script/repl.h		\
+	  src/script/script.c src/script/script.h			\
+	  src/script/L_mininim.c src/script/L_mininim.h			\
+	  src/script/L_mininim.level.c src/script/L_mininim.level.h	\
+	  src/script/L_mininim.level.position.c				\
+	  src/script/L_mininim.level.position.h				\
+	  src/script/L_mininim.actor.c src/script/L_mininim.actor.h	\
+	  src/script/L_mininim.audio.c src/script/L_mininim.audio.h	\
+	  src/script/L_mininim.audio.source.c				\
+	  src/script/L_mininim.audio.source.h				\
+	  src/script/L_mininim.video.c src/script/L_mininim.video.h	\
+	  src/script/L_mininim.video.bitmap.c				\
+	  src/script/L_mininim.video.bitmap.h				\
+	  src/script/L_mininim.video.font.c				\
+	  src/script/L_mininim.video.font.h				\
+	  src/script/L_mininim.video.color.c				\
+	  src/script/L_mininim.video.color.h				\
+	  src/script/L_mininim.video.rectangle.c			\
+	  src/script/L_mininim.video.rectangle.h			\
+	  src/script/L_mininim.video.shader.c				\
+	  src/script/L_mininim.video.shader.h				\
+	  src/script/L_mininim.settings.c				\
+	  src/script/L_mininim.settings.h				\
+	  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h	\
+	  src/script/L_mininim.multiroom.c				\
+	  src/script/L_mininim.multiroom.h				\
+	  src/script/L_mininim.profiler.c				\
+	  src/script/L_mininim.profiler.h				\
+	  src/script/L_mininim.debugger.c				\
+	  src/script/L_mininim.debugger.h src/script/L_mininim.math.c	\
+	  src/script/L_mininim.math.h src/gui/gui.c src/gui/gui.h	\
+	  src/gui/gui-icons.h src/gui/gui-menu.c src/gui/gui-menu.h	\
+	  src/gui/gui-editor-dialog.c src/gui/gui-editor-dialog.h	\
+	  src/gui/gui-undo-control.c src/gui/gui-undo-control.h		\
+	  src/gui/gui-tile-part-control.c				\
+	  src/gui/gui-tile-part-control.h				\
+	  src/gui/gui-tile-part-dialog.c				\
+	  src/gui/gui-tile-part-dialog.h				\
+	  src/gui/gui-tile-clipboard-control.c				\
+	  src/gui/gui-tile-clipboard-control.h				\
+	  src/gui/gui-tile-transform-control.c				\
+	  src/gui/gui-tile-transform-control.h				\
+	  src/gui/gui-tile-mirror-control.c				\
+	  src/gui/gui-tile-mirror-control.h				\
+	  src/gui/gui-tile-move-control.c				\
+	  src/gui/gui-tile-move-control.h				\
+	  src/gui/gui-position-control.c				\
+	  src/gui/gui-position-control.h				\
+	  src/gui/gui-editor-events-control.c				\
+	  src/gui/gui-editor-events-control.h				\
+	  src/gui/gui-editor-room-control.c				\
+	  src/gui/gui-editor-room-control.h				\
+	  src/gui/gui-editor-toolbar-control.c				\
+	  src/gui/gui-editor-toolbar-control.h				\
+	  src/gui/gui-directional-control.c				\
+	  src/gui/gui-directional-control.h				\
+	  src/gui/gui-coordinates-control.c				\
+	  src/gui/gui-coordinates-control.h				\
+	  src/gui/gui-zoom-control.c src/gui/gui-zoom-control.h		\
+	  src/gui/gui-place-control.c src/gui/gui-place-control.h	\
+	  src/gui/gui-mr-origin-control.c				\
+	  src/gui/gui-mr-origin-control.h src/gui/gui-row-control.c	\
+	  src/gui/gui-row-control.h src/gui/gui-page-control.c		\
+	  src/gui/gui-page-control.h src/gui/gui-editor-tabs.c		\
+	  src/gui/gui-editor-tabs.h src/gui/gui-editor-tile-control.c	\
+	  src/gui/gui-editor-tile-control.h				\
+	  src/gui/gui-editor-view-nav-control.c				\
 	  src/gui/gui-editor-view-nav-control.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"											\
--DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib					\
-${LUA_INCLUDE} -I$(top_srcdir)/gnulib -I${builddir}/src					\
--I${srcdir}/src -I${srcdir}/src/kernel -I${srcdir}/src/guard		\
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"			\
+-DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib		\
+${LUA_INCLUDE} -I$(top_srcdir)/gnulib -I${builddir}/src		\
+-I${srcdir}/src -I${srcdir}/src/kernel -I${srcdir}/src/guard	\
 -I${srcdir}/src/kid -I${srcdir}/src/levels -I${srcdir}/src/wall	\
 -I${srcdir}/src/script -I${srcdir}/src/gui
 
-AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
-	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}		\
+AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}		\
+	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}	\
 	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}	\
-	${ALLEGRO_MAIN_CFLAGS} ${ALLEGRO_DIALOG_CFLAGS}			\
+	${ALLEGRO_MAIN_CFLAGS} ${ALLEGRO_DIALOG_CFLAGS}		\
 	${ALLEGRO_COLOR_CFLAGS}
 
 if DEBUG
@@ -186,10 +205,10 @@ if PROFILING
  CFLAGS += -O0 -pg --coverage
 endif
 
-LIBS = -lm -lreadline ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}				\
+LIBS = -lm -lreadline ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}		\
 ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
-${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
-${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}				\
+${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}				\
+${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}		\
 ${LUA_LIB}
 
 LDADD = gnulib/libgnu.a $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL)	\
@@ -209,13 +228,35 @@ endif
 SUFFIXES = .rc
 WINDRES = ${host}-windres
 
+clean-tangle:
+	rm -f src/mininim.{c,h} src/settings.{c,h} src/test.{c,h}	\
+		src/kernel/xstring.{c,h}
+
+TAGS:
+	find . -type f -print | etags -
+
+test: mininim
+	./mininim --test
+
+coverage.info: test
+	lcov --capture --directory src --output-file coverage.info
+
+coverage: coverage.info
+	genhtml coverage.info --output-directory coverage.dir
+
+cyclomatic:
+	cccc /src/*.c /src/*/*.c
+
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 
-${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
+${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h} *.org
 	$(AM_V_CC) $(COMPILE) ${AM_CFLAGS} -o $@ -c $<
 
 gnulib/libgnu.a:
 	cd gnulib && $(MAKE)
+
+%.c %.h: %.org
+	emacs '$(basename $@).org' --quick --batch --funcall='toggle-debug-on-error' --load='org' --eval='(org-babel-goto-named-src-block "$(notdir $@)")' --eval="(org-babel-tangle '(4))"
 
 %.rc.$(OBJEXT): %.rc
 	$(WINDRES) $(WINDRESFLAGS) -o $@ $<
@@ -342,4 +383,4 @@ ensure-vcs :
 	  echo "***** Sorry, the requested target can only be made from \
 	VCS checkouts. *****"; exit 1; fi
 
-.PHONY : ensure-vcs
+.PHONY : ensure-vcs mostlyclean-am clean-am

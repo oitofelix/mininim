@@ -130,3 +130,8 @@ Makefile.in
 # Local Variables:
 # mode: conf-space
 # End:
+/.cccc/
+/TAGS
+/coverage.dir/
+*.html
+/mac/

@@ -1,0 +1,475 @@
+#+TITLE: MININIM Xstring
+#+PROPERTY: header-args :noweb no-export :comments noweb
+* COMMENT Copyright Notice
+  Copyright (C) Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3, or (at your option)
+  any later version.
+
+  This program is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see
+  <http://www.gnu.org/licenses/>.
+
+* COMMENT Tangle
+** =xstring.h=
+
+   #+NAME: xstring.h
+   #+BEGIN_SRC c :tangle xstring.h
+     #ifndef MININIM_XSTRING_H
+     #define MININIM_XSTRING_H
+     #include "mininim.h"
+     <<h_inc>>
+     <<h_mac>>
+     <<h_exp_data>>
+     <<h_exp_func>>
+     #endif
+   #+END_SRC
+
+** =xstring.c=
+
+   #+NAME: xstring.c
+   #+BEGIN_SRC c :tangle xstring.c
+     #include "mininim.h"
+     <<c_inc>>
+     <<c_mac>>
+     <<c_proto>>
+     <<c_priv_data>>
+     <<c_pub_data>>
+     <<c_priv_func>>
+     <<c_pub_func>>
+   #+END_SRC
+
+* ~TOSTRING(x)~
+
+  #+BEGIN_SRC c :noweb-ref h_mac
+    #define _STR(x) #x
+    #define STR(x) _STR(x)
+  #+END_SRC
+
+* ~SHORTEN_STRING_ELLIPSIS~
+
+  #+BEGIN_SRC c :noweb-ref h_mac
+    #define SHORTEN_STRING_ELLIPSIS L"..."
+  #+END_SRC
+
+* ~tolower_str~
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    void
+    tolower_str (char *str)
+    {
+      size_t i;
+      for (i = 0; str[i] != 0; i++) str[i] = tolower (str[i]);
+    }
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern void tolower_str (char *str);
+  #+END_SRC
+
+** Tests
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     void tolower_str_TEST ()
+     {
+       char *str = xasprintf ("%s", "MININIM");
+       tolower_str (str);
+       assert (! strcmp (str, "mininim"));
+       al_free (str);
+     }
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern void tolower_str_TEST ();
+   #+END_SRC
+
+* ~toupper_str~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern void toupper_str (char *str);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    void
+    toupper_str (char *str)
+    {
+      size_t i;
+      for (i = 0; str[i] != 0; i++) str[i] = toupper (str[i]);
+    }
+  #+END_SRC
+
+* ~repl_str_char~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern void repl_str_char (char *str, char a, char b);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    void
+    repl_str_char (char *str, char a, char b)
+    {
+      size_t i;
+      for (i = 0; str[i] != 0; i++) if (str[i] == a) str[i] = b;
+    }
+  #+END_SRC
+
+* ~trim_string~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern char *trim_string (char *s);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    char *
+    trim_string (char *s)
+    {
+      ALLEGRO_USTR *us = al_ustr_new (s);
+      al_ustr_trim_ws (us);
+      char *rs = al_cstr_dup (us);
+      al_ustr_free (us);
+      return rs;
+    }
+  #+END_SRC
+
+* ~repeat_char~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern char *repeat_char (char c, size_t n);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    char *
+    repeat_char (char c, size_t n)
+    {
+      char *s = xcalloc (n + 1, sizeof (*s));
+      size_t i;
+      for (i = 0; i < n; i++) s[i] = c;
+      s[n] = '\0';
+      return s;
+    }
+  #+END_SRC
+
+* ~str_end_matches~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern bool str_end_matches (const char *s, const char *m);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    bool
+    str_end_matches (const char *s, const char *m)
+    {
+      size_t ls = strlen (s), lm = strlen (m);
+      return ls >= lm && ! strcasecmp (s + ls - lm, m);
+    }
+  #+END_SRC
+
+* ~set_string_var~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern void set_string_var (char **var, const char *value);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    void
+    set_string_var (char **var, const char *value)
+    {
+      char *old_str = *var;
+      if (value) *var = xasprintf ("%s", value);
+      else *var = NULL;
+      al_free (old_str);
+    }
+  #+END_SRC
+
+* ~str2enum~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern int str2enum (char *enum2str[], char *str);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    int
+    str2enum (char *enum2str[], char *str)
+    {
+      for (size_t i = 0; enum2str[i]; i++)
+	if (! strcmp (str, enum2str[i])) return i;
+      return -1;
+    }
+  #+END_SRC
+
+* Terminal formatting
+
+** ~fmt_begin~
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern void fmt_begin (int ncols);
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_priv_data
+     static size_t *fmt_width;
+     static size_t fmt_width_nmemb;
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     void
+     fmt_begin (int ncols)
+     {
+       assert (! fmt_width && fmt_width_nmemb == 0);
+       fmt_width = xcalloc (ncols, sizeof (*fmt_width));
+       memset (fmt_width, 0, ncols * sizeof (*fmt_width));
+       fmt_width_nmemb = ncols;
+     }
+   #+END_SRC
+
+** ~fmt_row~
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern char *fmt_row (const char *fmt, ...);
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     char *
+     fmt_row (const char *fmt, ...)
+     {
+       va_list ap;
+       va_start (ap, fmt);
+
+       char *r = NULL;
+
+       if (fmt) r = xvasprintf (fmt, ap);
+       else {
+	 va_arg (ap, char *); /* ignore first */
+	 size_t i;
+	 for (i = 0; i < fmt_width_nmemb; i++) {
+	   char *s = va_arg (ap, char *);
+	   size_t l = strlen (s);
+	   if (fmt_width[i] < l) fmt_width[i] = l;
+	 }
+       }
+
+       va_end (ap);
+
+       return r;
+     }
+   #+END_SRC
+
+* ~term_cols~
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    uint
+    term_cols (void)
+    {
+      static const uint MAX_TERM_COLS = 320, DEFAULT_TERM_COLS = 80;
+    #if WINDOWS_PORT
+      CONSOLE_SCREEN_BUFFER_INFO csbi;
+      GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
+      uint cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+      return cols <= MAX_TERM_COLS ? cols : DEFAULT_TERM_COLS;
+    #else
+      struct winsize win;
+      if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &win) < 0) return DEFAULT_TERM_COLS;
+      else return win.ws_col <= MAX_TERM_COLS ? win.ws_col : DEFAULT_TERM_COLS;
+    #endif
+    }
+  #+END_SRC
+
+  This function is exported.
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern uint term_cols (void);
+  #+END_SRC
+
+* ~fmt_end~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern char *fmt_end (void);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    char *
+    fmt_end (void)
+    {
+      const char *sep = " ";
+
+      int total_width = 0;
+      size_t i;
+      for (i = 0; i < fmt_width_nmemb; i++)
+	total_width += fmt_width[i];
+
+      int avail_width =
+	max_int (0, term_cols () - 1 - (fmt_width_nmemb - 1) * strlen (sep));
+
+      if (total_width == 0) total_width = 1;
+
+      char *h = xasprintf ("%%s");
+
+      for (i = 0; i < fmt_width_nmemb; i++) {
+	int w = (fmt_width[i] * avail_width) / total_width;
+	if (total_width < avail_width) {
+	  w = fmt_width[i] + (avail_width - total_width) / fmt_width_nmemb;
+	} else if (w < fmt_width[i] / 2.0 && avail_width >= fmt_width[i] + 1) {
+	  w = fmt_width[i];
+	  total_width -= w;
+	  avail_width -= w + 1;
+	}
+
+	assert (avail_width >= 0);
+
+	char *old_h = h;
+	h = xasprintf ("%1$s%%-%2$i.%2$is%3$s", old_h, w,
+		       i + 1 < fmt_width_nmemb ? sep : "");
+	al_free (old_h);
+      }
+
+      char *old_h = h;
+      h = xasprintf ("%s%%s", old_h);
+      al_free (old_h);
+
+      al_free (fmt_width);
+      fmt_width = NULL;
+      fmt_width_nmemb = 0;
+
+      return h;
+    }
+  #+END_SRC
+
+* ~fmt_manual~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern char *fmt_manual (const char *sep, ...);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    char *
+    fmt_manual (const char *sep, ...)
+    {
+      int *width = NULL;
+      size_t width_nmemb = 0;
+
+      va_list ap;
+      va_start (ap, sep);
+
+      size_t i;
+      int w;
+      for (i = 0; (w = va_arg (ap, int)); i++)
+	width = add_to_array (&w, 1, width, &width_nmemb,
+			      width_nmemb, sizeof (w));
+
+      int fixed_width = (width_nmemb - 1) * strlen (sep);
+      int var_parts = 0;
+      for (i = 0; i < width_nmemb; i++)
+	if (width[i] > 0) fixed_width += width[i];
+	else var_parts += abs (width[i]);
+
+      int avail_width = max_int (0, term_cols () - 1 - fixed_width);
+      char *h = xasprintf ("%%s");
+      for (i = 0; i < width_nmemb; i++) {
+	int w;
+	if (width[i] > 0) w = width[i];
+	else w = (abs (width[i]) * avail_width) / var_parts;
+	char *old_h = h;
+	h = xasprintf ("%1$s%%-%2$i.%2$is%3$s", old_h, w,
+		       i + 1 < width_nmemb ? sep : "");
+	al_free (old_h);
+      }
+
+      char *old_h = h;
+      h = xasprintf ("%s%%s", old_h);
+      al_free (old_h);
+
+      va_end (ap);
+
+      return h;
+    }
+  #+END_SRC
+
+* ~hline~
+
+  #+BEGIN_SRC c :noweb-ref h_exp_func
+    extern char *hline (char c);
+  #+END_SRC
+
+  #+BEGIN_SRC c :noweb-ref c_pub_func
+    char *
+    hline (char c)
+    {
+      return repeat_char (c, term_cols () - 1);
+    }
+  #+END_SRC
+
+* Multi-byte strings
+** ~m2w_str~
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern wchar_t *m2w_str (const char *s);
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     wchar_t *
+     m2w_str (const char *s)
+     {
+       size_t ls = strlen (s);
+       wchar_t *r = xcalloc (ls, sizeof (wchar_t));
+       mbsrtowcs (r, &s, ls, NULL);
+       r = xrealloc (r, (wcslen (r) + 1) * sizeof (*r));
+       return r;
+     }
+   #+END_SRC
+
+** ~w2m_str~
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern char *w2m_str (const wchar_t *s);
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     char *
+     w2m_str (const wchar_t *s)
+     {
+       size_t ls = wcslen (s);
+       char *r = xcalloc (ls, sizeof (wchar_t));
+       wcsrtombs (r, &s, ls * sizeof (wchar_t), NULL);
+       r = xrealloc (r, (strlen (r) + 1) * sizeof (*r));
+       return r;
+     }
+   #+END_SRC
+
+** ~shorten_str~
+
+   #+BEGIN_SRC c :noweb-ref h_exp_func
+     extern char *shorten_str (char *s, size_t max);
+   #+END_SRC
+
+   #+BEGIN_SRC c :noweb-ref c_pub_func
+     char *
+     shorten_str (char *s, size_t max)
+     {
+       wchar_t *ws = m2w_str (s);
+       size_t lws = wcslen (ws);
+       size_t le = wcslen (SHORTEN_STRING_ELLIPSIS);
+       assert (max >= le + 2);
+       if (lws > max) {
+	 wchar_t *wr = xcalloc (max + 1, sizeof (wchar_t));
+	 size_t lp = (max - le) / 2;
+	 size_t a = (max - le) % 2;
+	 wmemcpy (wr, ws, lp);;
+	 wmemcpy (wr + lp, SHORTEN_STRING_ELLIPSIS, le);
+	 wmemcpy (wr + lp + le, ws + lws - lp - a, lp + a);
+	 ,*(wr + lp + le + lp + a) = L'\0';
+	 char *r = w2m_str (wr);
+	 al_free (ws);
+	 al_free (wr);
+	 return r;
+       } else {
+	 al_free (ws);
+	 return strdup (s);
+       }
+     }
+   #+END_SRC
