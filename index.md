@@ -112,13 +112,9 @@ show your appreciation or enable oitofelix to spend more time on its
 development (so these features come out faster and better),
 [__PLEASE, CONSIDER SUPPORTING MININIM DEVELOPMENT!__](/funding.html)
 
-<div class="h" markdown="1">
-
 <a target="_blank" href="https://www.youtube.com/watch?v=qvZFpOMrqdE"><img src="https://img.youtube.com/vi/qvZFpOMrqdE/0.jpg" alt="MININIM Menu and Replays" /></a>
 
 <a target="_blank" href="https://www.youtube.com/watch?v=mj_GPdXnYDQ"><img src="https://img.youtube.com/vi/mj_GPdXnYDQ/0.jpg" alt="MININIM Lua and Video Modes" /></a>
-
-</div>
 
 [PODebug](http://www.podebug.com/2016/08/029-recriando-prince-of-persia-dois-projetos-brasileiros/)
 has a podcast episode from august 2016 titled _Recriando Prince of
