@@ -146,11 +146,12 @@ of "The Making of Price of Persia" book.  It appears in section
 
 It reads:
 
-<a target="_blank" href="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen.jpg">
-<img src="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen-thumbnail.jpg"></a>
+<a target="_blank" href="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen.png">
+<img src="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen-thumbnail.png"></a>
 
 <blockquote markdown="1">
 **Bruno Félix "oitofelix" Rezende Ribeiro**
+
 Brazil
 
 Attached is a screenshot of MININIM, the free software Advanced Prince
