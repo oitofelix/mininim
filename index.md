@@ -144,6 +144,25 @@ of "The Making of Price of Persia" book.  It appears in section
 <img src="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-thumbnail.jpg"></a>
 </div>
 
+It reads:
+
+<a target="_blank" href="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen.jpg">
+<img src="{{page.base_local}}{{site.baseurl}}/jordan-book-mininim-screen-thumbnail.jpg"></a>
+
+<blockquote markdown="1">
+**Bruno Félix "oitofelix" Rezende Ribeiro**
+Brazil
+
+Attached is a screenshot of MININIM, the free software Advanced Prince
+of Persia Engine I wrote from scratch in C and Lua, using the Allegro
+low-level game library and the IUP widget tool kit.
+
+Its features include Macintosh video mode (DOS VGA/EGA/CGA also
+availale) multiroom dsplay, real-time level editor GUI, and Lua REPL
+for on-the-fly scripting.
+
+</blockquote>
+
 ### Download
 
 MININIM is under constant and fast development.  It uses a rolling
