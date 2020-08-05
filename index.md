@@ -129,6 +129,11 @@ Persia legacy level set, using MININIM's replay capabilities is also
 [available](https://www.youtube.com/playlist?list=PLSibI2wnwb-Yf1bhWygaC-2Q8XcmJ8D0I)
 at oitofelix's channel.
 
+MININIM has been included in Jordan Mechner's 30th anniversary edition
+of "The Making of Price of Persia" book.
+
+<a target="_blank" href="{{page.base_local}}{{site.baseurl}}/jordan-book-cover-thumbnail.jpg">
+<img src="{{page.base_local}}{{site.baseurl}}/jordan-book-cover-thumbnail.jpg"></a>
 
 ### Download
 
