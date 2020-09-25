@@ -27,6 +27,7 @@ local _debug = _debug
 local os = os
 local unpack = table.unpack
 local math = math
+local toint = math.tointeger
 local assert = assert
 local getmetatable = getmetatable
 local pairs = pairs
@@ -1683,7 +1684,9 @@ function video.WALL_PALACE:generate_colors_for_room (room)
             local color
             repeat color = bcolor + prandom (3)
             until color ~= ocolor
-            self.color_cache[room][floor..","..row..","..col]
+		  self.color_cache[room][floor.."\0"..
+					 row.."\0"..
+					 col]
                = self.color[color + 1]
             ocolor = color
          end
@@ -1698,7 +1701,9 @@ function video.WALL_PALACE:cached_color (p, row, col)
    if not self.color_cache[np.room] then
       self:generate_colors_for_room (np.room) end
    return
-      self.color_cache[np.room][np.floor..","..row..","..np.place + col]
+      self.color_cache[np.room][toint(np.floor).."\0"..
+				toint(row).."\0"..
+				toint(np.place + col)]
 end
 
 function video.WALL_PALACE:brick_rect (p, row, col)
