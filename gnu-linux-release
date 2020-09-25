@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 # build MININIM
 if [ -f Makefile ]; then make clean; fi
@@ -104,11 +104,12 @@ cp allegro5.cfg $RELEASE_DIR/lib
 
 # strip binaries
 strip $RELEASE_DIR/lib/mininim-exec
-strip $(find -name '*.so*')
+strip $(find -name '*.so' -or -name '*.so.*')
 
 # create package
 cd release
-tar -cf - ${RELEASE_DIR#release/} | xz -9e - > ${RELEASE_DIR#release/}.tar.xz
+time tar -cf - --exclude-backup ${RELEASE_DIR#release/} |
+    xz -9e - > ${RELEASE_DIR#release/}.tar.xz
 cd ..
 
 # remove temporary release directory

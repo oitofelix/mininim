@@ -273,7 +273,7 @@ AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
 AM_COND_IF([mingw_build],
            [LUA_LIB="-l:liblua50.a -l:liblualib50.a"],
            dnl [LUA_LIB="-ldl -llua50 -llualib50"]
-           [LUA_LIB="-ldl -llua"]
+           [LUA_LIB="-llua -ldl"]
 	   )
 
 
