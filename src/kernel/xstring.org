@@ -46,7 +46,7 @@
      <<c_pub_func>>
    #+END_SRC
 
-* ~TOSTRING(x)~
+* ~STR(x)~
 
   #+BEGIN_SRC c :noweb-ref h_mac
     #define _STR(x) #x

@@ -17,7 +17,7 @@
   along with this program.  If not, see
   <http://www.gnu.org/licenses/>.
 
-* Tangle
+* COMMENT Tangle
 ** =settings.h=
 
    #+NAME: settings.h
