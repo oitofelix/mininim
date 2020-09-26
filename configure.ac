@@ -72,7 +72,7 @@ AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AS_IF([[test x$debug != xtrue]],
   [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])],
-  dnl [debug_suffix=-debug]
+  [debug_suffix=-debug]
   )
 
 # Optimizations option

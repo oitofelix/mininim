@@ -7,7 +7,11 @@ if [ -f Makefile ]; then make clean; fi
 mv build-aux/texinfo.tex{,.bkp}
 autoreconf --install --force
 mv build-aux/texinfo.tex{.bkp,}
-./configure
+if [ "$1" == "debug" ]; then
+    ./configure --enable-debug
+else
+    ./configure
+fi
 make -j4
 
 # build documentation
@@ -24,7 +28,11 @@ else exit 1
 fi
 
 VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-gnu-linux$bits
-RELEASE_DIR=release/mininim-$VERSION
+if [ "$1" == "debug" ]; then
+    RELEASE_DIR=release/mininim-$VERSION-debug
+else
+    RELEASE_DIR=release/mininim-$VERSION
+fi
 
 # create directory structure
 rm -rf $RELEASE_DIR
