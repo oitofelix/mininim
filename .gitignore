@@ -2,12 +2,12 @@
 # Autotools bootstrapping or maintainer documentation building
 # process.
 
-ABOUT-NLS
-AUTHORS
-INSTALL
-ChangeLog
-NEWS
-README
+/ABOUT-NLS
+/AUTHORS
+/INSTALL
+/ChangeLog
+/NEWS
+/README
 
 # Ignore built documentation
 
@@ -28,8 +28,8 @@ README
 
 # Ignore Makefiles throughout the whole tree.
 
-**/Makefile
-**/Makefile.in
+Makefile
+Makefile.in
 
 
 # Ignore binary objects, Guile snarfed files and dependency
@@ -39,13 +39,12 @@ src/**/*.[ox]
 /mininim
 /mininim.exe
 *.rc.o
-**/.deps/
+.deps
 *.gch
 
 # Ignore Emacs backup files recursively.
 
-**/*~
-**/*\#*
+*~
 
 # Ignore gnulib files
 /gnulib
@@ -53,8 +52,8 @@ src/**/*.[ox]
 # Ignore all Autoconf M4 files except the non-standard ones used by
 # this project.  Ignore also the Autom4te temporary cache.
 
-autom4te.cache/
-aclocal.m4
+/autom4te.cache/
+/aclocal.m4
 m4/*.m4
 !m4/ax_prog_doxygen.m4
 !m4/ax_prog_guile_version.m4
@@ -87,7 +86,7 @@ build-aux/*
 
 # Ignore all Autotools configuration-time files.
 
-configure
+/configure
 config.h
 config.h.in
 config.log
@@ -109,6 +108,10 @@ GTAGS
 *.gcov
 gmon.out
 
+# Allegro
+
+/allegro.log
+
 # Others
 /core
 .depend
@@ -118,20 +121,17 @@ prince.gdb
 /_site/
 release/
 
-# Mac OS X specific
-
-*~
-*.o
-.DS_Store
-.deps
-Makefile
-Makefile.in
-
-# Local Variables:
-# mode: conf-space
-# End:
 /.cccc/
 /TAGS
 /coverage.dir/
 *.html
 /mac/
+
+*~
+*.o
+.DS_Store
+.deps
+
+# Local Variables:
+# mode: conf-space
+# End:
