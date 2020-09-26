@@ -332,7 +332,7 @@ npos (struct pos *p, struct pos *np)
 
   bool m;
 
-  np->room = room_val (np->l->room_nmemb, np->room);
+  np->room = room_val (np->l ? np->l->room_nmemb : 1, np->room);
 
   do {
     m = false;
