@@ -174,9 +174,9 @@ BEGIN_LUA (__tostring)
 END_LUA
 
 ALLEGRO_COLOR
-L_palette (ALLEGRO_COLOR c, void *_L)
+L_palette (ALLEGRO_COLOR c, void *_l)
 {
-  lua_State *L = _L;
+  lua_State *L = _l;
   lua_pushvalue (L, -1);
   L_pushcolor (L, c);
   ALLEGRO_COLOR c_ret;
