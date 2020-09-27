@@ -41,7 +41,7 @@ AC_DEFINE(PACKAGE_COPYRIGHT_HOLDER, ["Bruno Félix Rezende Ribeiro"],
 # GNU Autoconf settings;
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux])
-AC_PREREQ(2.60)
+AC_PREREQ([2.64])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([src/mininim.c])
 
@@ -264,8 +264,8 @@ AC_SUBST([mingw_ldadd])
 ### Check for Lua
 ######
 
-AX_PROG_LUA([5.0], [], [],
-  AC_MSG_ERROR([MININIM requires Lua 5.0 (or superior)]))
+AX_PROG_LUA([5.3], [5.4], [],
+  AC_MSG_ERROR([MININIM requires Lua 5.3]))
 AX_LUA_HEADERS(, AC_MSG_ERROR([MININIM requires Lua headers]))
 AX_LUA_LIBS(, AC_MSG_ERROR([MININIM requires Lua libraries]))
 AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
@@ -273,7 +273,7 @@ AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
 AM_COND_IF([mingw_build],
            [LUA_LIB="-l:liblua50.a -l:liblualib50.a"],
            dnl [LUA_LIB="-ldl -llua50 -llualib50"]
-           [LUA_LIB="-llua -ldl"]
+           [LUA_LIB="-llua5.3 -ldl"]
 	   )
 
 
