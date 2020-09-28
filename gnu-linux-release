@@ -54,9 +54,11 @@ cp mininim \
    $(libdep mininim) \
    "$lib_dir"
 
-# strip binaries
-strip --strip-all \
-      "$lib_dir"/*
+# strip binaries if not debug release
+if [ "$1" != "debug" ]; then
+    strip --strip-all \
+	  "$lib_dir"/*
+fi
 
 # copy Allegro configuration
 cp allegro5.cfg "$lib_dir"
