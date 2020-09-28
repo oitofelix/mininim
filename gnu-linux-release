@@ -44,7 +44,9 @@ mkdir --parents \
 
 # function to output library dependencies of executables
 function libdep () {
-    ldd "$@" | cut -f 3 -d ' '
+    ldd "$@" |
+	grep --only-matching '\W/[^ ]*' |
+	sort --unique
 }
 
 # copy MININIM and its dependencies
@@ -65,7 +67,9 @@ cat > "$exe_dir"/mininim <<'EOF'
 set -e
 app_path="$(dirname "$(readlink -f "$0")")"
 cd $USER_PWD
-LD_LIBRARY_PATH="$app_path/lib" "$app_path/lib/mininim" "$@"
+LD_LIBRARY_PATH="$app_path"/lib "$app_path"/lib/ld* \
+  --library-path "$app_path"/lib \
+  "$app_path"/lib/mininim "$@"
 EOF
 
 # make it executable
