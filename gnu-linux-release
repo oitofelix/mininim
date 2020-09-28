@@ -4,7 +4,7 @@ set -o errexit \
     -o xtrace
 
 # build MININIM
-mv build-aux/texinfo.tex{,.bkp}
+mv build-aux/texinfo.tex{,.bkp} || :
 autoreconf --install --force
 mv build-aux/texinfo.tex{.bkp,}
 if [ "$1" == "debug" ]; then
