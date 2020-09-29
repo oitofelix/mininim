@@ -18,17 +18,18 @@ make -j4
 # build documentation
 cd doc
 make mininim.pdf
-cd ..
+cd -
 
-VERSION=$(grep --perl-regexp \
+machine=$(gcc -dumpmachine)
+version=$(grep --perl-regexp \
 	       --only-matching \
 	       '#define VERSION "\K.*?(?=")' \
-	       config.h)-gnu-linux-$(uname --machine)
+	       config.h)-"$machine"
 
 if [ "$1" == "debug" ]; then
-    release_dir=release/mininim-$VERSION-debug
+    release_dir=release/mininim-$version-debug
 else
-    release_dir=release/mininim-$VERSION
+    release_dir=release/mininim-$version
 fi
 
 exe_dir="$release_dir"/mininim.exe
@@ -49,29 +50,72 @@ function libdep () {
 	sort --unique
 }
 
+# ensure all libraries are known
+sudo ldconfig
+
 # copy MININIM and its dependencies
 cp mininim \
-   $(libdep mininim) \
+   "$lib_dir"/mininim.exe
+
+# copy MININIM's dependencies
+cp $(libdep mininim) \
+   "$lib_dir"
+
+# rename loader
+mv "$lib_dir"/{ld*,mininim}
+
+# copy gdk pixbuf
+cp --recursive \
+   /usr/lib/"$machine"/gdk-pixbuf-2.0 \
+   "$lib_dir"
+cp $(libdep "$lib_dir"/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders \
+	    "$lib_dir"/gdk-pixbuf-2.0/2.10.0/loaders/*.so) \
+   "$lib_dir"
+
+# copy gtk pixmap module
+mkdir --parents "$lib_dir"/gtk-2.0/2.10.0/engines
+cp /usr/lib/"$machine"/gtk-2.0/2.10.0/engines/lib{pixmap,adwaita,murrine}.so \
+   "$lib_dir"/gtk-2.0/2.10.0/engines
+cp $(libdep "$lib_dir"/gtk-2.0/2.10.0/engines/*.so) \
    "$lib_dir"
 
 # strip binaries if not debug release
 if [ "$1" != "debug" ]; then
-    strip --strip-all \
-	  "$lib_dir"/*
+    find "$lib_dir" \
+	 -name 'mininim*' \
+	 -or \
+	 -name '*.so' \
+	 -or \
+	 -name '*.so.*' \
+	 -exec strip --verbose \
+	   --strip-all \{\} +
 fi
 
 # copy Allegro configuration
 cp allegro5.cfg "$lib_dir"
 
 # copy init script
-cat > "$exe_dir"/mininim <<'EOF'
+cat > "$exe_dir"/mininim <<EOF
 #!/usr/bin/env sh
-set -e
-app_path="$(dirname "$(readlink -f "$0")")"
-cd $USER_PWD
-LD_LIBRARY_PATH="$app_path"/lib "$app_path"/lib/ld* \
-  --library-path "$app_path"/lib \
-  "$app_path"/lib/mininim "$@"
+$([ "$1" == "debug" ] && echo 'set -ex')
+app_path="\$(dirname "\$(readlink -f "\$0")")"
+export GDK_PIXBUF_MODULEDIR="\$app_path"/lib/gdk-pixbuf-2.0/2.10.0/loaders
+export GDK_PIXBUF_MODULE_FILE="\$app_path"/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+export GDK_NATIVE_WINDOWS=1
+export GTK_PATH="\$app_path"/lib/gtk-2.0/2.10.0/engines
+export GTK_EXE_PREFIX="\$app_path"
+export GTK_THEME=Adwaita
+unset GDK_RENDERING GDK_BACKEND
+unset GTK_MODULES GTK2_MODULES GTK3_MODULES
+unset GTK_IM_MODULE GTK_IM_MODULE_FILE
+unset GTK_RC_FILES GTK2_RC_FILES
+"\$app_path"/lib/mininim \
+  --library-path "\$app_path"/lib \
+  "\$app_path"/lib/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > "\$GDK_PIXBUF_MODULE_FILE"
+cd \$USER_PWD
+"\$app_path"/lib/mininim \
+  --library-path "\$app_path"/lib \
+  "\$app_path"/lib/mininim.exe "\$@"
 EOF
 
 # make it executable
@@ -79,17 +123,27 @@ chmod +x \
       "$exe_dir"/mininim
 
 # make self-extracting executable
-makeself --xz \
-	 --complevel 9 \
-	 --noprogress \
-	 --nox11 \
-	 --nowait \
-	 --nomd5 \
-	 --nocrc \
-	 "$exe_dir" \
-	 "$release_dir"/mininim \
-	 "MININIM" \
-	 ./mininim
+if [ "$1" == "debug" ]; then
+    makeself --xz \
+	     --complevel 9 \
+	     --current \
+	     "$exe_dir" \
+	     "$release_dir"/mininim \
+	     "MININIM" \
+	     ./mininim
+else
+    makeself --xz \
+	     --complevel 9 \
+	     --noprogress \
+	     --nox11 \
+	     --nowait \
+	     --nomd5 \
+	     --nocrc \
+	     "$exe_dir" \
+	     "$release_dir"/mininim \
+	     "MININIM" \
+	     ./mininim
+fi
 
 # delete intermediate executable files
 rm --recursive \
@@ -113,7 +167,7 @@ tar --create \
     --verbose \
     "$(basename "$release_dir")" |
     xz -9 > "$(basename "$release_dir")".tar.xz
-cd ..
+cd -
 
 # remove temporary release directory
 rm --recursive \
