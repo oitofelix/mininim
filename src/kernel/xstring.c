@@ -125,14 +125,14 @@ fmt_row (const char *fmt, ...)
   return r;
 }
 
-uint
+unsigned int
 term_cols (void)
 {
-  static const uint MAX_TERM_COLS = 320, DEFAULT_TERM_COLS = 80;
+  static const unsigned int MAX_TERM_COLS = 320, DEFAULT_TERM_COLS = 80;
 #if WINDOWS_PORT
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
-  uint cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+  unsigned int cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
   return cols <= MAX_TERM_COLS ? cols : DEFAULT_TERM_COLS;
 #else
   struct winsize win;
