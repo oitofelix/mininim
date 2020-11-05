@@ -411,9 +411,10 @@ validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
 #if WINDOWS_PORT
   if (! bitmap) return;
-  al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
-		 ALLEGRO_LOCK_READWRITE);
-  al_unlock_bitmap(bitmap);
+  al_lock_bitmap (bitmap,
+		  ALLEGRO_PIXEL_FORMAT_ANY,
+		  ALLEGRO_LOCK_READONLY);
+  al_unlock_bitmap (bitmap);
 #endif
 }
 
