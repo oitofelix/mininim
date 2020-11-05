@@ -34,9 +34,6 @@ AC_DEFINE_UNQUOTED([PACKAGE_MAILING_LIST], ["$PACKAGE_MAILING_LIST"],
   [Help and support mailing list])
 AC_DEFINE(PACKAGE_TRANSLATION_BUGREPORT,
 ["http://translationproject.org/team/"], [Translation bugs reporting address])
-AC_DEFINE(PACKAGE_COPYRIGHT_HOLDER, ["Bruno Félix Rezende Ribeiro"],
-[Copyright holder's name])
-
 
 # GNU Autoconf settings;
 AC_CONFIG_AUX_DIR([build-aux])

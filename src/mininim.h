@@ -98,11 +98,16 @@ extern char *xvasprintf (const char *format, va_list args)
 #include <iup/iupcbs.h>
 
 /* MININIM */
+
+/* Port conditionals must come after this header. */
 #include "compatibility.h"
 
 #if WINDOWS_PORT
-#include <windows.h>
-#include <versionhelpers.h>
+# include <windows.h>
+# include <versionhelpers.h>
+# define PACKAGE_COPYRIGHT_HOLDER "Bruno Felix Rezende Ribeiro"
+#else
+# define PACKAGE_COPYRIGHT_HOLDER "Bruno Félix Rezende Ribeiro"
 #endif
 
 #include "colors.h"
