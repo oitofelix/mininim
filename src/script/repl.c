@@ -395,7 +395,7 @@ static char *get_prompt (lua_State *L, int firstline) {
 
 static int incomplete (lua_State *L, int status) {
   if (status == LUA_ERRSYNTAX &&
-         strstr(lua_tostring(L, -1), "near `<eof>'") != NULL) {
+      strstr(lua_tostring(L, -1), "near <eof>") != NULL) {
     lua_pop(L, 1);
     return 1;
   }
