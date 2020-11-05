@@ -197,6 +197,9 @@ video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
        const char *object, uintptr_t index, uintptr_t part,
        struct pos *p, int actor_id, lua_Number width)
 {
+  if (! is_video_rendering ())
+    return false;
+
   lua_State *L = main_L;
   if (! L_push_video_routine (L)) {
     int i;
@@ -254,6 +257,9 @@ void
 video_command_error (const char *command, const char *object,
                      uintptr_t index, uintptr_t part)
 {
+  if (! is_video_rendering ())
+    return;
+
   char *object_str;
   if (object) object_str = xasprintf (" %s", object);
   else object_str = xasprintf ("%s", "");
@@ -278,6 +284,8 @@ video_command_error (const char *command, const char *object,
   al_free (object_str);
   al_free (index_str);
   al_free (part_str);
+
+  video_rendering (false);
 }
 
 struct rect *
@@ -404,6 +412,9 @@ next_video_mode (char *current_vm)
 void
 setup_video_mode (char *requested_vm)
 {
+  if (! is_video_rendering ())
+    return;
+
   if (changing_vm) return;
   changing_vm = true;
   lock_lua ();
