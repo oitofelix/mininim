@@ -59,6 +59,7 @@ local meta = common.meta
 local to_color_range = common.to_color_range
 local palette_table_color = common.palette_table_color
 local palette_table_to_shader = common.palette_table_to_shader
+local safenav = common.safenav
 
 -- body
 local _ENV = P
@@ -2834,51 +2835,67 @@ function ASSET:load_actor (atype, action)
    self[atype][action] = o
 end
 
+-- Misc draw function
+
+DRAW = {}
+
+function DRAW.TEXT (text)
+   local x = OW (0)
+   local y = OH (MININIM.video.original_height - 8)
+   local w = REAL_WIDTH
+   local h = OH (8)
+   rect (x, y, w, h).draw (C (0, 0, 0))
+   asset.font.draw (text, REAL_WIDTH / 2,
+		    REAL_HEIGHT - asset.font.height + 3)
+end
+
+function DRAW.BACKGROUND_SELECTION (p)
+   local x = OW (p.place * PLACE_WIDTH + 25)
+   local y = OH (p.floor * PLACE_HEIGHT - 13)
+   local w = OW (PLACE_WIDTH)
+   local h = OH (PLACE_HEIGHT)
+   rect (x, y, w, h).draw (C (64, 64, 64))
+end
+
 -- Load assets
-function load ()
+local loaded = false
+
+function LOAD ()
+   if loaded then return end
    asset.DUNGEON = new (ASSET, {}, "DUNGEON"):load ()
    asset.PALACE = new (ASSET, {}, "PALACE"):load ()
    local font_bmp = load_bitmap ("font.png")
    asset.font = font (font_bmp, 32, 95, 97, 122)
-   return P
+   loaded = true
+end
+
+-- debug video mode
+function DEBUG (object)
+   local t = {video = video, asset = asset}
+   return t[object]
+end
+
+function VALUE (object)
+   return video.VALUE[object]
 end
 
 -- MAC video mode interface
 MININIM.lua.video_mode["Macintosh Color"] = function (command, object, ...)
-   local arg = {...}
-
-   if command == "DEBUG" then
-      local t = {video = video, asset = asset}
-      return t[object]
+   local o = safenav (asset, MININIM.video.env_mode, object)
+   local f = safenav (o, command)
+   if f then
+      return f (o, ...)
    end
 
-   if command == "VALUE" then
-      return video.VALUE[object] end
-
-   if command == "DRAW" and object == "TEXT" then
-      local x = OW (0)
-      local y = OH (MININIM.video.original_height - 8)
-      local w = REAL_WIDTH
-      local h = OH (8)
-      rect (x, y, w, h).draw (C (0, 0, 0))
-      asset.font.draw (arg[1], REAL_WIDTH / 2,
-                       REAL_HEIGHT - asset.font.height + 3)
-      return
+   f = safenav (P, command)
+   if type (f) == "function" then
+      return f (object, ...)
    end
 
-   if command == "DRAW" and object == "BACKGROUND_SELECTION" then
-      local p = arg[1]
-      local x = OW (p.place * PLACE_WIDTH + 25)
-      local y = OH (p.floor * PLACE_HEIGHT - 13)
-      local w = OW (PLACE_WIDTH)
-      local h = OH (PLACE_HEIGHT)
-      rect (x, y, w, h).draw (C (64, 64, 64))
-      return
+   f = safenav (P, command, object)
+   if f then
+      return f (...)
    end
-
-   local em = MININIM.video.env_mode
-   local o = asset[em][object]
-   return o[command](o, unpack (arg))
 end
 
 -- end

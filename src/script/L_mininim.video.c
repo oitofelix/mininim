@@ -424,7 +424,20 @@ setup_video_mode (char *requested_vm)
   else if (! is_valid_video_mode (video_mode))
     set_string_var (&video_mode, next_video_mode (NULL));
 
-  if (video_mode) video_rendering (true);
+  if (video_mode)
+    {
+      video_rendering (true);
+      load_callback = process_display_events;
+      if (! video (NULL, 0, "LOAD", NULL, 0, 0, NULL, -1, -1))
+	{
+	  video_rendering (false);
+	  load_callback = NULL;
+	  changing_vm = false;
+	  unlock_lua ();
+	  return;
+	}
+      load_callback = NULL;
+    }
   else {
     REAL_WIDTH = ORIGINAL_WIDTH;
     REAL_HEIGHT = ORIGINAL_HEIGHT;
