@@ -30,6 +30,7 @@ include documentation.am
 
 bin_PROGRAMS = mininim
 mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h	\
+	  src/copyright-version.c src/copyright-version.h		\
 	  src/ui-command.c src/ui-command.h src/hotkeys.c		\
 	  src/hotkeys.h src/constants.h src/types.h src/colors.h	\
 	  src/anim.c src/anim.h src/actor.c src/actor.h src/pos.c	\

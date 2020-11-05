@@ -811,6 +811,7 @@ ui_about_screen (bool value)
   if (value) {
     main_menu_enabled = false;
     if (! message_box_thread_id) {
+      about_dialog.text = copyright_version_info ();
       message_box_thread_id =
         al_create_thread (message_box_thread, &about_dialog);
       al_start_thread (message_box_thread_id);

@@ -1163,8 +1163,9 @@ show (void)
     }
   else if (about_screen)
     {
-      show_logo ("http://oitofelix.github.io/mininim/",
-		 "http://forum.princed.org/", oitofelix_face);
+      show_logo (PACKAGE_URL,
+		 FORUM_URL,
+		 oitofelix_face);
       return;
     }
 

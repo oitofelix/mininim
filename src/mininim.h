@@ -101,14 +101,7 @@ extern char *xvasprintf (const char *format, va_list args)
 
 /* Port conditionals must come after this header. */
 #include "compatibility.h"
-
-#if WINDOWS_PORT
-# include <windows.h>
-# include <versionhelpers.h>
-# define PACKAGE_COPYRIGHT_HOLDER "Bruno Felix Rezende Ribeiro"
-#else
-# define PACKAGE_COPYRIGHT_HOLDER "Bruno Félix Rezende Ribeiro"
-#endif
+#include "copyright-version.h"
 
 #include "colors.h"
 #include "constants.h"

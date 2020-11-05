@@ -82,16 +82,8 @@ struct dialog save_picture_dialog = {
 
 struct message_box about_dialog = {
   .title = "About",
-  .heading = "MININIM " VERSION,
-  .text =
-  "Copyright (C) 2015-2017 " PACKAGE_COPYRIGHT_HOLDER "\n\n"
-
-  "MININIM is free software under GPLv3+.\n"
-  "You are free to change and redistribute it.\n"
-  "There is NO WARRANTY, to the extent permitted by law.\n\n"
-
-  "Please, support MININIM development!\n"
-  "http://oitofelix.github.io/funding.html",
+  .heading = PACKAGE_NAME " " VERSION,
+  .text = NULL,
   .buttons = NULL,
   .flags = 0,
 };
@@ -1176,28 +1168,8 @@ Levels have been converted using module %s into native format at\n\
 void
 version (FILE *stream, struct argp_state *state)
 {
-  uint32_t allegro_version = al_get_allegro_version ();
-  int allegro_major = allegro_version >> 24;
-  int allegro_minor = (allegro_version >> 16) & 255;
-  int allegro_revision = (allegro_version >> 8) & 255;
-  int allegro_release = allegro_version & 255;
-
-  fprintf (stream,
-           "%s (%s) %s\n\n"	/* mininim (MININIM) a.b */
-
-           "Copyright (C) %s " PACKAGE_COPYRIGHT_HOLDER " <%s>\n\n"
-
-           "%s\n\n" /* License GPLv3+... */
-           "%s\n\n" /* Written by... */
-           "Using Allegro %i.%i.%i[%i].\n", /* Using Allegro... */
-           PACKAGE, PACKAGE_NAME, VERSION,
-           "2015, 2016, 2017", "oitofelix@gnu.org",
-           "MININIM is free software under GPLv3+.\n"
-           "You are free to change and redistribute it.\n"
-           "There is NO WARRANTY, to the extent permitted by law.",
-
-           "Written by Bruno Félix Rezende Ribeiro.",
-           allegro_major, allegro_minor, allegro_revision, allegro_release);
+  fputs (copyright_version_info(),
+	 stream);
 }
 
 char *

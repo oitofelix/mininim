@@ -59,4 +59,9 @@
 #define HAPTIC_FEATURE false
 #endif
 
+#if WINDOWS_PORT
+# include <windows.h>
+# include <versionhelpers.h>
+#endif
+
 #endif	/* MININIM_COMPATIBILITY_H */
