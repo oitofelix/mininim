@@ -326,13 +326,13 @@ void
 lock_lua ()
 {
   al_lock_mutex (L_mutex);
-  al_set_target_backbuffer (display);
+  /* al_set_target_backbuffer (display); */
 }
 
 void
 unlock_lua ()
 {
-  al_set_target_bitmap (NULL);
+  /* al_set_target_bitmap (NULL); */
   al_unlock_mutex (L_mutex);
 }
 
