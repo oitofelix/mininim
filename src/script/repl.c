@@ -480,6 +480,12 @@ ALLEGRO_COND *repl_cond;
 void *
 repl (ALLEGRO_THREAD *thread, void *L)
 {
+#if WINDOWS_PORT
+  /* Ncurses needs this so readline will behave a little bit more
+     sanely in Windows. */
+  setenv ("TERM", "#win32con", false);
+#endif
+
   lock_lua ();
 
   al_broadcast_cond (repl_cond);
