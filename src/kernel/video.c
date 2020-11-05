@@ -205,7 +205,7 @@ create_bitmap (int w, int h)
   al_set_new_bitmap_flags (video_bitmap_flags ());
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
   al_set_new_bitmap_flags (flags);
-  validate_bitmap_for_mingw (bitmap);
+  /* validate_bitmap_for_windows (bitmap); */
   return bitmap;
 }
 
@@ -295,7 +295,7 @@ load_bitmap (const char *filename)
   if (! bitmap)
     fprintf (stderr, "cannot load bitmap file '%s'\n", filename);
 
-  validate_bitmap_for_mingw (bitmap);
+  /* validate_bitmap_for_windows (bitmap); */
 
   if (load_callback) load_callback ();
 
@@ -407,7 +407,7 @@ get_shader_platform (ALLEGRO_SHADER *s)
    black/transparent images. */
 
 void
-validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
+validate_bitmap_for_windows (ALLEGRO_BITMAP *bitmap)
 {
 #if WINDOWS_PORT
   if (! bitmap) return;
@@ -426,7 +426,7 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
   al_set_target_backbuffer (display);
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
   al_set_new_bitmap_flags (flags);
-  validate_bitmap_for_mingw (new_bitmap);
+  /* validate_bitmap_for_windows (new_bitmap); */
   return new_bitmap;
 }
 

@@ -42,7 +42,7 @@ ALLEGRO_FONT *load_font (const char *filename);
 ALLEGRO_BITMAP *trim_bitmap (ALLEGRO_BITMAP *b, ALLEGRO_COLOR t);
 bool attach_shader_source_file (ALLEGRO_SHADER *shader, const char *filename);
 const char *get_shader_platform (ALLEGRO_SHADER *shader);
-void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
+void validate_bitmap_for_windows (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
