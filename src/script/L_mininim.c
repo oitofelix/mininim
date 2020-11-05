@@ -123,13 +123,14 @@ call_lua_function (lua_State *L, const char *name, int nargs, int nresults)
 bool
 run_lua_hook (lua_State *L, const char *name)
 {
+  /* lock_lua (); */
   L_get_registry_by_ref (L, mininim_lua_ref);
-
   lua_pushstring (L, name);
   lua_rawget (L, -2);
   lua_remove (L, -2);
-
-  return L_run_hook (L);
+  bool error = L_run_hook (L);
+  /* unlock_lua (); */
+  return error;
 }
 
 BEGIN_LUA (__eq)
