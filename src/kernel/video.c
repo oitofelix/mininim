@@ -230,14 +230,10 @@ ALLEGRO_BITMAP *
 clone_memory_bitmap (ALLEGRO_BITMAP *bitmap)
 {
   if (! bitmap) return NULL;
-
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (memory_bitmap_flags ());
-
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
-
   al_set_new_bitmap_flags (flags);
-
   return new_bitmap;
 }
 
@@ -407,13 +403,14 @@ get_shader_platform (ALLEGRO_SHADER *s)
   } else return "NONE";
 }
 
+/* Work around a bug in Windows, where bitmaps are loaded as
+   black/transparent images. */
+
 void
 validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
 #if WINDOWS_PORT
   if (! bitmap) return;
-  /* work around a bug (MinGW target), where bitmaps are loaded as
-     black/transparent images */
   al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
 		 ALLEGRO_LOCK_READWRITE);
   al_unlock_bitmap(bitmap);
@@ -425,15 +422,10 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
 {
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
-
   al_set_target_backbuffer (display);
-
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
-
   al_set_new_bitmap_flags (flags);
-
   validate_bitmap_for_mingw (new_bitmap);
-
   return new_bitmap;
 }
 

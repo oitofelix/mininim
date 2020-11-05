@@ -583,12 +583,12 @@ video.POTION = new (video.OBJECT)
 function video.POTION:DRAW (p)
    local bottle = self.bitmap
    bottle.draw (self:rect (p))
-
    local i = mod (MININIM.cycle, 7) + 1
    if self[i] and self[i].bitmap then
       local bubble = self[i].bitmap
       if self.palette then
-         bubble = bubble.apply_palette (self.palette, true) end
+         bubble = bubble.apply_palette (self.palette, true)
+      end
       bubble.DRAW (self[i]:rect (p))
    end
 end
@@ -613,7 +613,8 @@ video.SMALL_POTION[1].rect = function (self, p)
 end
 
 for i = 1, 7 do
-   video.SMALL_POTION[i].rect = video.SMALL_POTION[1].rect end
+   video.SMALL_POTION[i].rect = video.SMALL_POTION[1].rect
+end
 
 -- BIG POTION
 video.BIG_POTION = new (video.POTION)
