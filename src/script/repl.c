@@ -495,8 +495,13 @@ repl (ALLEGRO_THREAD *thread, void *L)
 
   if (! L_debugging) {
     fprintf (rl_outstream,
-             "MININIM %s %s\n\n", VERSION, about_dialog.text);
-    fprintf (rl_outstream, LUA_VERSION " " LUA_COPYRIGHT "\n");
+             "MININIM %s\n"
+	     "%s\n\n",
+	     VERSION,
+	     about_dialog.text);
+    fprintf (rl_outstream,
+	     "%s\n",
+	     LUA_COPYRIGHT);
   }
 
   int status;
