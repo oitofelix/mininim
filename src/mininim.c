@@ -1587,8 +1587,13 @@ main (int _argc, char **_argv)
   return EXIT_SUCCESS;
 }
 
+/* finalize_game is not currently used.  It's here just for future
+   reference and has proved not reliable on Windows.  In case it's
+   needed in the future we should fix it for use there. */
+
+static
 void
-quit_game (void)
+finalize_game (void)
 {
   finalize_script ();
   finalize_gui ();
@@ -1606,6 +1611,17 @@ quit_game (void)
   finalize_video ();
 
   destroy_level (&global_level);
+}
+
+void
+quit_game (void)
+{
+  /* We used to call finalize_game here.  It has proved unnecessary,
+     time-consuming and unreliable --- at least for the Windows port.
+     Libraries and the OS must handle resource freeing properly at
+     program termination anyway.  Let's not over-complicate things. */
+
+  if (false) finalize_game ();	/* avoid unused-function warning */
 
   if (scream && kid_scream && guard_scream
       && fat_scream && shadow_scream && skeleton_scream

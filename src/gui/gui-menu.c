@@ -423,6 +423,7 @@ init_gui_menu (void)
 void
 finalize_gui_menu (void)
 {
+  al_set_display_menu (display, NULL);
   unload_icons ();
 }
 

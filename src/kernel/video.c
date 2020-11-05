@@ -156,7 +156,6 @@ finalize_video (void)
   al_destroy_bitmap (black_screen);
   al_destroy_font (builtin_font);
   al_destroy_timer (video_timer);
-  al_set_display_menu (display, NULL);
   al_destroy_display (display);
   al_shutdown_image_addon ();
   al_shutdown_font_addon ();
