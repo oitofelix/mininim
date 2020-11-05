@@ -124,6 +124,7 @@ lua_Number IH (lua_Number h);
 lua_Number OW (lua_Number w);
 lua_Number OH (lua_Number h);
 
+bool is_video_rendering ();
 void video_rendering (bool enable);
 
 /* variables */

@@ -771,7 +771,7 @@ bool
 is_dedicatedly_replaying (void)
 {
   return replay_mode == PLAY_REPLAY
-    && (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING);
+    && ! is_video_rendering ();
 }
 
 void

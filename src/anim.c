@@ -119,9 +119,9 @@ play_anim (anim_callback_t draw_callback,
           (event_queue, al_get_timer_event_source (iup_timer));
         al_set_timer_count (iup_timer, 0);
       } else if (event.timer.source == video_timer) {
-        if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
-          show ();
-        else stop_video_effect ();
+        if (! is_video_rendering ())
+          stop_video_effect ();
+	show ();
         /* drop_all_events_from_source */
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
@@ -196,9 +196,11 @@ play_anim (anim_callback_t draw_callback,
 
         kid_debug ();
 
+	if (anim_cycle == 0 && ! is_video_rendering ())
+	  show ();
+
         if (anim_cycle > 0 && ! is_video_effect_started ()
-            && (rendering == BOTH_RENDERING
-                || rendering == VIDEO_RENDERING
+            && (is_video_rendering ()
                 || update_replay_progress (NULL)))
           show ();
 
@@ -223,8 +225,7 @@ play_anim (anim_callback_t draw_callback,
 
           if (! title_demo
               && replay_mode == PLAY_REPLAY
-              && (rendering == BOTH_RENDERING
-                  || rendering == VIDEO_RENDERING)) {
+              && is_video_rendering ()) {
             int progress;
             if (update_replay_progress (&progress))
               fprintf (stderr, "%3i%%\r", progress);

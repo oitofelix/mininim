@@ -745,7 +745,7 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                     float sx, float sy, float sw, float sh,
                     float dx, float dy, int flags)
 {
-  if (! from || rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+  if (! from || ! is_video_rendering ())
     return;
 
   merge_drawn_rectangle (to, dx, dy, sw, sh);
@@ -764,7 +764,7 @@ draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                 float x2, float y2, ALLEGRO_COLOR color,
                 float thickness)
 {
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+  if (! is_video_rendering ())
     return;
   al_set_target_bitmap (to);
   al_draw_rectangle (x1 + 1, y1, x2 + 1, y2, color, thickness);
@@ -774,7 +774,7 @@ void
 draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                        float x2, float y2, ALLEGRO_COLOR color)
 {
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+  if (! is_video_rendering ())
     return;
   al_set_target_bitmap (to);
   al_draw_filled_rectangle (x1, y1, x2 + 1, y2 + 1, color);
@@ -792,7 +792,7 @@ draw_text (ALLEGRO_BITMAP *bitmap, ALLEGRO_FONT *font,
 bool
 draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 {
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+  if (! is_video_rendering ())
     return false;
 
   static char *current_text = NULL;
@@ -929,8 +929,9 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
 
   int flags;
 
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING
-      || about_screen) flags = 0;
+  if (! is_video_rendering ()
+      || about_screen
+      || load_callback) flags = 0;
   else flags = screen_flags | potion_flags;
 
   if (bitmap) {
@@ -1021,7 +1022,7 @@ flip_display (struct mr *mr, ALLEGRO_BITMAP *bitmap)
     }
   }
 
-  if (! about_screen) {
+  if (! about_screen && ! load_callback) {
     int uw = get_bitmap_width (uscreen);
     int uh = get_bitmap_height (uscreen);
 
@@ -1453,7 +1454,9 @@ pop_clipping_rectangle (void)
 }
 
 void
-draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
+draw_logo (ALLEGRO_BITMAP *bitmap,
+	   const char *text0,
+	   const char *text1,
            ALLEGRO_BITMAP *icon)
 {
   int x = 145;
@@ -1510,10 +1513,10 @@ show_logo_replaying (void)
 }
 
 void
-show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon)
+show_logo (const char *text0, const char *text1, ALLEGRO_BITMAP *icon)
 {
   enum rendering rendering_backup = rendering;
-  rendering = VIDEO_RENDERING;
+  rendering |= VIDEO_RENDERING;
   draw_logo (cutscene_screen, text0, text1, icon);
   rendering = rendering_backup;
   flip_display (&global_mr, cutscene_screen);
@@ -1555,30 +1558,17 @@ OH (lua_Number h)
   return (h * REAL_HEIGHT) / ORIGINAL_HEIGHT;
 }
 
+bool
+is_video_rendering ()
+{
+  return rendering & VIDEO_RENDERING;
+}
+
 void
 video_rendering (bool enable)
 {
-  if (enable) {
-    switch (rendering) {
-    case BOTH_RENDERING: break;
-    case VIDEO_RENDERING: break;
-    case AUDIO_RENDERING:
-      rendering = BOTH_RENDERING;
-      break;
-    case NONE_RENDERING:
-      rendering = VIDEO_RENDERING;
-      break;
-    }
-  } else {
-    switch (rendering) {
-    case BOTH_RENDERING:
-      rendering = AUDIO_RENDERING;
-      break;
-    case VIDEO_RENDERING:
-      rendering = NONE_RENDERING;
-      break;
-    case AUDIO_RENDERING: break;
-    case NONE_RENDERING: break;
-    }
-  }
+  if (enable)
+    rendering |= VIDEO_RENDERING;
+  else
+    rendering &= ~VIDEO_RENDERING;
 }

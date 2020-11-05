@@ -51,6 +51,7 @@ void stop_audio_instances (void);
 bool stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id);
 bool is_instance_of_audio_source (union audio_instance_data data,
                                   struct audio_source *as);
+bool is_audio_rendering ();
 
 /* variables */
 extern float audio_volume;

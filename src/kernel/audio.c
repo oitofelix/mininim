@@ -114,10 +114,16 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
   return as;
 }
 
+bool
+is_audio_rendering ()
+{
+  return rendering & AUDIO_RENDERING;
+}
+
 union audio_instance_data
 play_audio (struct audio_source *as, struct pos *p, int actor_id)
 {
-  if (rendering == NONE_RENDERING || rendering == VIDEO_RENDERING)
+  if (! is_audio_rendering ())
     return (union audio_instance_data) {NULL};
 
   /* do nothing if the same sample has been played in a near cycle */

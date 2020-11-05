@@ -161,7 +161,7 @@ apply_mr_fit_mode (struct mr *mr, enum mr_fit_mode mode)
 {
   mr_busy (mr);
 
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
+  if (! is_video_rendering ()) {
     mr->fit_w = 1;
     mr->fit_h = 1;
     mode = MR_FIT_NONE;
