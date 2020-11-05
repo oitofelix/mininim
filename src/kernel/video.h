@@ -49,6 +49,7 @@ bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
 int get_bitmap_width (ALLEGRO_BITMAP *bitmap);
 int get_bitmap_height (ALLEGRO_BITMAP *bitmap);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
+void convert_bitmap (ALLEGRO_BITMAP *bitmap, int flags);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);
 void draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,

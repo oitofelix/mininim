@@ -444,6 +444,16 @@ clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
   al_clear_to_color (color);
 }
 
+void
+convert_bitmap (ALLEGRO_BITMAP *bitmap, int flags)
+{
+  int old_flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (flags);
+  al_set_target_backbuffer (display);
+  al_convert_bitmap (bitmap);
+  al_set_new_bitmap_flags (old_flags);
+}
+
 ALLEGRO_BITMAP *
 get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
