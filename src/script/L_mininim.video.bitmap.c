@@ -271,8 +271,20 @@ BEGIN_LUA (draw)
     al_use_shader (*s);
   }
 
-  if (r) draw_bitmap_regionc (*b, target_bitmap, sx, sy, sw, sh, &r->c, 0);
-  else draw_bitmap_region (*b, target_bitmap, sx, sy, sw, sh, dx, dy, 0);
+  if (r)
+    draw_bitmap_regionc (*b, target_bitmap, sx, sy, sw, sh, &r->c, 0);
+  else
+    {
+      draw_bitmap_region (*b, target_bitmap, sx, sy, sw, sh, dx, dy, 0);
+      /* Workaround for Windows: make programmatically generated
+	 bitmaps preserve their content (otherwise they would be
+	 transparent).  (Doors has been affected by this in VGA and
+	 Macintosh video modes.)*/
+#if WINDOWS_PORT
+      if (target_bitmap != L_target_bitmap)
+	validate_bitmap_for_windows (target_bitmap);
+#endif
+    }
 
   if (s) {
     al_set_target_bitmap (target_bitmap);

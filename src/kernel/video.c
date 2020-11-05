@@ -647,6 +647,13 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
   al_unlock_bitmap (rbitmap);
   al_unlock_bitmap (bitmap);
 
+  /* Workaround for Windows: make all paletted bitmaps preserve their
+     content.  (The last frame of potion bubbles has been affected by
+     this in VGA video mode.) */
+#if WINDOWS_PORT
+  validate_bitmap_for_windows (rbitmap);
+#endif
+
   if (palette_cache_size_limit && k) {
     /* In case it's Lua bitmap and palette */
     if (p == L_palette) {
