@@ -88,7 +88,7 @@ BEGIN_LUA (L_mininim_video_bitmap)
     int height = luaL_checknumber (L, 2);
     b = create_bitmap (width, height);
     clear_bitmap (b, TRANSPARENT_COLOR);
-    validate_bitmap_for_mingw (b);
+    validate_bitmap_for_windows (b);
   } else return luaL_argerror (L, 1, "invalid argument, expecting (filename)"
                                " or (width, height)");
   L_pushbitmap (L, b);
