@@ -1351,6 +1351,20 @@ free_argv (size_t *cargc, char ***cargv)
   destroy_array ((void *) cargv, cargc);
 }
 
+/* Innocuous function intended to catch Allegro failed assertions on
+   platforms where SIGABRT is not detected by GDB and setting a direct
+   breakpoint on function abort does not work. */
+
+static
+void
+assert_handler (char const *expr,
+		char const *file,
+		int line,
+		char const *func)
+{
+  return;
+}
+
 int
 main (int _argc, char **_argv)
 {
@@ -1385,6 +1399,10 @@ main (int _argc, char **_argv)
 
   /* initialize Allegro */
   al_init ();
+
+  /* Give a potential breakpoint for catching failed Allegro
+     assertions. */
+  al_register_assert_handler (assert_handler);
 
   /* create primary event queue */
   event_queue = al_create_event_queue ();
