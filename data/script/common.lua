@@ -218,5 +218,13 @@ function opposite_direction (direction)
    if direction == "LEFT" then return "RIGHT" else return "LEFT" end
 end
 
+function safenav (t, k, ...)
+   if t == nil or k == nil then
+      return t
+   else
+      return safenav (t[k], ...)
+   end
+end
+
 -- end
 return P
