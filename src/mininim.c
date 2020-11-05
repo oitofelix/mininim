@@ -144,7 +144,6 @@ static int start_replay_favorite = -1;
 volatile static sig_atomic_t quitting_in_progress = 0;
 
 static void quit_game (void);
-static void quit_game_sighandler (int signum);
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
 static void print_display_modes (void);
@@ -1355,16 +1354,6 @@ free_argv (size_t *cargc, char ***cargv)
 int
 main (int _argc, char **_argv)
 {
-  /* CRITICAL SECTION START: TERMINATION SIGNALS BLOCKED */
-  sigset_t intmask;
-  sigemptyset (&intmask);
-  sigaddset (&intmask, SIGINT);
-#ifdef SIGHUP
-  sigaddset (&intmask, SIGHUP);
-#endif
-  sigaddset (&intmask, SIGTERM);
-  sigprocmask (SIG_BLOCK, &intmask, NULL);
-
   /* Init global level structure */
   new_level (&global_level, 1, 1, 1);
 
@@ -1506,14 +1495,6 @@ main (int _argc, char **_argv)
 
   /* register exit cleanup function */
   atexit (quit_game);
-  signal (SIGINT, quit_game_sighandler);
-#ifdef SIGHUP
-  signal (SIGHUP, quit_game_sighandler);
-#endif
-  signal (SIGTERM, quit_game_sighandler);
-
-  /* CRITICAL SECTION END: TERMINATION SIGNALS UNBLOCKED */
-  sigprocmask (SIG_UNBLOCK, &intmask, NULL);
 
   if (skip_title) goto play_game;
 
@@ -1633,16 +1614,6 @@ quit_game (void)
   else if (exit_code != EXIT_SUCCESS)
     error (0, 0, "MININIM: exiting with error! :(");
   else fprintf (stderr, "MININIM: Hope you enjoyed it! :)\n");
-}
-
-void
-quit_game_sighandler (int signum)
-{
-  if (quitting_in_progress) raise (signum);
-  quitting_in_progress = 1;
-  quit_game ();
-  signal (signum, SIG_DFL);
-  raise (signum);
 }
 
 void
