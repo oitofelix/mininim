@@ -168,23 +168,27 @@ memory_bitmap_flags (void)
   return
     (al_get_new_bitmap_flags ()
      & ~ALLEGRO_VIDEO_BITMAP
-     & ~ALLEGRO_CONVERT_BITMAP)
-    | ALLEGRO_MEMORY_BITMAP
-    | ALLEGRO_MIN_LINEAR
-    | ALLEGRO_MAG_LINEAR
-    | ALLEGRO_MIPMAP;
+     & ~ALLEGRO_CONVERT_BITMAP
+     & ~ALLEGRO_MEMORY_BITMAP
+     & ~ALLEGRO_NO_PRESERVE_TEXTURE
+     & ~ALLEGRO_MIN_LINEAR
+     & ~ALLEGRO_MAG_LINEAR
+     & ~ALLEGRO_MIPMAP)
+    | ALLEGRO_MEMORY_BITMAP;
 }
 
 int
 video_bitmap_flags (void)
 {
-  return
-    al_get_new_bitmap_flags ()
-    & ~ALLEGRO_VIDEO_BITMAP
-    & ~ALLEGRO_MEMORY_BITMAP
-    & ~ALLEGRO_MIN_LINEAR
-    & ~ALLEGRO_MAG_LINEAR
-    & ~ALLEGRO_MIPMAP;
+  return (al_get_new_bitmap_flags ()
+	  & ~ALLEGRO_VIDEO_BITMAP
+	  & ~ALLEGRO_CONVERT_BITMAP
+	  & ~ALLEGRO_MEMORY_BITMAP
+	  & ~ALLEGRO_NO_PRESERVE_TEXTURE
+	  & ~ALLEGRO_MIN_LINEAR
+	  & ~ALLEGRO_MAG_LINEAR
+	  & ~ALLEGRO_MIPMAP)
+    | ALLEGRO_VIDEO_BITMAP;
 }
 
 ALLEGRO_BITMAP *
