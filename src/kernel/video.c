@@ -40,6 +40,7 @@ void (*load_callback) (void);
 int display_mode = -1;
 bool about_screen;
 ALLEGRO_BITMAP *oitofelix_face;
+bool is_video_initialized = false;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -142,6 +143,8 @@ init_video (void)
   /* workaround bug in which first access to clipboard fails */
   char *clipboard_text = al_get_clipboard_text (display);
   al_free (clipboard_text);
+
+  is_video_initialized = true;
 }
 
 void
@@ -1120,23 +1123,34 @@ is_video_effect_started (void)
 void
 show (void)
 {
-  if (load_callback) {
-    show_logo ("Loading...", NULL, NULL);
+  if (! is_video_initialized)
     return;
-  } else if (is_dedicatedly_replaying ()) {
-    show_logo_replaying ();
-    return;
-  } else if (! command_line_replay
-             && (rendering == NONE_RENDERING
-                 || rendering == AUDIO_RENDERING)) {
-    char *text1 = rendering == AUDIO_RENDERING ? "AUDIO" : "NONE";
-    show_logo ("RENDERING", text1, NULL);
-    return;
-  } else if (about_screen) {
-    show_logo ("http://oitofelix.github.io/mininim/",
-               "http://forum.princed.org/", oitofelix_face);
-    return;
-  }
+
+  if (load_callback)
+    {
+      show_logo ("Loading...",
+		 current_resource_filename,
+		 NULL);
+      return;
+    }
+  else if (is_dedicatedly_replaying ())
+    {
+      show_logo_replaying ();
+      return;
+    }
+  else if (! command_line_replay
+	   && ! is_video_rendering ())
+    {
+      char *text1 = is_audio_rendering () ? "AUDIO" : "NONE";
+      show_logo ("RENDERING", text1, NULL);
+      return;
+    }
+  else if (about_screen)
+    {
+      show_logo ("http://oitofelix.github.io/mininim/",
+		 "http://forum.princed.org/", oitofelix_face);
+      return;
+    }
 
   switch (video_effect.type) {
   case VIDEO_NO_EFFECT:

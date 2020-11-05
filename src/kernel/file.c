@@ -20,47 +20,54 @@
 
 #include "mininim.h"
 
+char *current_resource_filename;
+
 intptr_t
 load_resource (const char *filename, load_resource_f lrf, bool success)
 {
-  intptr_t resource = ! success;
-  char *data_path_filename;
-  char *user_data_path_filename;
-  char *resources_path_filename;
-  char *system_data_path_filename;
-
-  /* user data path */
-  if (! equiv (resource, success)) {
-    user_data_path_filename = xasprintf ("%s%s", user_data_dir, filename);
-    resource = lrf (user_data_path_filename);
-    al_free (user_data_path_filename);
-  }
-
-  /* data path */
-  if (data_dir && ! equiv (resource, success)) {
-    data_path_filename = xasprintf ("%s%s", data_dir, filename);
-    resource = lrf (data_path_filename);
-    al_free (data_path_filename);
-  }
-
-  /* current working directory */
-  if (! equiv (resource, success)) resource = lrf (filename);
-
-  /* resources path */
-  if (! equiv (resource, success)) {
-    resources_path_filename = xasprintf ("%s%s", resources_dir, filename);
-    resource = lrf (resources_path_filename);
-    al_free (resources_path_filename);
-  }
-
-  /* system data path */
-  if (! equiv (resource, success)) {
-    system_data_path_filename = xasprintf ("%s%s", system_data_dir, filename);
-    resource = lrf (system_data_path_filename);
-    al_free (system_data_path_filename);
-  }
-
-  return resource;
+  const char *dirs[] =
+    {
+      user_data_dir,
+      data_dir,
+      ".",
+      resources_dir,
+      system_data_dir
+    };
+  const int dirs_count = sizeof (dirs) / sizeof (*dirs);
+  for (const char **dir = dirs;
+       dir < dirs + dirs_count;
+       dir++)
+    {
+      if (! *dir) continue;
+      intptr_t resource = ! success;
+      ALLEGRO_PATH *path = al_create_path_for_directory (*dir);
+      assert (path);
+      al_set_path_filename (path, filename);
+      const char *path_cstr = al_path_cstr (path, ALLEGRO_NATIVE_PATH_SEP);
+       /* Allegro thinks that trying to load an nonexistent file is
+	  worth a warning. */
+      if (al_filename_exists (path_cstr))
+	{
+	  if (load_callback)
+	    {
+	      char *dir = dir_name (filename);
+	      assert (dir);
+	      if (! current_resource_filename
+		  || strcmp (current_resource_filename, dir))
+		{
+		  free (current_resource_filename);
+		  current_resource_filename = dir;
+		  show ();
+		}
+	      else free (dir);
+	    }
+	  resource = lrf (path_cstr);
+	}
+      al_destroy_path (path);
+      if (equiv (resource, success))
+	return resource;
+    }
+  return ! success;
 }
 
 ALLEGRO_FILE *

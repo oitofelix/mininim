@@ -80,9 +80,13 @@ void process_display_events (void);
 int bool2bitmap_flags (bool v, bool h);
 
 /* special screens */
-void draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
+void draw_logo (ALLEGRO_BITMAP *bitmap,
+		const char *text0,
+		const char *text1,
                 ALLEGRO_BITMAP *icon);
-void show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon);
+void show_logo (const char *text0,
+		const char* text1,
+		ALLEGRO_BITMAP *icon);
 void show_logo_replaying (void);
 void load_oitofelix_face (void);
 void unload_oitofelix_face (void);
@@ -149,6 +153,7 @@ extern bool about_screen;
 extern ALLEGRO_BITMAP *oitofelix_face;
 extern ssize_t palette_cache_size_limit;
 extern ALLEGRO_FONT *builtin_font;
+extern bool is_video_initialized;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
 size_t drawn_rectangle_stack_nmemb;

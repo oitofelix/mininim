@@ -25,4 +25,6 @@ intptr_t load_resource (const char *filename, load_resource_f lrf, bool success)
 ALLEGRO_FILE *xfopen_r (char *filename);
 int8_t *load_file (char *filename);
 
+extern char *current_resource_filename;
+
 #endif	/* MININIM_FILE_H */
