@@ -209,8 +209,10 @@ function palette_table_to_shader (t)
    local p = string.lower (MININIM.video.shader_platform)
    local shader = load_shader (P, "default."..p..".vert",
                                "palette-table."..p..".frag")
-   shader.palette_table_in = palette_table_in
-   shader.palette_table_out = palette_table_out
+   if shader then
+      shader.palette_table_in = palette_table_in
+      shader.palette_table_out = palette_table_out
+   end
    return shader
 end
 
