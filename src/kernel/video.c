@@ -254,8 +254,10 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
   al_set_target_bitmap (scaled_bitmap);
 #if WINDOWS_PORT
-  /* White is the transparent mask for menu icons in Windows */
-  al_clear_to_color (WHITE);
+  /* White is the transparent mask for menu icons in Windows XP. */
+  al_clear_to_color (IsWindowsVistaOrGreater ()
+		     ? TRANSPARENT_COLOR
+		     : WHITE);
 #else
   al_clear_to_color (TRANSPARENT_COLOR);
 #endif
