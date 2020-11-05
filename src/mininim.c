@@ -753,12 +753,12 @@ parser (int key, char *arg, struct argp_state *state)
       level_module_next_level (&vanilla_level, i);
       if (mirror_level)
         mirror_level_h (&vanilla_level);
-      if (! save_level (&vanilla_level)) exit (-1);
+      if (! save_level (&vanilla_level)) exit (EXIT_FAILURE);
     }
     fprintf (stderr, "\
 Levels have been converted using module %s into native format at\n\
 %s\n", level_module_str (level_module), user_data_dir);
-    exit (0);
+    exit (EXIT_SUCCESS);
     break;
   case MIRROR_LEVEL_OPTION:
     mirror_level = optval_to_bool (arg);
@@ -969,10 +969,10 @@ Levels have been converted using module %s into native format at\n\
     break;
   case PRINT_PATHS_OPTION:
     print_paths ();
-    exit (0);
+    exit (EXIT_SUCCESS);
   case PRINT_DISPLAY_MODES_OPTION:
     print_display_modes ();
-    exit (0);
+    exit (EXIT_SUCCESS);
   case SKIP_TITLE_OPTION:
     skip_title = optval_to_bool (arg);
     break;
@@ -1038,7 +1038,7 @@ Levels have been converted using module %s into native format at\n\
     break;
   case JOYSTICK_INFO_OPTION:
     if (joystick_info ()) error (-1, 0, "Joystick not found");
-    exit (0);
+    exit (EXIT_SUCCESS);
     break;
   case SEMANTICS_OPTION:
     e = optval_to_enum (&i, key, arg, state, semantics_enum, 0);
@@ -1069,8 +1069,8 @@ Levels have been converted using module %s into native format at\n\
     replay_info = true;
     break;
   case PRINT_REPLAY_FAVORITES_OPTION:
-    if (print_replay_favorites ()) exit (0);
-    else exit (-1);
+    if (print_replay_favorites ()) exit (EXIT_SUCCESS);
+    else exit (EXIT_FAILURE);
     break;
   case REPLAY_FAVORITE_OPTION:
     if (! replay_favorite_nmemb)
@@ -1423,7 +1423,7 @@ main (int _argc, char **_argv)
 
   /* size_t i; */
   /* for (i = 0; i < cargc; i++) printf ("%s\n", cargv[i]); */
-  /* exit (0); */
+  /* exit (EXIT_SUCCESS); */
 
   argp_program_version_hook = version;
 
@@ -1450,7 +1450,7 @@ main (int _argc, char **_argv)
     if (replay_chain_nmemb == 0)
       error (-1, 0, "empty replay chain");
     print_replay_chain_info ();
-    exit (0);
+    exit (EXIT_SUCCESS);
   }
 
   init_dialog ();
@@ -1493,7 +1493,7 @@ main (int _argc, char **_argv)
 
   /* ----------------- */
   /* save_guard_bitmaps (VGA); */
-  /* exit (0); */
+  /* exit (EXIT_SUCCESS); */
   /* --------------- */
 
   give_dat_compat_preference ();
@@ -1530,14 +1530,14 @@ main (int _argc, char **_argv)
   /* /\* begin test *\/ */
   /* cutscene_mode (true); */
   /* play_anim (cutscene_out_of_time_anim, NULL); */
-  /* exit (0); */
+  /* exit (EXIT_SUCCESS); */
   /* /\* end test *\/ */
 
   play_title ();
 
   stop_audio_instances ();
   stop_video_effect ();
-  if (quit_anim == QUIT_GAME) exit (0);
+  if (quit_anim == QUIT_GAME) exit (EXIT_SUCCESS);
   else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
@@ -1553,7 +1553,7 @@ main (int _argc, char **_argv)
     min_legacy_level = min_int (min_legacy_level, replay->start_level);
     max_legacy_level = max_int (max_legacy_level, replay->start_level);
     if (! next_legacy_level (&vanilla_level, replay->start_level))
-      exit (-1);
+      exit (EXIT_FAILURE);
     title_demo = true;
     play_level (&vanilla_level);
     title_demo = false;
@@ -1563,7 +1563,7 @@ main (int _argc, char **_argv)
 
   stop_audio_instances ();
   stop_video_effect ();
-  if (quit_anim == QUIT_GAME) exit (0);
+  if (quit_anim == QUIT_GAME) exit (EXIT_SUCCESS);
   else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
@@ -1594,7 +1594,7 @@ main (int _argc, char **_argv)
 
   int level = next_level_number >= 0 ? next_level_number : start_level;
   if (! level_module_next_level (&vanilla_level, level))
-    exit (-1);
+    exit (EXIT_FAILURE);
   play_level (&vanilla_level);
 
   if (quit_anim == LOAD_GAME) goto play_game;

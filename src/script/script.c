@@ -150,7 +150,7 @@ init_script (void)
       error (0, 0, "%s", lua_tostring(L, 1));
       lua_remove (L, 1);
     }
-    exit (-1);
+    exit (EXIT_FAILURE);
   }
   lua_settop (L, 0);
 }

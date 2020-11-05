@@ -1219,7 +1219,7 @@ process_display_events (void)
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
-      exit (0);
+      exit (EXIT_SUCCESS);
       break;
     }
 }

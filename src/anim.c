@@ -449,7 +449,7 @@ play_anim (anim_callback_t draw_callback,
     default:
       print_replay_chain_aborted ();
       stop_replaying (1);
-      if (command_line_replay) exit (-1);
+      if (command_line_replay) exit (EXIT_FAILURE);
       break;
     }
   }

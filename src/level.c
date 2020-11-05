@@ -419,10 +419,10 @@ play_level (struct level *lv)
       HLINE;
 
       int status = ! replay_skipped && complete_replay_chain
-        && valid_replay_chain ? 0 : 1;
+        && valid_replay_chain ? EXIT_SUCCESS : EXIT_FAILURE;
 
       if (validate_replay_chain == WRITE_VALIDATE_REPLAY_CHAIN) {
-        if (status == 0) {
+        if (status == EXIT_SUCCESS) {
           save_replay_chain ();
           fprintf (stderr, "MININIM: replay chain VALID and COMPLETE!  Replay chain HAS been saved.\n");
         } else fprintf (stderr, "MININIM: replay chain INVALID or INCOMPLETE!  Replay chain has NOT been saved.\n");

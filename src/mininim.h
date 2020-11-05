@@ -330,7 +330,7 @@ extern struct message_box about_dialog;
 
 extern int exit_code;
 
-#define exit(x) ((exit)(exit_code = (x)))
+#define exit(x) (exit (exit_code = (x)))
 
 #define _STR(x) #x
 #define STR(x) _STR(x)
