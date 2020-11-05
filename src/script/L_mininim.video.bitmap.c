@@ -296,8 +296,9 @@ BEGIN_LUA (set_pixel)
   if (! b) return 0;
 
   al_set_target_bitmap (*b);
-  /* al_lock_bitmap (*b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE); */
+  al_lock_bitmap (*b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
   al_put_pixel (x, y, *c);
+  al_unlock_bitmap (*b);
 
   return 0;
 }
@@ -313,8 +314,9 @@ BEGIN_LUA (get_pixel)
 
   if (! b) return 0;
 
-  /* al_lock_bitmap (*b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY); */
+  al_lock_bitmap (*b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
   ALLEGRO_COLOR c = al_get_pixel (*b, x, y);
+  al_unlock_bitmap (*b);
   L_pushcolor (L, c);
   return 1;
 }
