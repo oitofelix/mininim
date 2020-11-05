@@ -21,6 +21,12 @@
 #ifndef MININIM_MININIM_H
 #define MININIM_MININIM_H
 
+/* All the love, all the power! */
+#define _GNU_SOURCE 1
+
+/* Fix printf format specifier for windows port */
+#define __USE_MINGW_ANSI_STDIO 1
+
 #include <config.h>
 
 /* C Library */
@@ -55,7 +61,14 @@
 #include "progname.h"
 #include "vasnprintf.h"
 #include "xprintf.h"
-#include "xvasprintf.h"
+
+/* xvasprintf.h generates warnings for the Windows port.  Properly
+   declare its functions.  */
+
+extern char *xasprintf (const char *format, ...)
+       _GL_ATTRIBUTE_FORMAT ((gnu_printf, 1, 2));
+extern char *xvasprintf (const char *format, va_list args)
+       _GL_ATTRIBUTE_FORMAT ((gnu_printf, 1, 0));
 
 /* Allegro */
 #define ALLEGRO_UNSTABLE

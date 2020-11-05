@@ -42,7 +42,7 @@ bool gui_control_int (Ihandle *ih, char *name, int value);
 bool gui_control_attribute (Ihandle *ih, char *name, char *value);
 bool gui_control_attribute_str (Ihandle *ih, char *name, char *value);
 bool gui_control_attribute_strf (Ihandle *ih, char *name, char *format, ...)
-  __attribute__ ((format (printf, 3, 4)));
+  __attribute__ ((format (gnu_printf, 3, 4)));
 
 int gui_default_key_cb (Ihandle *ih, int c);
 int gui_debug_print_key_cb (Ihandle *ih, int c);

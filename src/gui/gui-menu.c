@@ -34,14 +34,14 @@ static uint16_t vmenu_item (int flags, ALLEGRO_BITMAP *icon,
 
 /* static uint16_t *menu_item (int flags, ALLEGRO_BITMAP *icon, bool has_submenu, */
 /*                             char const *title_template, ...) */
-/*   __attribute__ ((format (printf, 4, 5))); */
+/*   __attribute__ ((format (gnu_printf, 4, 5))); */
 
 static uint16_t menu_hitem (bool enabled, char const *title_template, ...)
-  __attribute__ ((format (printf, 2, 3)));
+  __attribute__ ((format (gnu_printf, 2, 3)));
 
 static uint16_t menu_sitem (bool enabled, ALLEGRO_BITMAP *icon,
                             char const *title_template, ...)
-  __attribute__ ((format (printf, 3, 4)));
+  __attribute__ ((format (gnu_printf, 3, 4)));
 
 static void menu_ditem (bool first, uint16_t *id0, uint16_t *id1,
                         bool enabled0, bool enabled1,
@@ -49,27 +49,27 @@ static void menu_ditem (bool first, uint16_t *id0, uint16_t *id1,
                         ALLEGRO_BITMAP *icon1,
                         char const *title_template0,
                         char const *title_template1, ...)
-  __attribute__ ((format (printf, 9, 10)));
+  __attribute__ ((format (gnu_printf, 9, 10)));
 
 static uint16_t menu_sub (ALLEGRO_MENU **submenu, bool enabled,
                           ALLEGRO_BITMAP *icon,
                           void (*build_f) (intptr_t data), intptr_t data,
                           char const *title_template, ...)
-  __attribute__ ((format (printf, 6, 7)));
+  __attribute__ ((format (gnu_printf, 6, 7)));
 
 static uint16_t menu_array (ALLEGRO_MENU **submenu,
                             bool enabled, ALLEGRO_BITMAP *icon,
                             void (*build_f) (int index, int lower),
                             int id_nmemb, int nmemb, int index,
                             char const *title_template, ...)
-  __attribute__ ((format (printf, 8, 9)));
+  __attribute__ ((format (gnu_printf, 8, 9)));
 
 static uint16_t menu_citem (bool enabled, bool checked, ALLEGRO_BITMAP *icon,
                             char const *title_template, ...)
-  __attribute__ ((format (printf, 4, 5)));
+  __attribute__ ((format (gnu_printf, 4, 5)));
 
 static void menu_sep (char const *title_template, ...)
-  __attribute__ ((format (printf, 1, 2)));
+  __attribute__ ((format (gnu_printf, 1, 2)));
 
 static void end_menu (void);
 
