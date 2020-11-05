@@ -127,10 +127,7 @@ play_anim (anim_callback_t draw_callback,
         /* al_set_timer_count (video_timer, 0); */
       } else if (event.timer.source == timer) {
         /* ensures Lua stack is empty */
-        if (DEBUG && lua_gettop (main_L)) {
-          L_dump_stack (main_L);
-          assert (false);
-        }
+	lua_settop (main_L, 0);
 
         /* check for replay favorite cycle */
         if (replay_favorite_cycle > 0
