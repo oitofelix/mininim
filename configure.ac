@@ -137,8 +137,8 @@ AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
-  # Joystick in MinGW crashes for Allegro non-debug builds
-  [debug_suffix=-debug]
+  dnl # Joystick in MinGW crashes for Allegro non-debug builds
+  dnl [debug_suffix=-debug]
 
   [ALLEGRO_CFLAGS=""
    ALLEGRO_LIBS="-lallegro${debug_suffix}"
@@ -156,10 +156,10 @@ AS_CASE([$host],
    ALLEGRO_DIALOG_LIBS="-lallegro_dialog${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_COLOR_CFLAGS="${ALLEGRO_CFLAGS}"
    ALLEGRO_COLOR_LIBS="-lallegro_color${debug_suffix} ${ALLEGRO_LIBS}"
-   mingw_ldadd="-lFLAC \
-      -lfreetype \
-      -lvorbisfile \
-      -lvorbis \
+   mingw_ldadd="dnl -lFLAC \
+      dnl -lfreetype \
+      dnl -lvorbisfile \
+      dnl -lvorbis \
       -logg \
       -lz \
       -lgdiplus \
@@ -264,18 +264,20 @@ AC_SUBST([mingw_ldadd])
 ### Check for Lua
 ######
 
+AM_COND_IF([mingw_build],
+           [LUA_EXEC_PREFIX="/usr/i686-w64-mingw32"
+	    LUA_INCLUDE="-I/usr/i686-w64-mingw32/include"
+	    LUA_LIB="-l:liblua.a"
+	    LUA_PLATFORM="i686-w64-mingw32"
+	    LUA_SHORT_VERSION="53"
+	    LUA_VERSION="5.3"],
+           [LUA_LIB="-llua5.3 -ldl"])
+
 AX_PROG_LUA([5.3], [5.4], [],
   AC_MSG_ERROR([MININIM requires Lua 5.3]))
 AX_LUA_HEADERS(, AC_MSG_ERROR([MININIM requires Lua headers]))
 AX_LUA_LIBS(, AC_MSG_ERROR([MININIM requires Lua libraries]))
 AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
-
-AM_COND_IF([mingw_build],
-           [LUA_LIB="-l:liblua50.a -l:liblualib50.a"],
-           dnl [LUA_LIB="-ldl -llua50 -llualib50"]
-           [LUA_LIB="-llua5.3 -ldl"]
-	   )
-
 
 
 
