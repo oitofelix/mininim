@@ -633,16 +633,17 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
   /* fprintf (stderr, "%" PRIu64 ": paletted again!!!\n", anim_cycle); */
 
   /* Apply palette */
-  int x, y;
-  ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
+  al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
   int w = get_bitmap_width (bitmap);
   int h = get_bitmap_height (bitmap);
-  al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+  ALLEGRO_BITMAP *rbitmap = create_bitmap (w, h);
+  al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
   al_set_target_bitmap (rbitmap);
-  for (y = 0; y < h; y++)
-    for (x = 0; x < w; x++)
-      al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y), data));
+  for (int y = 0; y < h; y++)
+    for (int x = 0; x < w; x++)
+      al_put_pixel (x, y, p (al_get_pixel (bitmap, x, y), data));
   al_unlock_bitmap (rbitmap);
+  al_unlock_bitmap (bitmap);
 
   if (palette_cache_size_limit && k) {
     /* In case it's Lua bitmap and palette */
