@@ -47,11 +47,7 @@
 #define MININIM_HISTSIZE_ENV "MININIM_HISTSIZE"
 #define MININIM_HISTSIZE_DEFAULT 1024
 
-#if WINDOWS_PORT
-int repl_priority = 512;
-#else
 int repl_priority = 1;
-#endif
 
 char *myhist;
 static char *lhandler_line;
