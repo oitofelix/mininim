@@ -20,8 +20,8 @@
 -- called during loading screen for loading assets
 function MININIM.lua.load_hook ()
    -- video modes
-   require "vm-mac/vm-mac"
-   require "vga/vga"
+   require "port.macintosh.video.color"
+   require "port.ibmpc.video.vga"
    -- require "ega/ega".load ()
    -- require "cga/cga".load ()
 
