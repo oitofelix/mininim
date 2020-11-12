@@ -42,8 +42,8 @@ flow (struct actor *k)
 {
   if (k->oaction != kid_sword_attack) {
     /* if (k->id == 0) */
-    /*   printf ("kid_sword_attack: dx = %i, k->i = %i, k->f.b = %p\n", */
-    /*           k->f.c.x - k->of.c.x, k->i, k->f.b); */
+    /*   eprintf ("kid_sword_attack: dx = %i, k->i = %i, k->f.b = %p\n", */
+    /*            k->f.c.x - k->of.c.x, k->i, k->f.b); */
 
     k->i = -1;
     k->of = k->f;

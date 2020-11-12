@@ -224,7 +224,7 @@ play_anim (anim_callback_t draw_callback,
               && is_video_rendering ()) {
             int progress;
             if (update_replay_progress (&progress))
-              fprintf (stderr, "%3i%%\r", progress);
+              eprintf ("%3i%%\r", progress);
           }
 
           /* if (replay_mode == PLAY_REPLAY) debug_random_seed (); */
@@ -236,9 +236,10 @@ play_anim (anim_callback_t draw_callback,
           (event_queue, al_get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
 
-      /* fprintf (stderr, "KEY DOWN: %i, %s, %c\n", key.modifiers, */
-      /*          al_keycode_to_name (key.keycode), */
-      /*          toupper (key2char (&key))); */
+        /* eprintf ("KEY DOWN: %i, %s, %c\n", */
+        /*       key.modifiers, */
+        /*       al_keycode_to_name (key.keycode), */
+        /*       toupper (key2char (&key))); */
 
         if (about_screen
             && (was_any_key_pressed () || ! message_box_thread_id))
@@ -335,11 +336,12 @@ play_anim (anim_callback_t draw_callback,
       /* int h = al_get_display_height (display); */
       /* ALLEGRO_MOUSE_STATE mouse_state; */
       /* al_get_mouse_state (&mouse_state); */
-      /* printf ("display: %i, %i; mouse: %i, %i\n", */
-      /*         w, h, mouse_state.x, mouse_state.y); */
+      /* eprintf ("display: %i, %i; mouse: %i, %i\n", */
+      /*          w, h, mouse_state.x, mouse_state.y); */
 
       /* struct mouse_coord mc; get_mouse_coord (&mc); */
-      /* printf ("%i,%i,%i\n", mc.c.room, mc.c.x, mc.c.y); */
+      /* eprintf ("%i,%i,%i\n", */
+      /*          mc.c.room, mc.c.x, mc.c.y); */
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
       /* for some reason popup menus don't show properly in response
@@ -399,7 +401,7 @@ play_anim (anim_callback_t draw_callback,
         key.keycode = event.keyboard.keycode;
       key.modifiers = get_key_modifiers ();
 
-      /* fprintf (stderr, "KEY DOWN: %i, %s, %c\n", key.modifiers, */
+      /* eprintf ("KEY DOWN: %i, %s, %c\n", key.modifiers, */
       /*          al_keycode_to_name (key.keycode), */
       /*          toupper (key2char (&key))); */
 

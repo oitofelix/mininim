@@ -96,7 +96,7 @@ physics_in (struct actor *k)
     k->inertia = 0;
   }
 
-  /* printf ("inertia: %i\n", k->inertia); */
+  /* eprintf ("inertia: %i\n", k->inertia); */
 
   /* /\* collision *\/ */
   /* uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, NULL); */
@@ -234,7 +234,7 @@ physics_out (struct actor *k)
     kid_haptic (k, KID_HAPTIC_SCREAM);
     if (scream) {
       if (! kid_scream) {
-        fprintf (stderr, "In MININIM, the kid screams...\n");
+        eprintf ("In MININIM, the kid screams...\n");
         kid_scream = true;
       }
     }

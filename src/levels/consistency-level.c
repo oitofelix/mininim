@@ -41,7 +41,7 @@ next_consistency_level (struct level *l, int n)
 {
   random_seed = n;
   /* random_seed = time (NULL); */
-  /* printf ("LEVEL NUMBER: %u\n", random_seed); */
+  /* eprintf ("LEVEL NUMBER: %u\n", random_seed); */
 
   randomize_memory (l, sizeof (*l));
 

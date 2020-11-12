@@ -112,7 +112,7 @@ fix_door_lacking_opener (struct pos *p)
       if (peq (&event (p->l, i)->p, p)
           && is_there_event_handler (p->l, i)) return p;
 
-    /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
+    /* eprintf ("%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
     set_tile (p, FLOOR, BRICKS_5, NO_ITEM, NO_FAKE);
@@ -138,7 +138,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
         return p;
     } while (le->next && ++i < p->l->event_nmemb);
 
-    /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
+    /* eprintf ("%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
     /*          __func__, fg (p) == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
     /*          ext (p), "FLOOR", p->room, p->floor, p->place); */
 

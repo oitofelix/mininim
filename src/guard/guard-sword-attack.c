@@ -42,8 +42,8 @@ flow (struct actor *g)
 {
   if (g->oaction != guard_sword_attack) {
     /* if (g->id == 0) */
-    /*   printf ("guard_sword_attack: dx = %i, g->i = %i, g->f.b = %p\n", */
-    /*           g->f.c.x - g->of.c.x, g->i, g->f.b); */
+    /*   eprintf ("guard_sword_attack: dx = %i, g->i = %i, g->f.b = %p\n", */
+    /* 	       g->f.c.x - g->of.c.x, g->i, g->f.b); */
 
     g->i = -1;
     g->of = g->f;

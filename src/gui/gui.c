@@ -427,7 +427,7 @@ gui_default_key_cb (Ihandle *ih, int c)
 int
 gui_debug_print_key_cb (Ihandle *ih, int c)
 {
-  fprintf (stderr, "Key pressed: %x\n", c);
+  eprintf ("Key pressed: %x\n", c);
   return IUP_CONTINUE;
 }
 

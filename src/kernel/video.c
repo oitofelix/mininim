@@ -346,8 +346,10 @@ trim_bitmap (ALLEGRO_BITMAP *b, ALLEGRO_COLOR t)
   int w = xr - xl + 1;
   int h = yr - yl + 1;
 
-  /* fprintf (stderr, "%i,%i,%i,%i\n", xl, yl, xr, yr); */
-  /* fprintf (stderr, "%i,%i:%ix%i\n", xl, yl, w, h); */
+  /* eprintf ("%i,%i,%i,%i\n", */
+  /*          xl, yl, xr, yr); */
+  /* eprintf ("%i,%i:%ix%i\n", */
+  /*          xl, yl, w, h); */
 
   return al_create_sub_bitmap (b, xl, yl, w, h);
 }
@@ -598,8 +600,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
 
     if (consecutive_cycles >= 120) {
       char *hl = hline ('-');
-      fprintf (stderr,
-               "%s\nWARNING: Palettes are being cached for each cycle.\n"
+      eprintf ("%s\nWARNING: Palettes are being cached for each cycle.\n"
                "This is probably a result of mutable cache keys.\n"
                "This severely slows down MININIM and needlessly consumes"
                " memory.\n"
@@ -621,8 +622,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
 
     if (consecutive_cycles >= 120) {
       char *hl = hline ('-');
-      fprintf (stderr,
-               "%s\nWARNING: Palettes are being applied "
+      eprintf ("%s\nWARNING: Palettes are being applied "
                "for each cycle without caching.\n"
                "This severely slows down MININIM.\n"
                "Please, consider fixing the %s video mode.\n",
@@ -635,7 +635,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
   }
   /* END: Palette caching guardian */
 
-  /* fprintf (stderr, "%" PRIu64 ": paletted again!!!\n", anim_cycle); */
+  /* eprintf ("%" PRIu64 ": paletted again!!!\n", anim_cycle); */
 
   /* Apply palette */
   al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);

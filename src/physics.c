@@ -1632,7 +1632,8 @@ can_hang (struct actor *a, bool reverse, struct pos *hang_pos)
 
   float d = dist_coord (&tb, &ch);
 
-  /* if (reverse) printf ("dist_coord = %f\n", d); */
+  /* if (reverse) */
+  /*   eprintf ("dist_coord = %f\n", d); */
 
   if (is_actor_fall (a) && d > (reverse ? 22 : 18)) return false;
 

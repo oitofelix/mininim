@@ -53,20 +53,22 @@ save_guard_bitmaps (void)
 void
 debug_pos (struct pos *p)
 {
-  printf ("(%i,%i,%i)\n", p->room, p->floor, p->place);
+  eprintf ("(%i,%i,%i)\n",
+	   p->room, p->floor, p->place);
 }
 
 void
 debug_random_seed (void)
 {
-  fprintf (stderr, "%" PRIu64 " 0x%X\n", anim_cycle, random_seed);
+  eprintf ("%" PRIu64 " 0x%X\n",
+	   anim_cycle, random_seed);
 }
 
 void
 debug_actor (struct actor *a)
 {
   char *hl = hline ('=');
-  fprintf (stderr, "%s\n"
+  eprintf ("%s\n"
            "action: %s\n"
            "previous_action: %s\n"
            "index: %i\n"
@@ -90,34 +92,38 @@ L_dump_stack (lua_State *L)
   for (i = 1; i <= lua_gettop (L); i++) {
     int type = lua_type (L, i);
     switch (type) {
-    case LUA_TNIL: fprintf (stderr, "%i: nil\n", i); break;
+    case LUA_TNIL:
+      eprintf ("%i: nil\n", i); break;
     case LUA_TNUMBER:
-      fprintf (stderr, "%i: %f\n", i, lua_tonumber (L, i));
+      eprintf ("%i: %f\n",
+	       i, lua_tonumber (L, i));
       break;
     case LUA_TBOOLEAN:
-      fprintf (stderr, "%i: %s\n", i,
+      eprintf ("%i: %s\n",
+	       i,
                lua_toboolean (L, i) ? "true" : "false");
       break;
     case LUA_TSTRING:
-      fprintf (stderr, "%i: \"%s\"\n", i, lua_tostring (L, i));
+      eprintf ("%i: \"%s\"\n",
+	       i, lua_tostring (L, i));
       break;
     case LUA_TTABLE:
-      fprintf (stderr, "%i: [table]\n", i);
+      eprintf ("%i: [table]\n", i);
       break;
     case LUA_TFUNCTION:
-      fprintf (stderr, "%i: [function]\n", i);
+      eprintf ("%i: [function]\n", i);
       break;
     case LUA_TUSERDATA:
-      fprintf (stderr, "%i: [userdata]\n", i);
+      eprintf ("%i: [userdata]\n", i);
       break;
     case LUA_TTHREAD:
-      fprintf (stderr, "%i: [thread]\n", i);
+      eprintf ("%i: [thread]\n", i);
       break;
     case LUA_TLIGHTUSERDATA:
-      fprintf (stderr, "%i: [lightuserdata]\n", i);
+      eprintf ("%i: [lightuserdata]\n", i);
       break;
     default:
-      fprintf (stderr, "%i: [unknown]\n", i);
+      eprintf ("%i: [unknown]\n", i);
       break;
     }
   }

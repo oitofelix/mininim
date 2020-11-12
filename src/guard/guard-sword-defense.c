@@ -76,8 +76,8 @@ flow (struct actor *g)
   if (g->i == 1) g->xf.b = NULL;
 
   /* if (g->id == 0) */
-  /*   printf ("guard_sword_defense: g->i = %i, g->fo.dx = %i\n", */
-  /*           g->i, g->fo.dx); */
+  /*   eprintf ("guard_sword_defense: g->i = %i, g->fo.dx = %i\n", */
+  /*            g->i, g->fo.dx); */
 
   return true;
 }

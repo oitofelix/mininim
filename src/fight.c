@@ -530,10 +530,11 @@ fight_mechanics (struct actor *k)
     k->hurt_enemy_in_counter_attack =
       (ke->enemy_counter_attacked_myself && ! ke->i_counter_defended);
 
-  /* printf ("ke->attack_range_near: %i\n", ke->attack_range_near); */
+  /* eprintf ("ke->attack_range_near: %i\n", */
+  /*          ke->attack_range_near); */
 
-  /* printf ("ke->enemy_defended_my_attack = %i, ke->i = %i, k->key.up = %i\n", */
-  /*         ke->enemy_defended_my_attack, ke->i, k->key.up); */
+  /* eprintf ("ke->enemy_defended_my_attack = %i, ke->i = %i, k->key.up = %i\n", */
+  /*          ke->enemy_defended_my_attack, ke->i, k->key.up); */
 
   ke->placed_at_attack_frame = false;
 
@@ -561,11 +562,22 @@ fight_mechanics (struct actor *k)
     } else ke->enemy_defended_my_attack = false;
   }
 
-/*   printf ("id: %i, ad: %i, ca: %i, cd: %i, i: %i, hurt: %i\n\ */
-/* id: %i, ad: %i, ca: %i, cd: %i, i: %i, hurt: %i\n\ */
-/* -------------------------------\n", */
-/*           k->id, k->enemy_defended_my_attack, k->enemy_counter_attacked_myself, k->i_counter_defended, k->i, k->hurt, */
-/*           ke->id, ke->enemy_defended_my_attack, ke->enemy_counter_attacked_myself, ke->i_counter_defended, ke->i, ke->hurt); */
+  /* eprintf ("id: %i, ad: %i, ca: %i, cd: %i, i: %i, hurt: %i\n" */
+  /* 	   "id: %i, ad: %i, ca: %i, cd: %i, i: %i, hurt: %i\n" */
+  /* 	   "-------------------------------\n", */
+  /* 	   k->id, */
+  /* 	   k->enemy_defended_my_attack, */
+  /* 	   k->enemy_counter_attacked_myself, */
+  /* 	   k->i_counter_defended, */
+  /* 	   k->i, */
+  /* 	   k->hurt, */
+  /* 	   ke->id, */
+  /* 	   ke->enemy_defended_my_attack, */
+  /* 	   ke->enemy_counter_attacked_myself, */
+  /* 	   ke->i_counter_defended, */
+  /* 	   ke->i, */
+  /* 	   ke->hurt); */
+
 }
 
 void
@@ -822,8 +834,8 @@ put_at_defense_frame (struct actor *k)
   }
 
   /* if (k->id == 0) */
-  /*   printf ("%s: k->i = %i, k->fo.dx = %i\n", */
-  /*           __func__, k->i, k->fo.dx); */
+  /*   eprintf ("%s: k->i = %i, k->fo.dx = %i\n", */
+  /*            __func__, k->i, k->fo.dx); */
 }
 
 void

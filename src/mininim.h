@@ -351,4 +351,8 @@ extern int exit_code;
 #define _STR(x) #x
 #define STR(x) _STR(x)
 
+#define eprintf(format, ...)			\
+  (fprintf (stderr,				\
+	    format,				\
+	    ##__VA_ARGS__))
 #endif	/* MININIM_MININIM_H */

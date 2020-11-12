@@ -176,31 +176,31 @@ physics_out (struct actor *g)
       switch (g->type) {
       case GUARD:
         if (! guard_scream) {
-          fprintf (stderr, "In MININIM, the guard screams...\n");
+          eprintf ("In MININIM, the guard screams...\n");
           guard_scream = true;
         }
         break;
       case FAT:
         if (! fat_scream) {
-          fprintf (stderr, "In MININIM, the fat guard screams...\n");
+          eprintf ("In MININIM, the fat guard screams...\n");
           fat_scream = true;
         }
         break;
       case VIZIER:
         if (! vizier_scream) {
-          fprintf (stderr, "In MININIM, the vizier screams...\n");
+          eprintf ("In MININIM, the vizier screams...\n");
           vizier_scream = true;
         }
         break;
       case SKELETON:
         if (! skeleton_scream) {
-          fprintf (stderr, "In MININIM, the skeleton screams...\n");
+          eprintf ("In MININIM, the skeleton screams...\n");
           skeleton_scream = true;
         }
         break;
       case SHADOW:
         if (! shadow_scream) {
-          fprintf (stderr, "In MININIM, the shadow screams...\n");
+          eprintf ("In MININIM, the shadow screams...\n");
           shadow_scream = true;
         }
         break;

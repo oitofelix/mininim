@@ -380,7 +380,7 @@ BEGIN_LUA (lbr)
 
   char *debugger_breaks = debugger_breaks_report (L, fmt);
   if (strcmp (debugger_breaks, ""))
-    fprintf (stderr, "%s\n", debugger_breaks);
+    eprintf ("%s\n", debugger_breaks);
   al_free (debugger_breaks);
 
   al_free (fmt);
@@ -683,7 +683,8 @@ start_debugging (void)
   lua_sethook (main_L, debugger_hook,
                LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE, 0);
   if (! was_debugging) {
-    if (repl_prompt_ready) fprintf (stderr, "\n");
+    if (repl_prompt_ready)
+      eprintf ("\n");
     repl_update_prompt ();
   }
 }
@@ -697,7 +698,8 @@ stop_debugging (void)
     lua_sethook (main_L, profiler_hook, LUA_MASKCALL | LUA_MASKRET, 0);
   else lua_sethook (main_L, NULL, 0, 0);
   if (was_debugging) {
-    if (repl_prompt_ready) fprintf (stderr, "\n");
+    if (repl_prompt_ready)
+      eprintf ("\n");
     repl_update_prompt ();
   }
 }
@@ -774,7 +776,8 @@ print_full_backtrace (lua_State *L, int event)
   char *hl = hline ('-');
   char *report = get_full_backtrace_report (L, event);
   if (strcmp (report, ""))
-    fprintf (stderr, "%s\n%s\n", report, hl);
+    eprintf ("%s\n%s\n",
+	     report, hl);
   al_free (report);
   al_free (hl);
 }
@@ -785,7 +788,8 @@ print_compact_backtrace (lua_State *L, int event)
   char *hl = hline ('-');
   char *report = get_compact_backtrace_report (L, event);
   if (strcmp (report, ""))
-    fprintf (stderr, "%s\n%s\n", report, hl);
+    eprintf ("%s\n%s\n",
+	     report, hl);
   al_free (report);
   al_free (hl);
 }
@@ -1362,7 +1366,8 @@ debugger_hook (lua_State *L, lua_Debug *ar)
   }
   }
 
-  /* if (repl_prompt_ready) fprintf (stderr, "\n"); */
+  /* if (repl_prompt_ready) */
+  /*   eprintf ("\n"); */
 
   print_full_backtrace (L, event);
 

@@ -198,8 +198,9 @@ L_call (lua_State *L, int nargs, int nresults)
   lua_pushcfunction (L, L_TRACEBACK);
   lua_insert (L, base);
   if (lua_pcall (L, nargs, nresults, base)) {
-    if (repl_prompt_ready) fprintf (stderr, "\n");
-    fprintf (stderr, "%s\n", lua_tostring(L, -1));
+    if (repl_prompt_ready) eprintf ("\n");
+    eprintf ("%s\n",
+	     lua_tostring (L, -1));
     lua_pop (L, 1);
     lua_remove(L, base);
     int i;

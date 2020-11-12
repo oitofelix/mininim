@@ -444,7 +444,8 @@ kid_debug (void)
     /* al_set_target_bitmap (screen); */
     /* al_put_pixel (px, py, al_map_rgb (0, 255, 255)); */
 
-    /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
+    /* eprintf ("x = %i, y = %i, floor = %i, place = %i\n", */
+    /* 	     px, py, (py -3) / 63, (px - 15) / 32); */
 
     struct coord bf; struct pos pbf, npbf;
     survey (_bf, pos, &k->f, &bf, &pbf, &npbf);
@@ -464,9 +465,9 @@ kid_debug (void)
     int dch = dist_chomper (&k->f, false);
     int de = dist_enemy (k);
 
-      printf ("\
+      eprintf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
-              pbf.floor, pbf.place, dn, dp, dc, dcb, df, dl, dcl, dch, de);
+	       pbf.floor, pbf.place, dn, dp, dc, dcb, df, dl, dcl, dch, de);
 
   }
   /* end kid hack */

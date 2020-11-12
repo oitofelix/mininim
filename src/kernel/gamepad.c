@@ -561,7 +561,8 @@ gamepad_rumble (double intensity, double duration)
 
   if (al_rumble_haptic (joystick_haptic, intensity * gamepad_rumble_gain,
                         duration, joystick_haptic_effect_id[i])) {
-    /* printf ("%i: %.2f/%.2f\n", i, intensity, duration); */
+    /* eprintf ("%i: %.2f/%.2f\n", */
+    /* 	     i, intensity, duration); */
     i = (i + 1) % joystick_max_haptic_effects;
   }
 #endif

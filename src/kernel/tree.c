@@ -116,8 +116,10 @@ get_tree_node_id_by_data (struct tree *tree, int depth, void *data)
 bool
 tree_eq (struct tree *a, struct tree *b)
 {
+
   /* if (a->nmemb != b->nmemb) */
-  /*   fprintf (stderr, "a->nmemb: %zu, b->nmemb: %zu\n", a->nmemb, b->nmemb); */
+  /*   eprintf ("a->nmemb: %zu, b->nmemb: %zu\n", */
+  /* 	     a->nmemb, b->nmemb); */
 
   if (a->nmemb != b->nmemb) return false;
 

@@ -420,12 +420,18 @@ play_level (struct level *lv)
       int status = ! replay_skipped && complete_replay_chain
         && valid_replay_chain ? EXIT_SUCCESS : EXIT_FAILURE;
 
-      if (validate_replay_chain == WRITE_VALIDATE_REPLAY_CHAIN) {
-        if (status == EXIT_SUCCESS) {
-          save_replay_chain ();
-          fprintf (stderr, "MININIM: replay chain VALID and COMPLETE!  Replay chain HAS been saved.\n");
-        } else fprintf (stderr, "MININIM: replay chain INVALID or INCOMPLETE!  Replay chain has NOT been saved.\n");
-      }
+      if (validate_replay_chain == WRITE_VALIDATE_REPLAY_CHAIN)
+	{
+	  if (status == EXIT_SUCCESS)
+	    {
+	      save_replay_chain ();
+	      eprintf ("MININIM: replay chain VALID and COMPLETE!  "
+		       "Replay chain HAS been saved.\n");
+	    }
+	  else
+	    eprintf ("MININIM: replay chain INVALID or INCOMPLETE!  "
+		     "Replay chain has NOT been saved.\n");
+	}
 
       stop_replaying (1);
 

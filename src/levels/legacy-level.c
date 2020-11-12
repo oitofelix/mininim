@@ -839,8 +839,8 @@ interpret_legacy_level (struct level *l, int n)
                  __func__, t, n, p.room, p.floor, p.place);
         }
 
-        /* printf ("(%i, %i, %i): TILE!!!\n", */
-        /*         p.room, p.floor, p.place); */
+        /* eprintf ("(%i, %i, %i): TILE!!!\n", */
+        /*          p.room, p.floor, p.place); */
 
         struct pos pl; prel (&p, &pl, +0, -1);
         int step = 0;
@@ -1096,8 +1096,8 @@ interpret_legacy_level (struct level *l, int n)
     get_legacy_skill (lv.guard_skill[i], &g->skill);
     g->total_hp = hp_table[n];
 
-    /* printf ("(%i, %i, %i), style: %i\n", */
-    /*         g->p.room, g->p.floor, g->p.place, g->style); */
+    /* eprintf ("(%i, %i, %i), style: %i\n", */
+    /*          g->p.room, g->p.floor, g->p.place, g->style); */
   }
 
   /* define the enviroment mode based on the level */

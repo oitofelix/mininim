@@ -182,7 +182,7 @@ mouse_run (struct actor *m)
     if (scream && m->f.dir == RIGHT) {
       if (! mouse_scream) {
         play_audio (&scream_audio, NULL, m->id);
-        fprintf (stderr, "In MININIM, the mouse screams...\n");
+        eprintf ("In MININIM, the mouse screams...\n");
         mouse_scream = true;
       }
     }

@@ -784,7 +784,7 @@ vmenu_item (int flags, ALLEGRO_BITMAP *icon, ALLEGRO_MENU **submenu,
 
     /* update flags */
     if (cflags != flags) {
-      /* fprintf (stderr, "changed flags: %i, %s (%i) -> %s (%i)\n", */
+      /* eprintf ("changed flags: %i, %s (%i) -> %s (%i)\n", */
       /*          id, ctitle, cflags, title, flags); */
       al_set_menu_item_flags (*am, -*am_i, flags);
     }
@@ -793,14 +793,16 @@ vmenu_item (int flags, ALLEGRO_BITMAP *icon, ALLEGRO_MENU **submenu,
     if ((ctitle && ! title) || (! ctitle && title)
         || (ctitle && title && strcmp (ctitle, title))) {
       if (submenu) goto replace;
-      /* fprintf (stderr, "changed caption: %i, %s -> %s\n", id, ctitle, title); */
+      /* eprintf ("changed caption: %i, %s -> %s\n", */
+      /* 	       id, ctitle, title); */
       al_set_menu_item_caption (*am, -*am_i, title);
     }
 
     /* update icon */
     if ((cicon && ! icon) || (! cicon && icon)
         || (cicon && icon && ! bitmap_heq (cicon, icon))) {
-      /* fprintf (stderr, "changed icon: %i, %s -> %s\n", id, ctitle, title); */
+      /* eprintf ("changed icon: %i, %s -> %s\n", */
+      /* 	       id, ctitle, title); */
       al_set_menu_item_icon (*am, -*am_i, clone_memory_bitmap (icon));
     }
 
@@ -812,7 +814,8 @@ vmenu_item (int flags, ALLEGRO_BITMAP *icon, ALLEGRO_MENU **submenu,
 
  replace:
   al_remove_menu_item (*am, -*am_i);
-  /* fprintf (stderr, "replaced menu item: %i, %s\n", id, title); */
+  /* eprintf ("replaced menu item: %i, %s\n", */
+  /* 	   id, title); */
   ALLEGRO_MENU *new_submenu = NULL;
   if (submenu) {
     new_submenu = al_create_menu ();

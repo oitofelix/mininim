@@ -300,7 +300,7 @@ title_anim (void)
       if (scream) {
         if (! princess_scream) {
           play_audio (&scream_audio, NULL, princess.id);
-          fprintf (stderr, "In MININIM, the princess screams...\n");
+          eprintf ("In MININIM, the princess screams...\n");
           princess_scream = true;
         }
       }
@@ -767,7 +767,7 @@ cutscene_14_anim (void)
     if (scream) {
       if (! princess_scream) {
         play_audio (&scream_audio, NULL, princess.id);
-        fprintf (stderr, "In MININIM, the princess screams...\n");
+        eprintf ("In MININIM, the princess screams...\n");
         princess_scream = true;
       }
     }
@@ -948,7 +948,7 @@ draw_title_screen (ALLEGRO_BITMAP *bitmap, int i)
     draw_bitmap (text_credits, bitmap, 24, 25, 0); break;
   }
 
-  /* printf ("step %i\n", i); */
+  /* eprintf ("step %i\n", i); */
 }
 
 static void
@@ -1001,7 +1001,7 @@ draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i)
     break;
   }
 
-  /* printf ("step %i\n", i); */
+  /* eprintf ("step %i\n", i); */
 }
 
 static void

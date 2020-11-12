@@ -84,8 +84,8 @@ flow (struct actor *k)
   select_actor_xframe (k, "KID", "SWORD", k->j);
 
   /* if (k->id == 0) */
-  /*   printf ("kid_sword_defense: k->i = %i, k->fo.dx = %i\n", */
-  /*           k->i, k->fo.dx); */
+  /*   eprintf ("kid_sword_defense: k->i = %i, k->fo.dx = %i\n", */
+  /*            k->i, k->fo.dx); */
 
   return true;
 }

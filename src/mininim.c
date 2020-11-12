@@ -745,9 +745,10 @@ parser (int key, char *arg, struct argp_state *state)
         mirror_level_h (&vanilla_level);
       if (! save_level (&vanilla_level)) exit (EXIT_FAILURE);
     }
-    fprintf (stderr, "\
-Levels have been converted using module %s into native format at\n\
-%s\n", level_module_str (level_module), user_data_dir);
+    eprintf ("Levels have been converted using module %s into "
+	     "native format at\n%s\n",
+	     level_module_str (level_module),
+	     user_data_dir);
     exit (EXIT_SUCCESS);
     break;
   case MIRROR_LEVEL_OPTION:
@@ -1615,10 +1616,11 @@ quit_game (void)
   if (scream && kid_scream && guard_scream
       && fat_scream && shadow_scream && skeleton_scream
       && vizier_scream  && princess_scream && mouse_scream)
-    fprintf (stderr, "In MININIM, everybody screams! ;)\n");
+    eprintf ("In MININIM, everybody screams! ;)\n");
   else if (exit_code != EXIT_SUCCESS)
-    error (0, 0, "MININIM: exiting with error! :(");
-  else fprintf (stderr, "MININIM: Hope you enjoyed it! :)\n");
+    eprintf ("MININIM: exiting with error! :(\n");
+  else
+    eprintf ("MININIM: Hope you enjoyed it! :)\n");
 }
 
 void

@@ -209,8 +209,8 @@ compute_loose_floors (void)
     if (! should_remove_loose_floor (l)) {
       i++; continue;
     }
-    /* printf ("(%i,%i,%i) --- %i\n", */
-    /*         l->p.room, l->p.floor, l->p.place, l->action); */
+    /* eprintf ("(%i,%i,%i) --- %i\n", */
+    /* 	     l->p.room, l->p.floor, l->p.place, l->action); */
 
     remove_loose_floor (l);
   }
@@ -485,13 +485,13 @@ loose_floor_fall_debug (void)
     if (l->action != FALL_LOOSE_FLOOR) continue;
     struct pos pv; pos2room (&l->p, room_view, &pv);
     struct coord cv; coord2room (&l->f.c, room_view, &cv);
-    printf ("(%i,%i,%i) == (%i,%i,%i) <%i,%f,%f> <%i,%f,%f> ? %i ? %i\n",
-            l->p.room, l->p.floor, l->p.place,
-            pv.room, pv.floor, pv.place,
-            l->f.c.room, l->f.c.x, l->f.c.y,
-            cv.room, cv.x, cv.y,
-            peq (&l->p, &pv),
-            cpos (&l->p, &pv));
+    eprintf ("(%i,%i,%i) == (%i,%i,%i) <%i,%f,%f> <%i,%f,%f> ? %i ? %i\n",
+	     l->p.room, l->p.floor, l->p.place,
+	     pv.room, pv.floor, pv.place,
+	     l->f.c.room, l->f.c.x, l->f.c.y,
+	     cv.room, cv.x, cv.y,
+	     peq (&l->p, &pv),
+	     cpos (&l->p, &pv));
     draw_falling_loose_floor
       (global_mr.cell[global_mr.dx][global_mr.dy].screen,
        &loose_floor[i].p);
