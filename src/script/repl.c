@@ -91,7 +91,7 @@ static int lua_readline(lua_State *L, const char *prompt)
     int r = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
     /* QUESTION: it used to be a thread locking around
        rl_callback_read_char, but it was removed because it didn't
-       play nice with the Windows port.  Is it practically
+       play nice with the Windows edition.  Is it practically
        safer/useful to use that for other systems? */
     if (r > 0) rl_callback_read_char ();
   }
@@ -479,7 +479,7 @@ ALLEGRO_COND *repl_cond;
 void *
 repl (ALLEGRO_THREAD *thread, void *L)
 {
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   /* Ncurses needs this so readline will behave a little bit more
      sanely in Windows. */
   setenv ("TERM", "#win32con", false);

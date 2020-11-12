@@ -23,7 +23,7 @@
 /* All the love, all the power! */
 #define _GNU_SOURCE 1
 
-/* Fix printf format specifier for windows port */
+/* Fix printf format specifier for Windows edition. */
 #define __USE_MINGW_ANSI_STDIO 1
 
 #include <config.h>
@@ -63,7 +63,7 @@
 #include "xalloc.h"
 #include "xprintf.h"
 
-/* xvasprintf.h generates warnings for the Windows port.  Properly
+/* xvasprintf.h generates warnings for the Windows Edition.  Properly
    declare its functions.  */
 
 extern char *xasprintf (const char *format, ...)
@@ -98,7 +98,10 @@ extern char *xvasprintf (const char *format, va_list args)
 
 /* MININIM */
 
-/* Port conditionals must come after this header. */
+/* Void pointer documentation */
+typedef void void_luaL_Buffer;
+
+/* Edition conditionals must come after this header. */
 #include "compatibility.h"
 #include "copyright-version.h"
 

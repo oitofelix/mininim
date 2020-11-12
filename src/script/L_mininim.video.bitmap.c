@@ -279,7 +279,7 @@ BEGIN_LUA (draw)
 	 bitmaps preserve their content (otherwise they would be
 	 transparent).  (Doors has been affected by this in VGA and
 	 Macintosh video modes.)*/
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
       if (target_bitmap != L_target_bitmap)
 	validate_bitmap_for_windows (target_bitmap);
 #endif

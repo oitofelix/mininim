@@ -288,7 +288,7 @@ joystick_info (void)
   int i, j;
 
   if (! al_is_joystick_installed ()) {
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
     if (HAPTIC_FEATURE) {
       init_dialog ();
       init_video ();

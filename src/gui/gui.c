@@ -493,7 +493,7 @@ dialog_fit_natural_size (Ihandle *ih)
   IupRefresh (ih);
   const char *size = IupGetAttribute (ih, "NATURALSIZE");
   IupSetAttribute (ih, "MINSIZE", size);
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   IupSetAttribute (ih, "RESIZE", "NO");
 #else
   /* IupSetAttribute (ih, "MAXSIZE", size); */

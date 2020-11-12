@@ -164,7 +164,7 @@ finalize_script (void)
 
   /* These sometimes cause trouble */
   /* al_join_thread (repl_thread, NULL); */
-#if ! WINDOWS_PORT
+#if ! WINDOWS_EDITION
   al_destroy_thread (repl_thread);
 #endif
 

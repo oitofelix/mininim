@@ -128,7 +128,7 @@ unsigned int
 term_cols (void)
 {
   static const unsigned int MAX_TERM_COLS = 320, DEFAULT_TERM_COLS = 80;
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
   unsigned int cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;

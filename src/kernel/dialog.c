@@ -28,7 +28,7 @@ init_dialog (void)
     error (0, 0, "%s (void): failed to initialize dialog addon",
            __func__);
 
-#if GNU_PORT
+#if GNU_EDITION
   /* Gtk inadvertently sets the application locale */
   setlocale (LC_ALL, "C");
 #endif

@@ -22,21 +22,21 @@
 
 /* Platform */
 #if defined ALLEGRO_UNIX || defined ALLEGRO_LINUX
-#define GNU_PORT true
+#define GNU_EDITION true
 #else
-#define GNU_PORT false
+#define GNU_EDITION false
 #endif
 
 #if defined ALLEGRO_MINGW32 || defined ALLEGRO_MSVC || defined ALLEGRO_BCC32
-#define WINDOWS_PORT true
+#define WINDOWS_EDITION true
 #else
-#define WINDOWS_PORT false
+#define WINDOWS_EDITION false
 #endif
 
 #if defined ALLEGRO_MACOSX || defined ALLEGRO_DARWIN
-#define MACOSX_PORT true
+#define MACOSX_EDITION true
 #else
-#define MACOSX_PORT false
+#define MACOSX_EDITION false
 #endif
 
 /* Non-debug build runtime checking */
@@ -52,13 +52,13 @@
 #endif
 
 /* Haptics */
-#if defined __al_included_allegro5_haptic_h && ! MACOSX_PORT
+#if defined __al_included_allegro5_haptic_h && ! MACOSX_EDITION
 #define HAPTIC_FEATURE true
 #else
 #define HAPTIC_FEATURE false
 #endif
 
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
 # include <windows.h>
 # include <versionhelpers.h>
 #endif

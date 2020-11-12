@@ -20,20 +20,30 @@
 #ifndef MININIM_COPYRIGHT_VERSION_H
 #define MININIM_COPYRIGHT_VERSION_H
 
-#define MARK "Copyright (C)"
-#define YEARS "2015--2020"
+#define COPYRIGHT_MARK "Copyright (C)"
+#define COPYRIGHT_YEARS "2015--" CURRENT_YEAR
 
-#if WINDOWS_PORT
-# define HOLDER "Bruno Felix Rezende Ribeiro"
+#if WINDOWS_EDITION
+# define COPYRIGHT_HOLDER "Bruno Felix Rezende Ribeiro"
 #else
-# define HOLDER "Bruno Félix Rezende Ribeiro"
+# define COPYRIGHT_HOLDER "Bruno Félix Rezende Ribeiro"
 #endif
 
-#define LICENSING "MININIM is free software under GPLv3+.\n"	\
+#if GNU_EDITION
+# define EDITION_NAME "GNU Edition"
+#elif WINDOWS_EDITION
+# define EDITION_NAME "Windows Edition"
+#elif MACOSX_EDITION
+# define EDITION_NAME "macOS Edition"
+#else
+# error "Unknown Edition"
+#endif
+
+#define LICENSING_MESSAGE "MININIM is free software under GPLv3+.\n"	\
   "You are free to change and redistribute it.\n"			\
   "There is NO WARRANTY, to the extent permitted by law."
 
-#define FUNDING "Please, support MININIM development!\n" \
+#define FUNDING_MESSAGE "Please, support MININIM development!\n" \
   "http://oitofelix.github.io/funding.html"
 
 #define FORUM_URL "http://forum.princed.org/"

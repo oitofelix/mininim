@@ -432,7 +432,7 @@ load_icon (char *filename)
   ALLEGRO_BITMAP *b;
   int w, h;
 
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   w = h = 13;
 #else
   w = h = 16;
@@ -950,7 +950,7 @@ menu_sep (char const *title_template, ...)
   va_list ap;
   va_start (ap, title_template);
 
-/* #if WINDOWS_PORT */
+/* #if WINDOWS_EDITION */
 /*   vmenu_item (title_template ? ALLEGRO_MENU_ITEM_DISABLED : 0, */
 /*               NULL, NULL, title_template, ap); */
 /* #else */
@@ -1049,7 +1049,7 @@ main_menu (void)
   menu_sub (&menu.main.help.m, main_menu_enabled, NULL, help_menu,
             0, "He&lp");
 
-/* #if WINDOWS_PORT */
+/* #if WINDOWS_EDITION */
 /*   item.main.unlock_selection = */
 /*     menu_sitem (main_menu_enabled && selection_locked, NULL, "(L)"); */
 /* #else */

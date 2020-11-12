@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
 #define LIST_VISIBLECOLUMNS 9
 #else
 #define LIST_VISIBLECOLUMNS 14

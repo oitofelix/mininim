@@ -133,7 +133,7 @@ init_video (void)
     error (0, 0, "%s (void): failed to initialize primitives addon",
            __func__);
 
-#if MACOSX_PORT
+#if MACOSX_EDITION
   /* workaround to make Mac OS X render the title screen cutscene
      properly */
   al_acknowledge_resize (display);
@@ -256,7 +256,7 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
 {
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
   al_set_target_bitmap (scaled_bitmap);
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   /* White is the transparent mask for menu icons in Windows XP. */
   al_clear_to_color (IsWindowsVistaOrGreater ()
 		     ? TRANSPARENT_COLOR
@@ -414,7 +414,7 @@ get_shader_platform (ALLEGRO_SHADER *s)
 void
 validate_bitmap_for_windows (ALLEGRO_BITMAP *bitmap)
 {
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   if (! bitmap) return;
   al_lock_bitmap (bitmap,
 		  ALLEGRO_PIXEL_FORMAT_ANY,
@@ -653,7 +653,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
   /* Workaround for Windows: make all paletted bitmaps preserve their
      content.  (The last frame of potion bubbles has been affected by
      this in VGA video mode.) */
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
   validate_bitmap_for_windows (rbitmap);
 #endif
 

@@ -108,7 +108,7 @@ play_anim (anim_callback_t draw_callback,
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == iup_timer) {
         /* IUP events */
-#if WINDOWS_PORT
+#if WINDOWS_EDITION
         IupFlush ();
 #else
         for (int i = 1; i <= 100; i++) IupLoopStep ();

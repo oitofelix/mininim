@@ -42,7 +42,8 @@ copyright_version_info ()
   struct allegro_version allegro_version = get_allegro_version ();
   return copyright_version_info_text = xasprintf
     ("%s"			/* package name */
-     " %s\n\n"			/* version */
+     " %s "			/* version */
+     "(%s)\n\n"			/* edition */
      "Website: %s\n"		/* website */
      "Forum: %s\n\n"		/* forum */
      "%s"			/* mark */
@@ -52,19 +53,22 @@ copyright_version_info ()
      "%s\n\n"			/* licensing */
      "%s\n\n"			/* funding */
      "Allegro %i.%i.%i\n"	/* Allegro version */
-     "%s\n",			/* Lua version and copyright */
+     "%s\n"			/* Lua version and copyright */
+     "IUP %s " IUP_COPYRIGHT "\n", /* IUP version and copyright */
      PACKAGE_NAME,
      PACKAGE_VERSION,
+     EDITION_NAME,
      PACKAGE_URL,
      FORUM_URL,
-     MARK,
-     YEARS,
-     HOLDER,
+     COPYRIGHT_MARK,
+     COPYRIGHT_YEARS,
+     COPYRIGHT_HOLDER,
      PACKAGE_BUGREPORT,
-     LICENSING,
-     FUNDING,
+     LICENSING_MESSAGE,
+     FUNDING_MESSAGE,
      allegro_version.major,
      allegro_version.minor,
      allegro_version.revision,
-     LUA_COPYRIGHT);
+     LUA_COPYRIGHT,
+     IupVersion ());
 }
