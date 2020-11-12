@@ -26,6 +26,6 @@
 void L_pushfont (lua_State *L, ALLEGRO_FONT *f);
 void define_L_mininim_video_font (lua_State *L);
 
-DECLARE_LUA (L_mininim_video_font);
+DEFUN (L_mininim_video_font);
 
 #endif	/* MININIM_L_MININIM_VIDEO_FONT_H */

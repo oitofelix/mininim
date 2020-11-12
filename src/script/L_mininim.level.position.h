@@ -25,6 +25,6 @@
 void define_L_mininim_level_position (lua_State *L);
 void L_pushposition (lua_State *L, struct pos *p);
 
-DECLARE_LUA (L_mininim_level_position);
+DEFUN (L_mininim_level_position);
 
 #endif	/* MININIM_L_MININIM_LEVEL_POSITION_H */

@@ -25,6 +25,6 @@
 void L_pushaudiosource (lua_State *L, struct audio_source *as);
 void define_L_mininim_audio_source (lua_State *L);
 
-DECLARE_LUA (L_mininim_audio_source);
+DEFUN (L_mininim_audio_source);
 
 #endif	/* MININIM_L_MININIM_AUDIO_SOURCE_H */

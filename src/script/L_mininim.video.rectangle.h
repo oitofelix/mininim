@@ -25,6 +25,6 @@
 void define_L_mininim_video_rectangle (lua_State *L);
 void L_pushrectangle (lua_State *L, struct rect *p);
 
-DECLARE_LUA (L_mininim_video_rectangle);
+DEFUN (L_mininim_video_rectangle);
 
 #endif	/* MININIM_L_MININIM_VIDEO_RECTANGLE_H */

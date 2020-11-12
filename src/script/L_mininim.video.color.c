@@ -19,10 +19,10 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
 void
 define_L_mininim_video_color (lua_State *L)
@@ -57,7 +57,7 @@ L_pushcolor (lua_State *L, ALLEGRO_COLOR c)
   *c_new = c;
 }
 
-BEGIN_LUA (L_mininim_video_color)
+DEFUN (L_mininim_video_color)
 {
   if (lua_isnumber (L, 1)) {
     int r = lua_tonumber (L, 1);
@@ -80,9 +80,8 @@ BEGIN_LUA (L_mininim_video_color)
     return 1;
   } else return luaL_argerror (L, 1, "expecting number or string");
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   ALLEGRO_COLOR *c0 = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
   ALLEGRO_COLOR *c1 = luaL_testudata (L, 2, L_MININIM_VIDEO_COLOR);
@@ -90,9 +89,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   ALLEGRO_COLOR *c_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
 
@@ -145,9 +143,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   ALLEGRO_COLOR *c = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
   if (! c) return 0;
@@ -199,9 +196,8 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   ALLEGRO_COLOR *c = luaL_testudata (L, 1, L_MININIM_VIDEO_COLOR);
   if (c) {
@@ -211,4 +207,3 @@ BEGIN_LUA (__tostring)
   } else lua_pushstring (L, L_MININIM_VIDEO_COLOR " (-1, -1, -1, -1)");
   return 1;
 }
-END_LUA

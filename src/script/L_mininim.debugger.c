@@ -75,25 +75,25 @@ static char *get_file_line (const char *filename, size_t n);
 static char *get_full_backtrace_report (lua_State *L, int event);
 static char *get_compact_backtrace_report (lua_State *L, int event);
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (debug_here);
-static DECLARE_LUA (br);
-static DECLARE_LUA (lbr);
-static DECLARE_LUA (dbr);
-static DECLARE_LUA (cont);
-static DECLARE_LUA (next);
-static DECLARE_LUA (step);
-static DECLARE_LUA (finish);
-static DECLARE_LUA (getlocal);
-static DECLARE_LUA (getupvalue);
-static DECLARE_LUA (setlocal);
-static DECLARE_LUA (setupvalue);
-static DECLARE_LUA (bt);
-static DECLARE_LUA (cbt);
+static DEFUN (debug_here);
+static DEFUN (br);
+static DEFUN (lbr);
+static DEFUN (dbr);
+static DEFUN (cont);
+static DEFUN (next);
+static DEFUN (step);
+static DEFUN (finish);
+static DEFUN (getlocal);
+static DEFUN (getupvalue);
+static DEFUN (setlocal);
+static DEFUN (setupvalue);
+static DEFUN (bt);
+static DEFUN (cbt);
 
 void
 define_L_mininim_debugger (lua_State *L)
@@ -138,14 +138,13 @@ define_L_mininim_debugger (lua_State *L)
   lua_pop (L, 1);
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -211,9 +210,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -231,14 +229,12 @@ BEGIN_LUA (__newindex)
   }
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushstring (L, "MININIM DEBUGGER INTERFACE");
   return 1;
 }
-END_LUA
 
 void
 L_debug_main_thread (void)
@@ -246,15 +242,14 @@ L_debug_main_thread (void)
   invoke_debugger (main_L, L_INVOKED_EVENT, DEBUG_INVOKED);
 }
 
-BEGIN_LUA (debug_here)
+DEFUN (debug_here)
 {
   if (L != main_L) return luaL_error (L, "Only main thread may be debugged");
   invoke_debugger (L, L_INVOKED_EVENT, DEBUG_INVOKED);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (br)
+DEFUN (br)
 {
   struct debugger_break b;
 
@@ -315,7 +310,6 @@ BEGIN_LUA (br)
 
   return 0;
 }
-END_LUA
 
 char *
 debugger_breaks_report (lua_State *L, const char *fmt)
@@ -372,7 +366,7 @@ debugger_breaks_report (lua_State *L, const char *fmt)
   return report;
 }
 
-BEGIN_LUA (lbr)
+DEFUN (lbr)
 {
   fmt_begin (7);
   debugger_breaks_report (L, NULL);
@@ -386,9 +380,8 @@ BEGIN_LUA (lbr)
   al_free (fmt);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (dbr)
+DEFUN (dbr)
 {
   if (lua_isnumber (L, 1)) {
     int id = lua_tonumber (L, 1);
@@ -406,9 +399,8 @@ BEGIN_LUA (dbr)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (cont)
+DEFUN (cont)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -417,9 +409,8 @@ BEGIN_LUA (cont)
   al_broadcast_cond (debug_cond);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (next)
+DEFUN (next)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -428,9 +419,8 @@ BEGIN_LUA (next)
   al_broadcast_cond (debug_cond);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (step)
+DEFUN (step)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -439,9 +429,8 @@ BEGIN_LUA (step)
   al_broadcast_cond (debug_cond);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (finish)
+DEFUN (finish)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -450,9 +439,8 @@ BEGIN_LUA (finish)
   al_broadcast_cond (debug_cond);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (bt)
+DEFUN (bt)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -460,9 +448,8 @@ BEGIN_LUA (bt)
   print_full_backtrace (main_L, L_INVOKED_EVENT);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (cbt)
+DEFUN (cbt)
 {
   if (debug.action != DEBUG_STOPPED)
     return luaL_error (L, "Debugger not stopped\n");
@@ -470,9 +457,8 @@ BEGIN_LUA (cbt)
   print_compact_backtrace (main_L, L_INVOKED_EVENT);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (getlocal)
+DEFUN (getlocal)
 {
   int nargs = lua_gettop (L);
   int level;
@@ -502,9 +488,8 @@ BEGIN_LUA (getlocal)
     return 1;
   } else return 0;
 }
-END_LUA
 
-BEGIN_LUA (getupvalue)
+DEFUN (getupvalue)
 {
   int nargs = lua_gettop (L);
   int level;
@@ -539,9 +524,8 @@ BEGIN_LUA (getupvalue)
     return 0;
   }
 }
-END_LUA
 
-BEGIN_LUA (setlocal)
+DEFUN (setlocal)
 {
   int nargs = lua_gettop (L);
   int level;
@@ -573,9 +557,8 @@ BEGIN_LUA (setlocal)
   lua_pushstring (L, name);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (setupvalue)
+DEFUN (setupvalue)
 {
   int nargs = lua_gettop (L);
   int level;
@@ -609,9 +592,8 @@ BEGIN_LUA (setupvalue)
   lua_pushstring (L, name);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (L_TRACEBACK)
+DEFUN (L_TRACEBACK)
 {
   char *report;
   if (! strcmp (bt_on_error, "FULL")
@@ -628,7 +610,6 @@ BEGIN_LUA (L_TRACEBACK)
 
   return 1;
 }
-END_LUA
 
 int
 upvalue_index_by_name (lua_State *L, int level, const char *name)

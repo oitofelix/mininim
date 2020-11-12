@@ -19,12 +19,12 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__gc);
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__tostring);
+static DEFUN (__gc);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (play);
+static DEFUN (play);
 
 void
 define_L_mininim_audio_source (lua_State *L)
@@ -59,7 +59,7 @@ L_pushaudiosource (lua_State *L, struct audio_source *as)
   *as_new = *as;
 }
 
-BEGIN_LUA (L_mininim_audio_source)
+DEFUN (L_mininim_audio_source)
 {
   const char *filename = luaL_checkstring (L, 1);
   const char *type_str = luaL_checkstring (L, 2);
@@ -74,17 +74,15 @@ BEGIN_LUA (L_mininim_audio_source)
   L_pushaudiosource (L, &as);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__gc)
+DEFUN (__gc)
 {
   struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
   if (as) destroy_audio (as);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   struct audio_source *as0 = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
   struct audio_source *as1 = luaL_testudata (L, 2, L_MININIM_AUDIO_SOURCE);
@@ -92,9 +90,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
@@ -115,9 +112,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   struct audio_source *as = luaL_testudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
@@ -139,9 +135,8 @@ BEGIN_LUA (__tostring)
 
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (play)
+DEFUN (play)
 {
   struct audio_source *as =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_AUDIO_SOURCE);
@@ -153,4 +148,3 @@ BEGIN_LUA (play)
   play_audio (as, p, (id && *id < actor_nmemb) ? *id : -1);
   return 0;
 }
-END_LUA

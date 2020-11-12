@@ -30,7 +30,7 @@ char *ar_tostring (lua_Debug *ar);
 char *get_cstack_report (lua_State *L, const char *fmt);
 char *L_typename (lua_State *L, int index);
 
-DECLARE_LUA (L_TRACEBACK);
+DEFUN (L_TRACEBACK);
 
 /* variables */
 bool L_debugging;

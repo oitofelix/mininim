@@ -24,6 +24,6 @@
 
 void L_pushcolor (lua_State *L, ALLEGRO_COLOR c);
 void define_L_mininim_video_color (lua_State *L);
-DECLARE_LUA (L_mininim_video_color);
+DEFUN (L_mininim_video_color);
 
 #endif	/* MININIM_L_MININIM_VIDEO_COLOR_H */

@@ -64,6 +64,6 @@ void place_actor (struct actor *a, struct pos *p,
 void draw_actor_part (ALLEGRO_BITMAP *bitmap, const char *type,
                       const char *part, struct actor *a);
 
-DECLARE_LUA (L_mininim_actor);
+DEFUN (L_mininim_actor);
 
 #endif	/* MININIM_L_MININIM_ACTOR_H */

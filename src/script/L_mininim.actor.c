@@ -19,13 +19,13 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (draw);
-static DECLARE_LUA (position);
+static DEFUN (draw);
+static DEFUN (position);
 
 void
 define_L_mininim_actor (lua_State *L)
@@ -60,13 +60,12 @@ L_pushactor (lua_State *L, int id)
   *id_new = id;
 }
 
-BEGIN_LUA (L_mininim_actor)
+DEFUN (L_mininim_actor)
 {
   int id = luaL_checknumber (L, 1);
   L_pushactor (L, id);
   return 1;
 }
-END_LUA
 
 const char *
 direction_string (enum dir dir)
@@ -378,7 +377,7 @@ actor_action_enum (const char *action, enum actor_type type)
   } else return NULL;
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   int *id0 = luaL_testudata (L, 1, L_MININIM_ACTOR);
   int *id1 = luaL_testudata (L, 2, L_MININIM_ACTOR);
@@ -386,9 +385,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   int *id_ptr = luaL_testudata (L, 1, L_MININIM_ACTOR);
 
@@ -498,9 +496,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   int *id_ptr = luaL_testudata (L, 1, L_MININIM_ACTOR);
 
@@ -590,17 +587,15 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   int *id = luaL_testudata (L, 1, L_MININIM_ACTOR);
   lua_pushfstring (L, L_MININIM_ACTOR " (%d)", id ? *id : -1);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (draw)
+DEFUN (draw)
 {
   int *id_ptr = luaL_testudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
 
@@ -647,9 +642,8 @@ BEGIN_LUA (draw)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (position)
+DEFUN (position)
 {
   int *id_ptr = luaL_testudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
 
@@ -671,8 +665,6 @@ BEGIN_LUA (position)
 
   return 1;
 }
-END_LUA
-
 
 bool
 select_actor_frame (struct actor *a, const char *type, const char *action,

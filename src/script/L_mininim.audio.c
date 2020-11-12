@@ -19,9 +19,9 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__tostring);
 
 void
 define_L_mininim_audio (lua_State *L)
@@ -53,14 +53,13 @@ define_L_mininim_audio (lua_State *L)
   define_L_mininim_audio_source (L);
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -79,14 +78,12 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushstring (L, "MININIM AUDIO INTERFACE");
   return 1;
 }
-END_LUA
 
 void
 L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id)

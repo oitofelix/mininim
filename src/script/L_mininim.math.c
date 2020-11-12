@@ -19,25 +19,25 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (_div);
-static DECLARE_LUA (mod);
+static DEFUN (_div);
+static DEFUN (mod);
 
-static DECLARE_LUA (rshift);
-static DECLARE_LUA (lshift);
+static DEFUN (rshift);
+static DEFUN (lshift);
 
-static DECLARE_LUA (uint32);
-static DECLARE_LUA (uint16);
-static DECLARE_LUA (uint8);
+static DEFUN (uint32);
+static DEFUN (uint16);
+static DEFUN (uint8);
 
-static DECLARE_LUA (band);
-static DECLARE_LUA (bor);
-static DECLARE_LUA (bxor);
-static DECLARE_LUA (bnot);
+static DEFUN (band);
+static DEFUN (bor);
+static DEFUN (bxor);
+static DEFUN (bnot);
 
 void
 define_L_mininim_math (lua_State *L)
@@ -63,14 +63,13 @@ define_L_mininim_math (lua_State *L)
   lua_pop (L, 1);
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -116,9 +115,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   /* const char *key; */
   int type = lua_type (L, 2);
@@ -131,16 +129,14 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushstring (L, "MININIM MATH INTERFACE");
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (_div)
+DEFUN (_div)
 {
   int64_t a = lua_tonumber (L, 1);
   int64_t b = lua_tonumber (L, 2);
@@ -148,9 +144,8 @@ BEGIN_LUA (_div)
   lua_pushnumber (L, a / b);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (mod)
+DEFUN (mod)
 {
   int64_t a = lua_tonumber (L, 1);
   int64_t b = lua_tonumber (L, 2);
@@ -158,51 +153,45 @@ BEGIN_LUA (mod)
   lua_pushnumber (L, a % b);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (rshift)
+DEFUN (rshift)
 {
   int64_t a = lua_tonumber (L, 1);
   int64_t b = lua_tonumber (L, 2);
   lua_pushnumber (L, a >> b);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (lshift)
+DEFUN (lshift)
 {
   int64_t a = lua_tonumber (L, 1);
   int64_t b = lua_tonumber (L, 2);
   lua_pushnumber (L, a << b);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (uint32)
+DEFUN (uint32)
 {
   uint32_t a = lua_tonumber (L, 1);
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (uint16)
+DEFUN (uint16)
 {
   uint16_t a = lua_tonumber (L, 1);
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (uint8)
+DEFUN (uint8)
 {
   uint8_t a = lua_tonumber (L, 1);
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (band)
+DEFUN (band)
 {
   int64_t a = ~0;
   int i, n = lua_gettop (L);
@@ -212,9 +201,8 @@ BEGIN_LUA (band)
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (bor)
+DEFUN (bor)
 {
   int64_t a = 0;
   int i, n = lua_gettop (L);
@@ -224,9 +212,8 @@ BEGIN_LUA (bor)
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (bxor)
+DEFUN (bxor)
 {
   int64_t a = 0;
   int i, n = lua_gettop (L);
@@ -236,12 +223,10 @@ BEGIN_LUA (bxor)
   lua_pushnumber (L, a);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (bnot)
+DEFUN (bnot)
 {
   int64_t a = lua_tonumber (L, 1);
   lua_pushnumber (L, ~ a);
   return 1;
 }
-END_LUA

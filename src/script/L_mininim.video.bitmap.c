@@ -21,16 +21,16 @@
 
 ALLEGRO_BITMAP *L_target_bitmap;
 
-static DECLARE_LUA (__gc);
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__tostring);
+static DEFUN (__gc);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (L_apply_palette);
-static DECLARE_LUA (draw);
-static DECLARE_LUA (set_pixel);
-static DECLARE_LUA (get_pixel);
-static DECLARE_LUA (sub);
+static DEFUN (L_apply_palette);
+static DEFUN (draw);
+static DEFUN (set_pixel);
+static DEFUN (get_pixel);
+static DEFUN (sub);
 
 void
 define_L_mininim_video_bitmap (lua_State *L)
@@ -75,7 +75,7 @@ L_pushbitmap (lua_State *L, ALLEGRO_BITMAP *b)
   } else lua_pushnil (L);
 }
 
-BEGIN_LUA (L_mininim_video_bitmap)
+DEFUN (L_mininim_video_bitmap)
 {
   ALLEGRO_BITMAP *b = NULL;
 
@@ -93,17 +93,15 @@ BEGIN_LUA (L_mininim_video_bitmap)
   L_pushbitmap (L, b);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__gc)
+DEFUN (__gc)
 {
   ALLEGRO_BITMAP **b = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
   al_destroy_bitmap (*b);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   ALLEGRO_BITMAP **b0 = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
   ALLEGRO_BITMAP **b1 = luaL_testudata (L, 2, L_MININIM_VIDEO_BITMAP);
@@ -111,9 +109,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   ALLEGRO_BITMAP **b_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
 
@@ -160,9 +157,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   ALLEGRO_BITMAP **b = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
   lua_pushfstring (L, L_MININIM_VIDEO_BITMAP " %dx%d",
@@ -170,7 +166,6 @@ BEGIN_LUA (__tostring)
                    b ? get_bitmap_height (*b) : 0);
   return 1;
 }
-END_LUA
 
 ALLEGRO_COLOR
 L_palette (ALLEGRO_COLOR c, void *_l)
@@ -187,7 +182,7 @@ L_palette (ALLEGRO_COLOR c, void *_l)
   return c_ret;
 }
 
-BEGIN_LUA (L_apply_palette)
+DEFUN (L_apply_palette)
 {
   ALLEGRO_BITMAP **b =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_BITMAP);
@@ -211,9 +206,8 @@ BEGIN_LUA (L_apply_palette)
   L_pushbitmap (L, r);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (draw)
+DEFUN (draw)
 {
   ALLEGRO_BITMAP **b =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_BITMAP);
@@ -292,9 +286,8 @@ BEGIN_LUA (draw)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (set_pixel)
+DEFUN (set_pixel)
 {
   int x = luaL_checknumber (L, 1);
   int y = luaL_checknumber (L, 2);
@@ -313,9 +306,8 @@ BEGIN_LUA (set_pixel)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (get_pixel)
+DEFUN (get_pixel)
 {
   int x = luaL_checknumber (L, 1);
   int y = luaL_checknumber (L, 2);
@@ -331,9 +323,8 @@ BEGIN_LUA (get_pixel)
   L_pushcolor (L, c);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (sub)
+DEFUN (sub)
 {
   ALLEGRO_BITMAP **b =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_BITMAP);
@@ -352,4 +343,3 @@ BEGIN_LUA (sub)
   L_pushbitmap (L, sb);
   return 1;
 }
-END_LUA

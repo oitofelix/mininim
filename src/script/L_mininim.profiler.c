@@ -36,13 +36,13 @@ static int compare_profiler_stats_by_id (const void *is0, const void *is1);
 static int compare_profiler_stats_by_score (const void *is0, const void *is1);
 static struct profiler_stats *get_profiler_stats (char *id);
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (start);
-static DECLARE_LUA (stop);
+static DEFUN (start);
+static DEFUN (stop);
 
 void
 define_L_mininim_profiler (lua_State *L)
@@ -68,14 +68,13 @@ define_L_mininim_profiler (lua_State *L)
   lua_pop (L, 1);
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -103,9 +102,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -121,25 +119,22 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushstring (L, "MININIM PROFILER INTERFACE");
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (start)
+DEFUN (start)
 {
   L_profiling = true;
   lua_sethook (main_L, profiler_hook, LUA_MASKCALL | LUA_MASKRET
                | (L_debugging ? LUA_MASKLINE : 0), 0);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (stop)
+DEFUN (stop)
 {
   L_profiling = false;
   if (L_debugging)
@@ -148,7 +143,6 @@ BEGIN_LUA (stop)
   else lua_sethook (main_L, NULL, 0, 0);
   return 0;
 }
-END_LUA
 
 void
 reset (void)

@@ -21,13 +21,13 @@
 
 int mininim_lua_ref = LUA_NOREF;
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (quit);
-static DECLARE_LUA (rest);
+static DEFUN (quit);
+static DEFUN (rest);
 
 void
 define_L_mininim (lua_State *L)
@@ -133,14 +133,13 @@ run_lua_hook (lua_State *L, const char *name)
   return error;
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -219,9 +218,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -244,23 +242,20 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushfstring (L, "MININIM %s INTERFACE", VERSION);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (quit)
+DEFUN (quit)
 {
   quit_anim = QUIT_GAME;
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (rest)
+DEFUN (rest)
 {
   double seconds = lua_tonumber (L, 1);
   unlock_lua ();
@@ -268,4 +263,3 @@ BEGIN_LUA (rest)
   lock_lua ();
   return 0;
 }
-END_LUA

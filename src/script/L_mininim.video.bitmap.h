@@ -28,7 +28,7 @@ void define_L_mininim_video_bitmap (lua_State *L);
 
 ALLEGRO_COLOR L_palette (ALLEGRO_COLOR c, void *_l);
 
-DECLARE_LUA (L_mininim_video_bitmap);
+DEFUN (L_mininim_video_bitmap);
 
 /* variables */
 extern ALLEGRO_BITMAP *L_target_bitmap;

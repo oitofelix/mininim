@@ -26,6 +26,6 @@
 void L_pushshader (lua_State *L, ALLEGRO_SHADER *s);
 void define_L_mininim_video_shader (lua_State *L);
 
-DECLARE_LUA (L_mininim_video_shader);
+DEFUN (L_mininim_video_shader);
 
 #endif	/* MININIM_L_MININIM_VIDEO_SHADER_H */

@@ -19,14 +19,14 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
-static DECLARE_LUA (__add);
-static DECLARE_LUA (__sub);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
+static DEFUN (__add);
+static DEFUN (__sub);
 
-static DECLARE_LUA (draw);
+static DEFUN (draw);
 
 void
 define_L_mininim_video_rectangle (lua_State *L)
@@ -69,7 +69,7 @@ L_pushrectangle (lua_State *L, struct rect *r)
   *r_new = *r;
 }
 
-BEGIN_LUA (L_mininim_video_rectangle)
+DEFUN (L_mininim_video_rectangle)
 {
   int room;
   lua_Number x, y, w, h;
@@ -85,9 +85,8 @@ BEGIN_LUA (L_mininim_video_rectangle)
   L_pushrectangle (L, &r);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
@@ -95,9 +94,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
 
@@ -133,9 +131,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
 
@@ -167,9 +164,8 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   struct rect *r = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   lua_pushfstring (L, L_MININIM_VIDEO_RECTANGLE " (%d, %f, %f, %f, %f)",
@@ -178,9 +174,8 @@ BEGIN_LUA (__tostring)
                    r ? r->w : -1, r ? r->h : -1);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__add)
+DEFUN (__add)
 {
   struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
@@ -194,9 +189,8 @@ BEGIN_LUA (__add)
 
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__sub)
+DEFUN (__sub)
 {
   struct rect *r0 = luaL_testudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   struct rect *r1 = luaL_testudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
@@ -210,9 +204,8 @@ BEGIN_LUA (__sub)
 
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (draw)
+DEFUN (draw)
 {
   if (! L_target_bitmap) return 0;
 
@@ -227,4 +220,3 @@ BEGIN_LUA (draw)
 
   return 0;
 }
-END_LUA

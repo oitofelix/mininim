@@ -23,9 +23,9 @@ int REAL_WIDTH = ORIGINAL_WIDTH;
 int REAL_HEIGHT = ORIGINAL_HEIGHT;
 bool changing_vm;
 
-static DECLARE_LUA ( __eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__tostring);
+static DEFUN ( __eq);
+static DEFUN (__index);
+static DEFUN (__tostring);
 
 static bool L_push_video_routine (lua_State *L);
 static void video_command_error (const char *command, const char *object,
@@ -74,14 +74,13 @@ define_L_mininim_video (lua_State *L)
   define_L_mininim_video_shader (L);
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -146,14 +145,12 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   lua_pushstring (L, "MININIM VIDEO INTERFACE");
   return 1;
 }
-END_LUA
 
 bool
 L_push_video_mode_table (lua_State *L)

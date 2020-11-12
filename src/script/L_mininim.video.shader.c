@@ -19,11 +19,11 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__gc);
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__gc);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
 void
 define_L_mininim_video_shader (lua_State *L)
@@ -64,7 +64,7 @@ L_pushshader (lua_State *L, ALLEGRO_SHADER *s)
   } else lua_pushnil (L);
 }
 
-BEGIN_LUA (L_mininim_video_shader)
+DEFUN (L_mininim_video_shader)
 {
   ALLEGRO_SHADER *s = al_create_shader (ALLEGRO_SHADER_AUTO);
 
@@ -105,17 +105,15 @@ BEGIN_LUA (L_mininim_video_shader)
 
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__gc)
+DEFUN (__gc)
 {
   ALLEGRO_SHADER **s = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
   al_destroy_shader (*s);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   ALLEGRO_SHADER **s0 = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
   ALLEGRO_SHADER **s1 = luaL_testudata (L, 2, L_MININIM_VIDEO_SHADER);
@@ -123,9 +121,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   ALLEGRO_SHADER **s_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
 
@@ -151,9 +148,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   ALLEGRO_SHADER **s_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
 
@@ -250,13 +246,11 @@ BEGIN_LUA (__newindex)
   al_use_shader (NULL);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   ALLEGRO_SHADER **s = luaL_testudata (L, 1, L_MININIM_VIDEO_SHADER);
   lua_pushfstring (L, L_MININIM_VIDEO_SHADER " (%s)",
                    get_shader_platform (*s));
   return 1;
 }
-END_LUA

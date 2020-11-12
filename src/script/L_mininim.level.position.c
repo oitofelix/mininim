@@ -19,17 +19,17 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
-static DECLARE_LUA (__tostring);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__newindex);
+static DEFUN (__tostring);
 
 char *wall_correlation_string (enum wall_correlation wc);
 
-static DECLARE_LUA (activate);
-static DECLARE_LUA (relative);
-static DECLARE_LUA (is_hangable_at);
-static DECLARE_LUA (is_free_at);
+static DEFUN (activate);
+static DEFUN (relative);
+static DEFUN (is_hangable_at);
+static DEFUN (is_free_at);
 
 void
 define_L_mininim_level_position (lua_State *L)
@@ -64,7 +64,7 @@ L_pushposition (lua_State *L, struct pos *p)
   *p_new = *p;
 }
 
-BEGIN_LUA (L_mininim_level_position)
+DEFUN (L_mininim_level_position)
 {
   int room = luaL_checknumber (L, 1);
   int floor = luaL_checknumber (L, 2);
@@ -74,7 +74,6 @@ BEGIN_LUA (L_mininim_level_position)
   L_pushposition (L, &p);
   return 1;
 }
-END_LUA
 
 char *
 wall_correlation_string (enum wall_correlation wc)
@@ -88,7 +87,7 @@ wall_correlation_string (enum wall_correlation wc)
   }
 }
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   struct pos *p0 = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
   struct pos *p1 = luaL_testudata (L, 2, L_MININIM_LEVEL_POSITION);
@@ -96,9 +95,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
 
@@ -155,9 +153,8 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__newindex)
+DEFUN (__newindex)
 {
   struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
 
@@ -183,18 +180,16 @@ BEGIN_LUA (__newindex)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   struct pos *p = luaL_testudata (L, 1, L_MININIM_LEVEL_POSITION);
   lua_pushfstring (L, L_MININIM_LEVEL_POSITION " (%d, %d, %d)",
                    p ? p->room : -1, p ? p->floor : -1, p ? p->place : -1);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (relative)
+DEFUN (relative)
 {
   struct pos *p =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
@@ -203,9 +198,8 @@ BEGIN_LUA (relative)
   L_pushposition (L, &pr);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (activate)
+DEFUN (activate)
 {
   struct pos *p =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
@@ -213,9 +207,8 @@ BEGIN_LUA (activate)
   activate_tile (p);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (is_hangable_at)
+DEFUN (is_hangable_at)
 {
   struct pos *p =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
@@ -226,9 +219,8 @@ BEGIN_LUA (is_hangable_at)
   lua_pushboolean (L, is_hangable (p, dir));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (is_free_at)
+DEFUN (is_free_at)
 {
   struct pos *p =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
@@ -239,4 +231,3 @@ BEGIN_LUA (is_free_at)
   lua_pushboolean (L, is_free (p, dir));
   return 1;
 }
-END_LUA

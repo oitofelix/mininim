@@ -19,12 +19,12 @@
 
 #include "mininim.h"
 
-static DECLARE_LUA (__gc);
-static DECLARE_LUA (__eq);
-static DECLARE_LUA (__index);
-static DECLARE_LUA (__tostring);
+static DEFUN (__gc);
+static DEFUN (__eq);
+static DEFUN (__index);
+static DEFUN (__tostring);
 
-static DECLARE_LUA (draw);
+static DEFUN (draw);
 
 void
 define_L_mininim_video_font (lua_State *L)
@@ -69,7 +69,7 @@ L_pushfont (lua_State *L, ALLEGRO_FONT *f)
   } else lua_pushnil (L);
 }
 
-BEGIN_LUA (L_mininim_video_font)
+DEFUN (L_mininim_video_font)
 {
   ALLEGRO_FONT *f = NULL;
   ALLEGRO_BITMAP **b = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
@@ -103,17 +103,15 @@ BEGIN_LUA (L_mininim_video_font)
   L_pushfont (L, f);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__gc)
+DEFUN (__gc)
 {
   ALLEGRO_FONT **f = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
   al_destroy_font (*f);
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__eq)
+DEFUN (__eq)
 {
   ALLEGRO_FONT **f0 = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
   ALLEGRO_FONT **f1 = luaL_testudata (L, 2, L_MININIM_VIDEO_FONT);
@@ -121,9 +119,8 @@ BEGIN_LUA (__eq)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (__index)
+DEFUN (__index)
 {
   ALLEGRO_FONT **f_ptr = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
 
@@ -150,18 +147,16 @@ BEGIN_LUA (__index)
 
   return 0;
 }
-END_LUA
 
-BEGIN_LUA (__tostring)
+DEFUN (__tostring)
 {
   ALLEGRO_FONT **f = luaL_testudata (L, 1, L_MININIM_VIDEO_FONT);
   lua_pushfstring (L, L_MININIM_VIDEO_FONT " (%d ranges)",
                    f ? al_get_font_ranges (*f, 0, NULL) : 0);
   return 1;
 }
-END_LUA
 
-BEGIN_LUA (draw)
+DEFUN (draw)
 {
   ALLEGRO_FONT **f =
     luaL_testudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_FONT);
@@ -202,4 +197,3 @@ BEGIN_LUA (draw)
 
   return 0;
 }
-END_LUA
