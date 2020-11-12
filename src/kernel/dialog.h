@@ -24,7 +24,7 @@
 void init_dialog (void);
 void finalize_dialog (void);
 void print_text_log (char const *template, ...)
-  __attribute__ ((format (printf, 1, 2)));
+  __attribute__ ((format (gnu_printf, 1, 2)));
 void close_text_log (ALLEGRO_EVENT *event);
 bool file_overwrite_dialog (char *filename);
 

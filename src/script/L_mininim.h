@@ -24,7 +24,7 @@
 
 void define_L_mininim (lua_State *L);
 void error_lua_invalid (const char *template, ...)
-  __attribute__ ((format (printf, 1, 2)));
+  __attribute__ ((format (gnu_printf, 1, 2)));
 bool call_lua_function (lua_State *L, const char *name, int nargs,
                         int nresults);
 bool run_lua_hook (lua_State *L, const char *name);

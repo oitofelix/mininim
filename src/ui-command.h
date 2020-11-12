@@ -29,7 +29,7 @@ void print_game_paused (int priority);
 bool ui_save_setting (char *section, char *key, char *value);
 char *ui_get_setting (char *section, char *key);
 bool ui_msg (int priority, const char *template, ...)
-  __attribute__ ((format (printf, 2, 3)));
+  __attribute__ ((format (gnu_printf, 2, 3)));
 bool ui_msg_clear (int priority);
 
 void ui_load_replay_favorites (void);
