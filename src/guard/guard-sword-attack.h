@@ -1,8 +1,7 @@
 /*
   guard-sword-attack.h -- guard sword attack module;
 
-  Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
-  <oitofelix@gnu.org>
+  Copyright (C) Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

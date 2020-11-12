@@ -1,7 +1,7 @@
 @c
 @c description.texi -- Description
 @c
-@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c Copyright (C) Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 @c
 @c Permission is granted to copy, distribute and/or modify this
 @c document under the terms of the GNU Free Documentation License,

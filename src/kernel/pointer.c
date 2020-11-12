@@ -1,8 +1,7 @@
 /*
   pointer.c -- pointer module;
 
-  Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
-  <oitofelix@gnu.org>
+  Copyright (C) Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,7 +27,7 @@ void
 init_mouse (void)
 {
   if (! al_install_mouse ())
-    error (0, 0, "%s (void): cannot install mouse", __func__);
+    warning ("cannot install mouse");
 
   al_register_event_source (event_queue, al_get_mouse_event_source ());
 }
