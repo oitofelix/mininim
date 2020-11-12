@@ -79,7 +79,7 @@ static int lua_readline(lua_State *L, const char *prompt)
   should_update_prompt = false;
   repl_prompt_ready = true;
 
-  unlock_lua ();
+  unlock_lua (L);
   struct timeval timeout;
   fd_set set;
   while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)
@@ -95,7 +95,7 @@ static int lua_readline(lua_State *L, const char *prompt)
        safer/useful to use that for other systems? */
     if (r > 0) rl_callback_read_char ();
   }
-  lock_lua ();
+  lock_lua (L);
   repl_prompt_ready = false;
 
   if (! lhandler_line) return 0;
@@ -103,7 +103,7 @@ static int lua_readline(lua_State *L, const char *prompt)
   lua_pushstring(L, lhandler_line);
   lua_pushliteral(L, "\n");
   lua_concat(L, 2);
-  free(lhandler_line);
+  al_free(lhandler_line);
   lhandler_line = NULL;
   return 1;
 }
@@ -358,8 +358,8 @@ static int report (lua_State *L, int status) {
 void
 repl_multithread (lua_State *L, lua_Debug *ar)
 {
-  unlock_lua ();
-  lock_lua ();
+  unlock_lua (L);
+  lock_lua (L);
   if (al_get_thread_should_stop (repl_thread))
     luaL_error (L, "main thread terminated");
 }
@@ -485,7 +485,7 @@ repl (ALLEGRO_THREAD *thread, void *L)
   setenv ("TERM", "#win32con", false);
 #endif
 
-  lock_lua ();
+  lock_lua (L);
 
   al_broadcast_cond (repl_cond);
 
@@ -512,6 +512,6 @@ repl (ALLEGRO_THREAD *thread, void *L)
 
   rl_callback_handler_remove ();
 
-  unlock_lua ();
+  unlock_lua (L);
   return NULL;
 }

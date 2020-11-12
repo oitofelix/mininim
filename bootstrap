@@ -5,6 +5,7 @@ gnulib-tool --source-base=gnulib \
 	    --aux-dir=gnulib/build-aux \
 	    --import \
 	    argp \
+	    basename-lgpl \
 	    calloc-gnu \
 	    dprintf-posix \
 	    dirname \

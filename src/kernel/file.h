@@ -20,6 +20,8 @@
 #ifndef MININIM_FILE_H
 #define MININIM_FILE_H
 
+bool do_for_each_data_dir (bool (*f) (void *args, const char *dir),
+			   void *args);
 intptr_t load_resource (const char *filename, load_resource_f lrf, bool success);
 ALLEGRO_FILE *xfopen_r (char *filename);
 int8_t *load_file (char *filename);

@@ -24,12 +24,56 @@
 #define lua_abs_index(L, i) ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
                              lua_gettop(L) + (i) + 1)
 
+/* Structure whose pointer is meant to be stored in the extra space of
+   Lua states.  It's meant to hold data associated with their
+   respective Lua states.  See functions lua_getextraspace,
+   alloc_lua_extra_space, get_lua_extra_space and
+   free_lua_extra_space.*/
+
+struct lua_extra_space
+{
+  ALLEGRO_MUTEX *mutex;
+};
+
+
+/* Lua state */
+lua_State *create_lua_state ();
+void destroy_lua_state (lua_State *L);
+
+
+/* Lua extra space */
+struct lua_extra_space *create_lua_extra_space (lua_State *L);
+void destroy_lua_extra_space (lua_State *L);
+struct lua_extra_space *get_lua_extra_space (lua_State *L);
+
+
+/* Lua recursive mutex */
+ALLEGRO_MUTEX *create_lua_mutex (struct lua_extra_space *les_ptr);
+void destroy_lua_mutex (struct lua_extra_space *les_ptr);
+ALLEGRO_MUTEX *get_lua_mutex (lua_State *L);
+void lock_lua (lua_State *L);
+void unlock_lua (lua_State *L);
+
+
+/* Lua path */
+bool add_to_lua_path_buffer (void_luaL_Buffer *data,
+			     const char *dir);
+int push_lua_path (lua_State *L);
+
+
+/* Table facilities */
+int remove_table_field (lua_State *L, int index, const char *k);
+bool is_last_table_key (lua_State *L, int index, const char *k);
+bool is_table_empty (lua_State *L, int index);
+
+
 /* functions */
+int remove_table_field (lua_State *L, int index, const char *k);
+bool is_last_table_key (lua_State *L, int index, const char *k);
+bool is_table_empty (lua_State *L, int index);
+
 void init_script (void);
 void finalize_script (void);
-
-void lock_lua (void);
-void unlock_lua (void);
 
 int lua_getn (lua_State *L, int index);
 lua_Number L_rawgeti_tonumber (lua_State *L, int index, int n);
@@ -56,6 +100,5 @@ void L_set_string_var (lua_State *L, int index, char **var);
 
 /* variables */
 extern lua_State *main_L;
-extern ALLEGRO_MUTEX *L_mutex;
 
 #endif	/* MININIM_SCRIPT_H */

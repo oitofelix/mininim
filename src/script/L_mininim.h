@@ -22,6 +22,8 @@
 
 #define L_MININIM "MININIM"
 
+int push_lua_table (lua_State *L);
+int push_lua_table_field (lua_State *L, const char *k);
 void define_L_mininim (lua_State *L);
 void error_lua_invalid (const char *template, ...)
   __attribute__ ((format (gnu_printf, 1, 2)));
@@ -29,6 +31,6 @@ bool call_lua_function (lua_State *L, const char *name, int nargs,
                         int nresults);
 bool run_lua_hook (lua_State *L, const char *name);
 
-extern int mininim_lua_ref;
+extern int lua_table_ref;
 
 #endif	/* MININIM_L_MININIM_H */

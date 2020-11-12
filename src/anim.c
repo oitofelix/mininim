@@ -99,9 +99,9 @@ play_anim (anim_callback_t draw_callback,
     L_gc (main_L);
 
     if (al_is_event_queue_empty (event_queue)) {
-      unlock_lua ();
+      unlock_lua (main_L);
       al_wait_for_event (event_queue, &event);
-      lock_lua ();
+      lock_lua (main_L);
     } else al_get_next_event (event_queue, &event);
 
     switch (event.type) {
@@ -120,13 +120,13 @@ play_anim (anim_callback_t draw_callback,
       } else if (event.timer.source == video_timer) {
         if (! is_video_rendering ())
           stop_video_effect ();
-	show ();
+        show ();
         /* drop_all_events_from_source */
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
       } else if (event.timer.source == timer) {
         /* ensures Lua stack is empty */
-	lua_settop (main_L, 0);
+        lua_settop (main_L, 0);
 
         /* check for replay favorite cycle */
         if (replay_favorite_cycle > 0
@@ -192,8 +192,8 @@ play_anim (anim_callback_t draw_callback,
 
         kid_debug ();
 
-	if (anim_cycle == 0 && ! is_video_rendering ())
-	  show ();
+        if (anim_cycle == 0 && ! is_video_rendering ())
+          show ();
 
         if (anim_cycle > 0 && ! is_video_effect_started ()
             && (is_video_rendering ()

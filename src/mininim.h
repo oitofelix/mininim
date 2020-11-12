@@ -53,6 +53,7 @@
 #include <wchar.h>
 
 #include "argp.h"
+#include "basename-lgpl.h"
 #include "dirname.h"
 #include "error.h"
 #include "fnmatch.h"

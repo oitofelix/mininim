@@ -17,9 +17,6 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 dnl
 
-
-
-
 
 ##################
 # Initialization #
@@ -30,6 +27,9 @@ AC_INIT([MININIM], m4_esyscmd_s([date -u +%-y.%-m.%-d.%-H.%-M]),
 [oitofelix@gnu.org], [mininim],
 [http://oitofelix.freeshell.org/mininim/])
 AC_SUBST([PACKAGE_MAILING_LIST], [])
+AC_DEFINE([CURRENT_YEAR],
+          "m4_esyscmd_s([date -u +%Y])",
+          [Last year in range for copyright purposes.])
 AC_DEFINE_UNQUOTED([PACKAGE_MAILING_LIST], ["$PACKAGE_MAILING_LIST"],
   [Help and support mailing list])
 AC_DEFINE(PACKAGE_TRANSLATION_BUGREPORT,

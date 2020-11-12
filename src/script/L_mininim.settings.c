@@ -95,9 +95,9 @@ DEFUN (__newindex)
       return 0;
     } else if (! strcasecmp (key, "video_mode")) {
       char *mode = (char *) lua_tostring (L, 3);
-      lock_lua ();
+      lock_lua (L);
       ui_vm (mode);
-      unlock_lua ();
+      unlock_lua (L);
       return 0;
     } else if (! strcasecmp (key, "env_mode")) {
       L_set_string_var (L, 3, &env_mode);

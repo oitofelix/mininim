@@ -27,7 +27,6 @@ static DEFUN ( __eq);
 static DEFUN (__index);
 static DEFUN (__tostring);
 
-static bool L_push_video_routine (lua_State *L);
 static void video_command_error (const char *command, const char *object,
                                  uintptr_t index, uintptr_t part);
 
@@ -52,7 +51,7 @@ define_L_mininim_video (lua_State *L)
   lua_pop (L, 1);
 
   /* create video mode table */
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  L_get_registry_by_ref (L, lua_table_ref);
   lua_pushstring (L, "video_mode");
   lua_newtable (L);
   lua_rawset (L, -3);
@@ -152,56 +151,154 @@ DEFUN (__tostring)
   return 1;
 }
 
-bool
-L_push_video_mode_table (lua_State *L)
+/* Push MININIM.lua.video_mode.  Ensure it's a table.  Return 1. */
+
+int
+push_video_mode_table (lua_State *L)
 {
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  /* Lua state must be not NULL! */
+  assert (L);
+  /* Acquire Lua lock. */
+  lock_lua (L);
+  /* Ensure stack size. */
+  luaL_checkstack (L, 1, "cannot push video mode table");
+  /* Push MININIM.lua.video_mode */
+  push_lua_table_field (L, "video_mode");
+  /* Ensure it is a table. */
+  if (! lua_istable (L, -1))
+    return luaL_error (L, "MININIM.lua.video_mode is not a table");
+  /* Release Lua lock. */
+  unlock_lua (L);
+  /* One value has been put on stack. */
+  return 1;
+}
 
-  lua_pushstring (L, "video_mode");
-  lua_rawget (L, -2);
+/* Push MININIM.lua.video_mode[vm].  Ensure it's a function.  VM
+   defaults to VIDEO_MODE.  Return 1. */
+
+int
+push_video_routine (lua_State *L, const char *vm)
+{
+  /* Ensure stack size. */
+  luaL_checkstack (L, 2, "cannot push video routine");
+  /* VM defaults to VIDEO_MODE. */
+  vm = vm ? vm : video_mode;
+  /* Push MININIM.lua.video_mode. */
+  push_video_mode_table (L);
+  /* Push MININIM.lua.video_mode[vm]. */
+  lua_getfield (L, -1, vm);
+  /* Ensure it is a function. */
+  if (! lua_isfunction (L, -1))
+    return luaL_error (L, "MININIM.lua.video_mode['%s'] is not a function",
+		       vm);
+  /* Remove MININIM.lua.video_mode. */
   lua_remove (L, -2);
+  /* Put one value on stack. */
+  return 1;
+}
 
-  if (! lua_istable (L, -1)) {
-    error_lua_invalid ("video_mode");
-    lua_pop (L, 1);
-    return false;
-  }
+/* MININIM.lua.video_mode[VM] = nil.  VM defaults to VIDEO_MODE.
+   Return 0. */
 
-  return true;
+int
+remove_video_mode (lua_State *L, const char *vm)
+{
+  /* Ensure stack size. */
+  luaL_checkstack (L, 1, "cannot remove video mode");
+  /* VM defaults to VIDEO_MODE */
+  vm = vm ? vm : video_mode;
+  /* VM must not be NULL! */
+  assert (vm);
+  /* To be safe, make own copy of VM, so this function won't be
+     affected by any other sub-routine that might free it. */
+  char vm_copy[strlen (vm)];
+  vm = strcpy (vm_copy, vm);
+  /* Presume should not setup video mode after removal. */
+  bool should_setup_vm = false;
+  /* Is VM the current video mode? */
+  if (! strcmp (vm, video_mode))
+    {
+      /* The current video mode will change, therefore must setup
+	 video mode after removal. */
+      should_setup_vm = true;
+      /* Change the current video mode to the next one available. */
+      set_string_var (&video_mode, next_video_mode (L, NULL));
+      /* Is VM still the current video mode? */
+      if (! strcmp (vm, video_mode))
+	/* There is no remaining video mode.  Failure! */
+	failure ("Removing last video mode available.  "
+		 "MININIM.lua.video_mode is empty!  Exiting.");
+    }
+  /* Push MININIM.lua.video_mode. */
+  push_video_mode_table (L);
+  /* MININIM.lua.video_mode[vm] = nil */
+  remove_table_field (L, -1, vm);
+  /* Pop MININIM.lua.video_mode. */
+  lua_pop (L, 1);
+  /* Should setup new current video mode? */
+  if (should_setup_vm)
+    setup_video_mode (L, NULL);	/* Set it up! */
+  /* No value has been put on stack. */
+  return 0;
+}
+
+/* Return video mode name next to CURRENT_VM as a newly allocated
+   string.  If CURRENT_VM is NULL or the name of the last video mode
+   available, get the first one.  It's the responsibility of the
+   caller to free the returned string. */
+
+char *
+next_video_mode (lua_State *L, const char *current_vm)
+{
+  /* Ensure stack size. */
+  luaL_checkstack (L, 3, "cannot query next video mode");
+  /* CURRENT_VM defaults to VIDEO_MODE. */
+  current_vm = current_vm ? current_vm : video_mode;
+  /* Push MININIM.lua.video_mode. */
+  push_video_mode_table (L);
+  /* Ensure there is at least one video mode. */
+  if (is_table_empty (L, -1))
+    failure ("No video mode available.  MININIM.lua.video_mode is empty.");
+  /* Is CURRENT_VM the last video mode? */
+  if (is_last_table_key (L, -1, current_vm))
+    {
+      /* CURRENT_VM is not NULL!  Otherwise there would be no video
+	 mode. */
+      assert (current_vm);
+      /* Wrap around to get the first video mode. */
+      lua_pushnil (L);
+    }
+  else
+    /* Get video mode next to CURRENT_VM.  If CURRENT_VM is NULL, get
+       the first one. */
+    lua_pushstring (L, current_vm);
+  /* There is a next video mode!  Get it. */
+  assert (lua_next (L, -2));
+  /* Make a copy of the video mode name. */
+  char *vm = xasprintf ("%s", lua_tostring (L, -2));
+  /* Pop MININIM.lua.video_mode, the next video mode name and its
+     routine function. */
+  lua_pop (L, 3);
+  /* Return the newly allocated video mode name. */
+  return vm;
 }
 
 bool
-L_push_video_routine (lua_State *L)
-{
-  if (! L_push_video_mode_table (L)) return false;
-
-  lua_pushstring (L, video_mode);
-  lua_rawget (L, -2);
-  lua_remove (L, -2);
-
-  if (! lua_isfunction (L, -1)) {
-    error_lua_invalid ("%s.%s", "video_mode", video_mode);
-    lua_pop (L, 1);
-    return false;
-  }
-
-  return true;
-}
-
-bool
-video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
-       const char *object, uintptr_t index, uintptr_t part,
-       struct pos *p, int actor_id, lua_Number width)
+video (lua_State *L,
+       ALLEGRO_BITMAP *bitmap,
+       int nret,
+       const char *command,
+       const char *object,
+       uintptr_t index,
+       uintptr_t part,
+       struct pos *p,
+       int actor_id,
+       lua_Number width)
 {
   if (! is_video_rendering ())
     return false;
 
-  lua_State *L = main_L;
-  if (! L_push_video_routine (L)) {
-    int i;
-    for (i = 0; i < nret; i++) lua_pushnil (L);
-    return false;
-  }
+  push_video_routine (L, NULL);
 
   int nargs = 0;
 
@@ -256,23 +353,25 @@ video_command_error (const char *command, const char *object,
   if (! is_video_rendering ())
     return;
 
-  char *object_str;
-  if (object) object_str = xasprintf (" %s", object);
-  else object_str = xasprintf ("%s", "");
+  char *object_str = NULL;
+  if (object)
+    object_str = xasprintf (" %s", object);
 
-  char *index_str;
-  if (index) {
-    if (index <= VIDEO_INDEX_MAX)
-      index_str = xasprintf (" %zu", index);
-    else index_str = xasprintf (" %s", (char *) index);
-  } else index_str = xasprintf ("%s", "");
+  char *index_str = NULL;
+  if (index)
+    {
+      if (index <= VIDEO_INDEX_MAX)
+	index_str = xasprintf (" %zu", index);
+      else index_str = xasprintf (" %s", (char *) index);
+    }
 
-  char *part_str;
-  if (part) {
-    if (part <= VIDEO_INDEX_MAX)
-      part_str = xasprintf (" %zu", part);
-    else part_str = xasprintf (" %s", (char *) part);
-  } else part_str = xasprintf ("%s", "");
+  char *part_str = NULL;
+  if (part)
+    {
+      if (part <= VIDEO_INDEX_MAX)
+	part_str = xasprintf (" %zu", part);
+      else part_str = xasprintf (" %s", (char *) part);
+    }
 
   warning ("video command '%s%s%s%s' failed",
 	   command,
@@ -284,7 +383,7 @@ video_command_error (const char *command, const char *object,
   al_free (index_str);
   al_free (part_str);
 
-  video_rendering (false);
+  remove_video_mode (main_L, NULL);
 }
 
 struct rect *
@@ -294,7 +393,7 @@ _rect_object_index_part (struct rect *r_ret, const char *object,
 {
   lua_State *L = main_L;
 
-  bool r = video (NULL, 1, "RECTANGLE", object, index, part, p,
+  bool r = video (L, NULL, 1, "RECTANGLE", object, index, part, p,
                   actor_id, -1);
 
   struct rect *r_ptr =
@@ -318,7 +417,7 @@ _bitmap_object_index_part (const char *object, uintptr_t index,
 {
   lua_State *L = main_L;
 
-  bool r = video (NULL, 1, "BITMAP", object, index, part, NULL, -1, -1);
+  bool r = video (L, NULL, 1, "BITMAP", object, index, part, NULL, -1, -1);
 
   ALLEGRO_BITMAP **b_ptr =
     luaL_testudata (L, -1, L_MININIM_VIDEO_BITMAP);
@@ -337,7 +436,7 @@ video_mode_value (const char *object)
 {
   lua_State *L = main_L;
 
-  bool r = video (NULL, 1, "VALUE", object, 0, 0, NULL, -1, -1);
+  bool r = video (L, NULL, 1, "VALUE", object, 0, 0, NULL, -1, -1);
 
   if (! r || ! lua_isnumber (L, -1))
     video_command_error ("VALUE", object, 0, 0);
@@ -348,103 +447,38 @@ video_mode_value (const char *object)
   return n;
 }
 
-bool
-is_valid_video_mode (char *vm)
-{
-  lua_State *L = main_L;
-
-  if (! vm) return false;
-
-  if (! L_push_video_mode_table (L)) return false;
-
-  lua_pushstring (L, vm);
-  lua_rawget (L, -2);
-
-  if (lua_isfunction (L, -1)) {
-    lua_pop (L, 2);
-    return true;
-  } else {
-    lua_pop (L, 2);
-    return false;
-  }
-}
-
-char *
-next_video_mode (char *current_vm)
-{
-  lua_State *L = main_L;
-
-  int first_time = true;
-
-  if (! L_push_video_mode_table (L)) return NULL;
-
-  if (current_vm) {
-    lua_pushstring (L, current_vm);
-    lua_rawget (L, -2);
-
-    if (! lua_isnil (L, -1)) {
-      lua_pop (L, 1);
-      lua_pushstring (L, current_vm);
-    }
-  } else lua_pushnil (L);
-
- retry:
-  while (lua_next (L, -2)) {
-    if (lua_isstring (L, -2) && lua_isfunction (L, -1)) {
-      char *vm = xasprintf ("%s", lua_tostring (L, -2));
-      lua_pop (L, 3);
-      return vm;
-    } else lua_pop (L, 1);
-  }
-
-  if (first_time) {
-    first_time = false;
-    lua_pushnil (L);
-    goto retry;
-  }
-
-  lua_pop (L, 1);
-
-  return NULL;
-}
-
 void
-setup_video_mode (char *requested_vm)
+setup_video_mode (lua_State *L, char *requested_vm)
 {
   if (! is_video_rendering ())
     return;
 
   if (changing_vm) return;
   changing_vm = true;
-  lock_lua ();
+  lock_lua (L);
 
-  if (is_valid_video_mode (requested_vm))
+  if (requested_vm)
     set_string_var (&video_mode, requested_vm);
-  else if (! is_valid_video_mode (video_mode))
-    set_string_var (&video_mode, next_video_mode (NULL));
+  else if (! video_mode)
+    set_string_var (&video_mode, next_video_mode (L, NULL));
 
-  if (video_mode)
+  /* VIDEO_MODE is defined! */
+  assert (video_mode);
+
+  eprintf ("Loading video mode '%s'... ", video_mode);
+  load_callback = process_display_events;
+  if (! video (L, NULL, 0, "LOAD", NULL, 0, 0, NULL, -1, -1))
     {
-      video_rendering (true);
-      load_callback = process_display_events;
-      if (! video (NULL, 0, "LOAD", NULL, 0, 0, NULL, -1, -1))
-	{
-	  video_rendering (false);
-	  load_callback = NULL;
-	  changing_vm = false;
-	  unlock_lua ();
-	  return;
-	}
+      eprintf ("Error!\n");
+      warning ("Video mode '%s' failed to load.  Removing it!", video_mode);
       load_callback = NULL;
+      changing_vm = false;
+      remove_video_mode (L, NULL);
+      unlock_lua (L);
+      return;
     }
-  else {
-    REAL_WIDTH = ORIGINAL_WIDTH;
-    REAL_HEIGHT = ORIGINAL_HEIGHT;
-    video_rendering (false);
-    changing_vm = false;
-    unlock_lua ();
-    return;
-  }
+  load_callback = NULL;
+  eprintf ("Done!\n");
 
   int w = video_mode_value ("WIDTH");
   int h = video_mode_value ("HEIGHT");
@@ -455,7 +489,7 @@ setup_video_mode (char *requested_vm)
     set_string_var (&video_mode, NULL);
     video_rendering (false);
     changing_vm = false;
-    unlock_lua ();
+    unlock_lua (L);
     return;
   }
 
@@ -528,6 +562,7 @@ setup_video_mode (char *requested_vm)
     }
   al_free (ba);
 
+  eprintf ("Changed to video mode '%s'.\n", video_mode);
   changing_vm = false;
-  unlock_lua ();
+  unlock_lua (L);
 }

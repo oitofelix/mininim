@@ -760,6 +760,6 @@ draw_actor_part (ALLEGRO_BITMAP *bitmap, const char *type,
                  const char *part, struct actor *a)
 {
   if (! type) type = actor_type_string (a->type);
-  video (bitmap, 0, "DRAW", type, 0, (uintptr_t) (part),
+  video (main_L, bitmap, 0, "DRAW", type, 0, (uintptr_t) (part),
          NULL, a->id, -1);
 }

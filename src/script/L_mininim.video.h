@@ -28,11 +28,21 @@ extern int REAL_WIDTH;
 extern int REAL_HEIGHT;
 extern bool changing_vm;
 
+int push_video_mode_table (lua_State *L);
+int push_video_routine (lua_State *L, const char *vm);
+char *next_video_mode (lua_State *L, const char *current_vm);
 void define_L_mininim_video (lua_State *L);
 
-bool video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
-            const char *object, uintptr_t index, uintptr_t part,
-            struct pos *p, int actor_id, lua_Number width);
+bool video (lua_State *L,
+	    ALLEGRO_BITMAP *bitmap,
+	    int nret,
+	    const char *command,
+            const char *object,
+	    uintptr_t index,
+	    uintptr_t part,
+            struct pos *p,
+	    int actor_id,
+	    lua_Number width);
 struct rect *_rect_object_index_part (struct rect *r_ret,
                                       const char *object,
                                       uintptr_t index, uintptr_t part,
@@ -41,29 +51,27 @@ ALLEGRO_BITMAP *_bitmap_object_index_part (const char *object,
                                            uintptr_t index, uintptr_t part);
 lua_Number video_mode_value (const char *object);
 
-bool is_valid_video_mode (char *vm);
-char *next_video_mode (char *current_vm);
-void setup_video_mode (char *requested_vm);
+void setup_video_mode (lua_State *L, char *requested_vm);
 
 #define draw_object(bitmap, object, p)            \
-  video (bitmap, 0, "DRAW", object, 0, 0, p, -1, -1)
+  video (main_L, bitmap, 0, "DRAW", object, 0, 0, p, -1, -1)
 
 #define draw_object_width(bitmap, object, p, width) \
-  video (bitmap, 0, "DRAW", object, 0, 0, p, -1, width)
+  video (main_L, bitmap, 0, "DRAW", object, 0, 0, p, -1, width)
 
 #define draw_object_part(bitmap, object, part, p)               \
-  video (bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, -1)
+  video (main_L, bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, -1)
 
 #define draw_object_part_width(bitmap, object, part, p, width)      \
-  video (bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, width)
+  video (main_L, bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, width)
 
 #define draw_object_index_part(bitmap, object, index, part, p)          \
-  video (bitmap, 0, "DRAW", object, (uintptr_t) (index),                \
+  video (main_L, bitmap, 0, "DRAW", object, (uintptr_t) (index),		\
          (uintptr_t) (part), p, -1, -1)
 
 #define draw_object_index_part_width(bitmap, object, index, part,       \
   p, width)                                                             \
-  video (bitmap, 0, "DRAW", object, (uintptr_t) (index),                \
+  video (main_L, bitmap, 0, "DRAW", object, (uintptr_t) (index),		\
          (uintptr_t) (part), p, -1, width)
 
 #define rect_object(r_ret, object, p)              \

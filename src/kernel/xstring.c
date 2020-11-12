@@ -70,10 +70,12 @@ str_end_matches (const char *s, const char *m)
 void
 set_string_var (char **var, const char *value)
 {
-  char *old_str = *var;
-  if (value) *var = xasprintf ("%s", value);
-  else *var = NULL;
-  al_free (old_str);
+  if (*var == value)
+    return;
+  al_free (*var);
+  *var = value
+    ? xasprintf ("%s", value)
+    : NULL;
 }
 
 int

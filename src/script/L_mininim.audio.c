@@ -43,7 +43,7 @@ define_L_mininim_audio (lua_State *L)
   lua_pop (L, 1);
 
   /* create audio mode table */
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  L_get_registry_by_ref (L, lua_table_ref);
   lua_pushstring (L, "audio_mode");
   lua_newtable (L);
   lua_rawset (L, -3);
@@ -88,7 +88,7 @@ DEFUN (__tostring)
 void
 L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id)
 {
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  L_get_registry_by_ref (L, lua_table_ref);
 
   lua_pushstring (L, "audio_mode");
   lua_rawget (L, -2);

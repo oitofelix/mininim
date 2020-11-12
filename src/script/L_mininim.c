@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-int mininim_lua_ref = LUA_NOREF;
+int lua_table_ref = LUA_NOREF;
 
 static DEFUN (__eq);
 static DEFUN (__index);
@@ -54,7 +54,7 @@ define_L_mininim (lua_State *L)
 
   /* lua table */
   lua_newtable (L);
-  L_set_registry_by_ref (L, &mininim_lua_ref);
+  L_set_registry_by_ref (L, &lua_table_ref);
 
   /* global shortcuts */
   lua_register (L, "_quit", quit);
@@ -102,10 +102,44 @@ error_lua_invalid (const char *template, ...)
   va_end (ap);
 }
 
+/* Push MININIM.lua.  Return 1.*/
+
+int
+push_lua_table (lua_State *L)
+{
+  /* Ensure stack size. */
+  luaL_checkstack (L, 1, "cannot push MININIM.lua");
+  lua_geti (L,
+	    LUA_REGISTRYINDEX,
+	    lua_table_ref);
+  /* Ensure it is a table.  This is an assert because the registry
+     can't be changed from Lua. */
+  assert (lua_istable (L, -1));
+  /* Put one value on stack. */
+  return 1;
+}
+
+/* Push field K of MININIM.lua.  Return 1.*/
+
+int
+push_lua_table_field (lua_State *L, const char *k)
+{
+  /* Ensure stack size. */
+  luaL_checkstack (L, 2, "cannot push MININIM.lua field");
+  /* Push MININIM.lua. */
+  push_lua_table (L);
+  /* Push MININIM.lua[K]. */
+  lua_getfield (L, -1, k);
+  /* Remove MININIM.lua */
+  lua_remove (L, -2);
+  /* Put one value on stack. */
+  return 1;
+}
+
 bool
 call_lua_function (lua_State *L, const char *name, int nargs, int nresults)
 {
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  L_get_registry_by_ref (L, lua_table_ref);
 
   lua_pushstring (L, name);
   lua_rawget (L, -2);
@@ -124,7 +158,7 @@ bool
 run_lua_hook (lua_State *L, const char *name)
 {
   /* lock_lua (); */
-  L_get_registry_by_ref (L, mininim_lua_ref);
+  L_get_registry_by_ref (L, lua_table_ref);
   lua_pushstring (L, name);
   lua_rawget (L, -2);
   lua_remove (L, -2);
@@ -192,7 +226,7 @@ DEFUN (__index)
       lua_pushcfunction (L, quit);
       return 1;
     } else if (! strcasecmp (key, "lua")) {
-      L_get_registry_by_ref (L, mininim_lua_ref);
+      L_get_registry_by_ref (L, lua_table_ref);
       return 1;
     } else if (! strcasecmp (key, "editing")) {
       lua_pushboolean (L, edit != EDIT_NONE);
@@ -258,8 +292,8 @@ DEFUN (quit)
 DEFUN (rest)
 {
   double seconds = lua_tonumber (L, 1);
-  unlock_lua ();
+  unlock_lua (L);
   al_rest (seconds);
-  lock_lua ();
+  lock_lua (L);
   return 0;
 }

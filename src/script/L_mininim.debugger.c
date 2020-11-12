@@ -1356,7 +1356,7 @@ debugger_hook (lua_State *L, lua_Debug *ar)
   debug.action = DEBUG_STOPPED;
 
   repl_update_prompt ();
-  al_wait_cond (debug_cond, L_mutex);
+  al_wait_cond (debug_cond, get_lua_mutex (L));
 
 end:
   if (lua_gethook (L) == debugger_hook && L_profiling)

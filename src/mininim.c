@@ -81,7 +81,9 @@ struct dialog save_picture_dialog = {
 
 struct message_box about_dialog = {
   .title = "About",
-  .heading = PACKAGE_NAME " " VERSION,
+  /* Heading must not be NULL, or dialog won't show (at least in
+     Windows). */
+  .heading = "",
   .text = NULL,
   .buttons = NULL,
   .flags = 0,
@@ -1403,7 +1405,8 @@ main (int _argc, char **_argv)
   get_env_args (&eargc, &eargv, options);
 
   /* size_t i; */
-  /* for (i = 0; i < cargc; i++) printf ("%s\n", cargv[i]); */
+  /* for (i = 0; i < cargc; i++) */
+  /*   printf ("%s\n", cargv[i]); */
   /* exit (EXIT_SUCCESS); */
 
   argp_program_version_hook = version;
@@ -1457,7 +1460,7 @@ main (int _argc, char **_argv)
   run_lua_hook (main_L, "load_hook");
 
   /* setup video mode */
-  setup_video_mode (video_mode);
+  setup_video_mode (main_L, NULL);
 
   init_gui_menu ();
 
@@ -1675,7 +1678,7 @@ get_paths (void)
   al_destroy_path (user_settings_path);
 
   /* system settings path string */
-  system_data_dir = xasprintf ("%s%c", PKGDATADIR, ALLEGRO_NATIVE_PATH_SEP);
+  system_data_dir = xasprintf ("%s"PS, PKGDATADIR);
 
   /* get executable file name */
   ALLEGRO_PATH *exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
@@ -1703,16 +1706,26 @@ get_paths (void)
 void
 print_paths (void)
 {
-  printf ("Main configuration file: %s\n", config_filename);
-  printf ("REPL history file: %s\n", history_filename);
-  printf ("Executable file: %s\n", exe_filename);
-  printf ("Resources: %s\n", resources_dir);
-  printf ("System data: %s\n", system_data_dir);
-  printf ("Temporary: %s\n", temp_dir);
-  printf ("User home: %s\n", user_home_dir);
-  printf ("User documents: %s\n", user_documents_dir);
-  printf ("User data: %s\n", user_data_dir);
-  printf ("User settings: %s\n", user_settings_dir);
+  printf ("Main configuration file: %s\n"
+	  "REPL history file: %s\n"
+	  "Executable file: %s\n"
+	  "Resources: %s\n"
+	  "System data: %s\n"
+	  "Temporary: %s\n"
+	  "User home: %s\n"
+	  "User documents: %s\n"
+	  "User data: %s\n"
+	  "User settings: %s\n",
+	  config_filename,
+	  history_filename,
+	  exe_filename,
+	  resources_dir,
+	  system_data_dir,
+	  temp_dir,
+	  user_home_dir,
+	  user_documents_dir,
+	  user_data_dir,
+	  user_settings_dir);
 }
 
 void
@@ -1721,10 +1734,12 @@ print_display_modes (void)
   printf ("Display Modes:\n");
   printf ("\t-1: desktop settings\n");
   int i, n = al_get_num_display_modes ();
-  for (i = 0; i < n ; i++) {
-    ALLEGRO_DISPLAY_MODE d; al_get_display_mode (i, &d);
-    printf ("\t% 2i: %ix%i %iHz\n", i, d.width, d.height, d.refresh_rate);
-  }
+  for (i = 0; i < n ; i++)
+    {
+      ALLEGRO_DISPLAY_MODE d; al_get_display_mode (i, &d);
+      printf ("\t% 2i: %ix%i %iHz\n",
+	      i, d.width, d.height, d.refresh_rate);
+    }
 }
 
 void *

@@ -178,7 +178,7 @@ animation_hotkeys_cb (Ihandle *ih, int c)
   /* F12: change video mode */
   else if (was_key_pressed (0, ALLEGRO_KEY_F12)
            || c == K_F12) {
-    char *next_vm = next_video_mode (video_mode);
+    char *next_vm = next_video_mode (main_L, video_mode);
     ui_vm (next_vm);
     al_free (next_vm);
   }

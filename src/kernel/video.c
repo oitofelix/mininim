@@ -178,13 +178,13 @@ int
 video_bitmap_flags (void)
 {
   return (al_get_new_bitmap_flags ()
-	  & ~ALLEGRO_VIDEO_BITMAP
-	  & ~ALLEGRO_CONVERT_BITMAP
-	  & ~ALLEGRO_MEMORY_BITMAP
-	  & ~ALLEGRO_NO_PRESERVE_TEXTURE
-	  & ~ALLEGRO_MIN_LINEAR
-	  & ~ALLEGRO_MAG_LINEAR
-	  & ~ALLEGRO_MIPMAP)
+          & ~ALLEGRO_VIDEO_BITMAP
+          & ~ALLEGRO_CONVERT_BITMAP
+          & ~ALLEGRO_MEMORY_BITMAP
+          & ~ALLEGRO_NO_PRESERVE_TEXTURE
+          & ~ALLEGRO_MIN_LINEAR
+          & ~ALLEGRO_MAG_LINEAR
+          & ~ALLEGRO_MIPMAP)
     | ALLEGRO_VIDEO_BITMAP;
 }
 
@@ -258,8 +258,8 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
 #if WINDOWS_EDITION
   /* White is the transparent mask for menu icons in Windows XP. */
   al_clear_to_color (IsWindowsVistaOrGreater ()
-		     ? TRANSPARENT_COLOR
-		     : WHITE);
+                     ? TRANSPARENT_COLOR
+                     : WHITE);
 #else
   al_clear_to_color (TRANSPARENT_COLOR);
 #endif
@@ -420,8 +420,8 @@ validate_bitmap_for_windows (ALLEGRO_BITMAP *bitmap)
 #if WINDOWS_EDITION
   if (! bitmap) return;
   al_lock_bitmap (bitmap,
-		  ALLEGRO_PIXEL_FORMAT_ANY,
-		  ALLEGRO_LOCK_READONLY);
+                  ALLEGRO_PIXEL_FORMAT_ANY,
+                  ALLEGRO_LOCK_READONLY);
   al_unlock_bitmap (bitmap);
 #endif
 }
@@ -1145,8 +1145,8 @@ show (void)
   if (load_callback)
     {
       show_logo ("Loading...",
-		 current_resource_filename,
-		 NULL);
+                 current_resource_filename,
+                 NULL);
       return;
     }
   else if (is_dedicatedly_replaying ())
@@ -1155,7 +1155,7 @@ show (void)
       return;
     }
   else if (! command_line_replay
-	   && ! is_video_rendering ())
+           && ! is_video_rendering ())
     {
       char *text1 = is_audio_rendering () ? "AUDIO" : "NONE";
       show_logo ("RENDERING", text1, NULL);
@@ -1164,8 +1164,8 @@ show (void)
   else if (about_screen)
     {
       show_logo (PACKAGE_URL,
-		 FORUM_URL,
-		 oitofelix_face);
+                 FORUM_URL,
+                 oitofelix_face);
       return;
     }
 
@@ -1486,8 +1486,8 @@ pop_clipping_rectangle (void)
 
 void
 draw_logo (ALLEGRO_BITMAP *bitmap,
-	   const char *text0,
-	   const char *text1,
+           const char *text0,
+           const char *text1,
            ALLEGRO_BITMAP *icon)
 {
   int x = 145;

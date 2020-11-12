@@ -368,7 +368,7 @@ void
 ui_vm (char *requested_vm)
 {
   if (strcmp (video_mode, requested_vm))
-    setup_video_mode (requested_vm);
+    setup_video_mode (main_L, requested_vm);
 
   if (! video_mode) {
     ui_msg (1, "NO VIDEO MODE AVAILABLE");

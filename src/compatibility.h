@@ -63,4 +63,10 @@
 # include <versionhelpers.h>
 #endif
 
+#if WINDOWS_EDITION
+#define PS "\\"
+#else
+#define PS "/"
+#endif
+
 #endif	/* MININIM_COMPATIBILITY_H */

@@ -20,11 +20,326 @@
 #include "mininim.h"
 
 lua_State *main_L;
-ALLEGRO_MUTEX *L_mutex;
 
 static int table_getn_ref = LUA_NOREF;
 static int weak_registry_ref = LUA_NOREF;
 
+
+/************
+ * Lua state
+ ************/
+
+/* Create Lua state and return it. */
+
+lua_State *
+create_lua_state ()
+{
+  /* Create Lua state with default panic function and allocator. */
+  lua_State *L = luaL_newstate ();
+  /* Ensure the state has been created. */
+  if (! L)
+    failerrno ("cannot create new Lua state");
+  /* Create Lua extra space. */
+  create_lua_extra_space (L);
+  /* Make all standard Lua libraries available. */
+  luaL_openlibs (L);
+  /* Return Lua state just created. */
+  return L;
+}
+
+/* Destroy Lua state L. */
+
+void
+destroy_lua_state (lua_State *L)
+{
+  /* Lua state L must be not NULL! */
+  assert (L);
+  /* Destroy Lua extra space structure. */
+  destroy_lua_extra_space (main_L);
+  /* Destroy Lua state L. */
+  lua_close (L);
+}
+
+
+/******************
+ * Lua extra space
+ ******************/
+
+/* Create extra space structure for Lua state L, store its pointer
+   in the extra space of L and return that pointer. */
+
+struct lua_extra_space *
+create_lua_extra_space (lua_State *L)
+{
+  /* Lua state L must be not NULL! */
+  assert (L);
+  /* Get extra space pointer. */
+  struct lua_extra_space **extra_space_ptr = lua_getextraspace (L);
+  /* Extra space pointer must not be NULL! */
+  assert (extra_space_ptr);
+  /* Allocate extra space structure and put its pointer in the extra
+     space of L. */
+  szalloc (*extra_space_ptr);
+  /* Create recursive mutex. */
+  create_lua_mutex (*extra_space_ptr);
+  /* Return extra space structure just created. */
+  return *extra_space_ptr;
+}
+
+/* Destroy extra space structure of Lua state L. */
+
+void
+destroy_lua_extra_space (lua_State *L)
+{
+  /* Lua state L must be not NULL! */
+  assert (L);
+  /* Get extra space pointer. */
+  struct lua_extra_space **extra_space_ptr = lua_getextraspace (L);
+  /* Extra space pointer must not be NULL! */
+  assert (extra_space_ptr);
+  /* Destroy recursive mutex. */
+  destroy_lua_mutex (*extra_space_ptr);
+  /* Free extra space structure. */
+  al_free (*extra_space_ptr);
+  /* Erase extra space structure pointer. */
+  *extra_space_ptr = NULL;
+}
+
+/* Return extra space structure pointer of Lua state L.  Asserted to
+   be non-NULL. */
+
+struct lua_extra_space *
+get_lua_extra_space (lua_State *L)
+{
+  /* Lua state L must be not NULL! */
+  assert (L);
+  /* Get extra space pointer. */
+  struct lua_extra_space **extra_space_ptr = lua_getextraspace (L);
+  /* Pointer to extra space must not be NULL! */
+  assert (extra_space_ptr);
+  /* Pointer to extra space structure in extra space must not be
+     NULL! */
+  assert (*extra_space_ptr);
+  /* Return it. */
+  return *extra_space_ptr;
+}
+
+
+/**********************
+ * Lua recursive mutex
+ **********************/
+
+/* Create recursive mutex for Lua extra space structure pointed by
+   LES_PTR store it there and return that mutex. */
+
+ALLEGRO_MUTEX *
+create_lua_mutex (struct lua_extra_space *les_ptr)
+{
+  /* Lua extra space structure pointer LES_PTR must be not NULL!  */
+  assert (les_ptr);
+  /* Allocate recursive mutex. */
+  ALLEGRO_MUTEX *mutex = al_create_mutex_recursive ();
+  /* Ensure mutex has been successfully allocated. */
+  if (! mutex)
+    failerrno ("cannot create recursive mutex");
+  /* Store MUTEX in the extra space structure and return it. */
+  return les_ptr->mutex = mutex;
+}
+
+/* Destroy recursive mutex of Lua extra space structure pointed by
+   LES_PTR. */
+
+void
+destroy_lua_mutex (struct lua_extra_space *les_ptr)
+{
+  /* Lua extra space structure pointer LES_PTR must be not NULL!  */
+  assert (les_ptr);
+  /* Get recursive mutex */
+  ALLEGRO_MUTEX *mutex = les_ptr->mutex;
+  /* MUTEX must not be NULL! */
+  assert (mutex);
+  /* Destroy recursive mutex. */
+  al_destroy_mutex (mutex);
+  /* Erase recursive mutex pointer. */
+  les_ptr->mutex = NULL;
+}
+
+/* Return mutex of Lua state L.  Asserted to be non-NULL.  The mutex
+   must have been previously allocated by alloc_lua_mutex. */
+
+ALLEGRO_MUTEX *
+get_lua_mutex (lua_State *L)
+{
+  /* Lua state L must not be NULL! */
+  assert (L);
+  /* Get mutex from extra space structure of L. */
+  ALLEGRO_MUTEX *mutex = get_lua_extra_space (L)->mutex;
+  /* Mutex must not be NULL! */
+  assert (mutex);
+  /* Return mutex. */
+  return mutex;
+}
+
+/* Acquire lock of Lua state L. */
+
+void
+lock_lua (lua_State *L)
+{
+  al_lock_mutex (get_lua_mutex (L));
+}
+
+/* Release lock of Lua state L. */
+
+void
+unlock_lua (lua_State *L)
+{
+  al_unlock_mutex (get_lua_mutex (L));
+}
+
+
+/***********
+ * Lua path
+ ***********/
+
+/* Add DIR path with the usual Lua package/module data directory
+   suffixes (DIR/data/?.lua;DIR/data/?/init.lua;) to Lua string buffer
+   DATA.  Intended for use with do_for_each_data_dir.  Return false as
+   to not interrupt it.  See push_lua_path. */
+
+bool
+add_to_lua_path_buffer (void_luaL_Buffer *data,
+			const char *dir)
+{
+  /* Lua string buffer pointer DATA and directory path DIR must not be
+     NULL! */
+  assert (data), assert (dir);
+  /* DATA is a pointer to a Lua string buffer. */
+  luaL_Buffer *b = data;
+  /* add DIR/data/?.lua; */
+  luaL_addstring (b, dir);
+  luaL_addstring (b, PS"data"PS"?.lua;");
+  /* add DIR/data/?/init.lua; */
+  luaL_addstring (b, dir);
+  luaL_addstring (b, PS"data"PS"?"PS"init.lua;");
+  /* Tell do_for_each_data_dir to proceed to the next data
+     directory. */
+  return false;
+}
+
+/* Push Lua path string.  It lists load paths for all data directories
+   known by do_for_each_data_dir.  It is intended to be used as a
+   substring of package.path.  Return 1. */
+
+int
+push_lua_path (lua_State *L)
+{
+  /* Lua state L must not be NULL! */
+  assert (L);
+  /* Acquire Lua state lock. */
+  lock_lua (L);
+  /* Ensure stack size. */
+  luaL_checkstack (L, 1, "cannot push Lua path");
+  /* Initialize string buffer. */
+  luaL_Buffer b; luaL_buffinit (L, &b);
+  /* Add to path buffer load paths for each data directory.  Assert
+     that all data directories are included. */
+  assert (! do_for_each_data_dir (add_to_lua_path_buffer, &b));
+  /* Push Lua path string. */
+  luaL_pushresult (&b);
+  /* Release Lua state lock. */
+  unlock_lua (L);
+  /* One value has been put on stack. */
+  return 1;
+}
+
+
+/*******************
+ * Table facilities
+ *******************/
+
+/* Remove field K from table at INDEX.  Ensure value at INDEX is a
+   table.  Return 0. */
+
+int
+remove_table_field (lua_State *L, int index, const char *k)
+{
+  /* Lua state L and key K must not be NULL! */
+  assert (L), assert (k);
+  /* Acquire Lua state lock. */
+  lock_lua (L);
+  /* Ensure stack size. */
+  luaL_checkstack (L, 1, "cannot remove field from table");
+  /* Ensure INDEX is absolute */
+  index = lua_absindex (L, index);
+  /* Ensure value at INDEX is a table. */
+  if (! lua_istable (L, index))
+    return luaL_error (L, "attempt to remove field from non-table");
+  /* Push nil value for the requested key. */
+  lua_pushnil (L);
+  /* Pop nil and assign it to INDEX[K]. */
+  lua_setfield (L, index, k);
+  /* Release Lua state lock. */
+  unlock_lua (L);
+  /* Put no values on stack. */
+  return 0;
+}
+
+/* Return true if K is the last key of table at INDEX.  Otherwise,
+   return false.  If K is NULL, effectively check whether table at
+   INDEX is empty.  Ensure value at INDEX is a table. */
+
+bool
+is_last_table_key (lua_State *L, int index, const char *k)
+{
+  /* Lua state L must not be NULL! */
+  assert (L);
+  /* Acquire Lua state lock. */
+  lock_lua (L);
+  /* Ensure stack size. */
+  luaL_checkstack (L, 2, "cannot check last table key");
+  /* Ensure INDEX is absolute. */
+  index = lua_absindex (L, index);
+  /* Ensure value at INDEX is a table. */
+  if (! lua_istable (L, index))
+    return luaL_error (L, "attempt to check last key of non-table");
+  /* Query key-value pair next to K.  If K is NULL, query first table
+     key-value. */
+  lua_pushstring (L, k);	/* push nil if K is NULL */
+  /* Return value variable. */
+  bool retval;
+  /* Pop the value pushed above, then push next (first, if K is NULL)
+     key-value pair if any and evaluate to true; otherwise push
+     nothing and evaluate to false. */
+  if (lua_next (L, index))
+    {
+      lua_pop (L, 2);		/* pop key-value pair */
+      /* K is NOT the last key; or table is not empty if K is NULL. */
+      retval = false;
+      goto end;
+    }
+  else
+    {
+      /* K IS the last key; or table is empty if K is NULL. */
+      retval = true;
+      goto end;
+    }
+ end:
+  /* Release Lua state lock. */
+  unlock_lua (L);
+  return retval;
+}
+
+/* Return true if table at INDEX is empty.  Otherwise, return
+   false. */
+
+bool
+is_table_empty (lua_State *L, int index)
+{
+  return is_last_table_key (L, index, NULL);
+}
+
+
+/* functions */
 int
 load_script (const char *filename)
 {
@@ -36,51 +351,15 @@ load_script (const char *filename)
 void
 init_script (void)
 {
-  /* setup canonical environment */
+  /* Create Lua state L. */
+  lua_State *L = create_lua_state ();
 
-  /* Lua 5.0 */
-  /* lua_State *L = lua_open (); */
-  /* ------- */
-
-  /* Lua 5.3 */
-  lua_State *L = luaL_newstate ();
-  /* ------- */
-
+  /* Make Lua state L available globally. */
   main_L = L;
 
-  assert (L);
-
-  /* Lua 5.0 */
-  /* luaopen_base (L); */
-  /* luaopen_table (L); */
-  /* luaopen_io (L); */
-  /* luaopen_string (L); */
-  /* luaopen_math (L); */
-  /* luaopen_loadlib (L); */
-  /* ------- */
-
-  /* Lua 5.3 */
-  luaL_openlibs (L);
-  /* ------- */
-
   /* path */
-  lua_settop (L, 0);
-  lua_pushfstring (L, "%sdata/?.lua;"
-                   "%sdata/?.lua;"
-                   "%sdata/?.lua;"
-                   "%sdata/?.lua;"
-                   "%sdata/?.lua;",
-                   user_data_dir,
-                   data_dir ? data_dir : "",
-                   "",
-                   resources_dir,
-                   system_data_dir);
+  push_lua_path (L);
 
-  /* Lua 5.0 */
-  /* lua_setglobal (L, "LUA_PATH"); */
-  /* ------- */
-
-  /* Lua 5.3 */
   lua_getglobal (L, "package");
   lua_getfield (L, -1, "path");
   lua_remove (L, -2);
@@ -89,7 +368,6 @@ init_script (void)
   lua_rotate (L, -2, 1);
   lua_setfield (L, -2, "path");
   lua_settop (L, 0);
-  /* ------- */
 
   /* mininim */
   define_L_mininim (L);
@@ -123,15 +401,14 @@ init_script (void)
   L_set_registry_by_ref (L, &weak_registry_ref);
 
   /* REPL */
-  L_mutex = al_create_mutex_recursive ();
   repl_cond = al_create_cond ();
   debug_cond = al_create_cond ();
-  lock_lua ();
+  lock_lua (L);
   repl_L = lua_newthread (L);
   L_set_registry_by_ref (L, &repl_thread_ref);
   repl_thread = al_create_thread (repl, repl_L);
   al_start_thread (repl_thread);
-  al_wait_cond (repl_cond, L_mutex);
+  al_wait_cond (repl_cond, get_lua_mutex (L));
 
   /* load script */
   int e = load_resource ("data/script/mininim.lua",
@@ -162,7 +439,7 @@ void
 finalize_script (void)
 {
   al_set_thread_should_stop (repl_thread);
-  unlock_lua ();
+  unlock_lua (main_L);
 
   al_rest (0.1);
 
@@ -171,11 +448,10 @@ finalize_script (void)
 #if ! WINDOWS_EDITION
   al_destroy_thread (repl_thread);
 #endif
-
-  al_destroy_mutex (L_mutex);
   al_destroy_cond (repl_cond);
   al_destroy_cond (debug_cond);
-  lua_close (main_L);
+
+  destroy_lua_state (main_L);
 }
 
 void *
@@ -324,20 +600,6 @@ L_rawgeti_tonumber (lua_State *L, int index, int n)
   lua_Number r = lua_tonumber (L, -1);
   lua_pop (L, 1);
   return r;
-}
-
-void
-lock_lua ()
-{
-  al_lock_mutex (L_mutex);
-  /* al_set_target_backbuffer (display); */
-}
-
-void
-unlock_lua ()
-{
-  /* al_set_target_bitmap (NULL); */
-  al_unlock_mutex (L_mutex);
 }
 
 void

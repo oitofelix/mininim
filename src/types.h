@@ -692,7 +692,7 @@ struct dialog {
 };
 
 struct message_box {
-  char *title, *heading, *text, *buttons;
+  const char *title, *heading, *text, *buttons;
   int flags;
 };
 
