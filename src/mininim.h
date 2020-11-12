@@ -355,6 +355,40 @@ extern int exit_code;
   (fprintf (stderr,				\
 	    format,				\
 	    ##__VA_ARGS__))
+#define error_trace(status, errno, format, ...) \
+  (error (status,				\
+	  errno,				\
+	  "%s: %s: %d: " format,		\
+	  __FILE__,				\
+	  __func__,				\
+	  __LINE__,				\
+	  ##__VA_ARGS__))
+#define warnerr(errno, format, ...)		\
+  (error_trace (EXIT_SUCCESS,			\
+		errno,				\
+		format,				\
+		##__VA_ARGS__))
+#define warnerrno(format, ...)			\
+  (warnerr (errno,				\
+	    format,				\
+	    ##__VA_ARGS__))
+#define warning(format, ...)			\
+  (warnerr (0,					\
+	    format,				\
+	    ##__VA_ARGS__))
+#define failerr(errno, format, ...)		\
+  (error_trace (EXIT_FAILURE,			\
+		errno,				\
+		format,				\
+		##__VA_ARGS__))
+#define failerrno(format, ...)			\
+  (failerr (errno,				\
+	    format,				\
+	    ##__VA_ARGS__))
+#define failure(format, ...)			\
+  (failerr (0,					\
+	    format,				\
+	    ##__VA_ARGS__))
 
 #define dmalloc(type, name) \
   type *name = xmalloc (sizeof (*name))

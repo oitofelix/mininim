@@ -73,30 +73,33 @@ BEGIN_LUA (L_mininim_video_font)
 {
   ALLEGRO_FONT *f = NULL;
   ALLEGRO_BITMAP **b = luaL_testudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  if (b)
+    {
+      int *ranges = NULL;
+      size_t ranges_nmemb = 0;
 
-  if (b) {
-    int *ranges = NULL;
-    size_t ranges_nmemb = 0;
-
-    int i;
-    for (i = 2; i <= lua_gettop (L); i++) {
-      int r = lua_tonumber (L, i);
-      ranges = add_to_array (&r, 1, ranges, &ranges_nmemb,
-                             ranges_nmemb, sizeof (r));
+      int i;
+      for (i = 2; i <= lua_gettop (L); i++)
+	{
+	  int r = lua_tonumber (L, i);
+	  ranges = add_to_array (&r, 1, ranges, &ranges_nmemb,
+				 ranges_nmemb, sizeof (r));
+	}
+      int ranges_n = ranges_nmemb / 2;
+      f = al_grab_font_from_bitmap (*b, ranges_n, ranges);
+      al_free (ranges);
+      if (! f)
+	warning ("cannot load font from bitmap (incorrect ranges?)");
     }
-    int ranges_n = ranges_nmemb / 2;
-    f = al_grab_font_from_bitmap (*b, ranges_n, ranges);
-    al_free (ranges);
-    if (! f)
-      fprintf (stderr, "error: cannot load font from bitmap"
-               " (incorrect ranges?)\n");
-  } else if (lua_type (L, 1) == LUA_TSTRING) {
-    const char *filename = lua_tostring (L, 1);
-    f = load_font (filename);
-  } else if (! lua_gettop (L)) f = builtin_font;
-    else return luaL_argerror (L, 1, "invalid argument, expecting (filename)"
-                               " or (bitmap, range_start, range_end, ...)");
-
+  else if (lua_type (L, 1) == LUA_TSTRING)
+    {
+      const char *filename = lua_tostring (L, 1);
+      f = load_font (filename);
+    }
+  else if (! lua_gettop (L))
+    f = builtin_font;
+  else return luaL_argerror (L, 1, "invalid argument, expecting (filename)"
+			     " or (bitmap, range_start, range_end, ...)");
   L_pushfont (L, f);
   return 1;
 }

@@ -96,7 +96,8 @@ error_lua_invalid (const char *template, ...)
   va_list ap;
   va_start (ap, template);
   char *name = xvasprintf (template, ap);
-  fprintf (stderr, "error: \"MININIM.lua.%s\" invalid\n", name);
+  warning ("'MININIM.lua.%s' invalid",
+	   name);
   al_free (name);
   va_end (ap);
 }

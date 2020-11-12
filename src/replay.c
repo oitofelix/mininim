@@ -206,8 +206,9 @@ save_replay_chain (void)
   for (i = 0; i < replay_chain_nmemb; i++) {
     struct replay *replay = &replay_chain[i];
     if (! save_replay (replay->filename, replay))
-      error (0, al_get_errno (), "failed to save replay file '%s'",
-             replay->filename);
+      warnerr (al_get_errno (),
+	       "failed to save replay file '%s'",
+	       replay->filename);
   }
 }
 

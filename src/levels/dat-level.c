@@ -35,10 +35,12 @@ load_dat_level (struct level *l, int n)
   int8_t *dat = (int8_t *)
     load_resource (filename, (load_resource_f) load_file, true);
 
-  if (! dat) {
-    error (0, 0, "cannot read dat level file %s", filename);
-    return NULL;
-  }
+  if (! dat)
+    {
+      warning ("cannot read dat level file '%s'",
+	       filename);
+      return NULL;
+    }
 
   al_free (filename);
 
@@ -46,10 +48,12 @@ load_dat_level (struct level *l, int n)
   int16_t size;
   dat_getres (dat, 2000 + n, &offset, &size);
 
-  if (! offset) {
-    error (0, 0, "incorrect format for dat level file %s", filename);
-    return NULL;
-  }
+  if (! offset)
+    {
+      warning ("incorrect format for dat level file '%s'",
+	       filename);
+      return NULL;
+    }
 
   memcpy (&lv, offset, sizeof (lv));
 

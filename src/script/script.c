@@ -137,20 +137,24 @@ init_script (void)
   int e = load_resource ("data/script/mininim.lua",
                          (load_resource_f) load_script, false);
 
-  if (! e) {
-    /* run-time error */
-    if (lua_isfunction (L, -1)) L_call (L, 0, 0);
-    /* syntax error */
-    else error (-1, 0, "%s", lua_tostring(L, -1));
-  } else {
-    /* no script found */
-    lua_remove (L, 1);
-    while (lua_gettop (L)) {
-      error (0, 0, "%s", lua_tostring(L, 1));
-      lua_remove (L, 1);
+  if (! e)
+    {
+      if (lua_isfunction (L, -1)) /* run-time error */
+	L_call (L, 0, 0);
+      else			/* syntax error */
+	failure ("%s", lua_tostring(L, -1));
     }
-    exit (EXIT_FAILURE);
-  }
+  else
+    {
+      /* no script found */
+      lua_remove (L, 1);
+      while (lua_gettop (L))
+	{
+	  warning ("%s", lua_tostring(L, 1));
+	  lua_remove (L, 1);
+	}
+      exit (EXIT_FAILURE);
+    }
   lua_settop (L, 0);
 }
 

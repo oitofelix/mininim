@@ -61,8 +61,7 @@ void
 init_video (void)
 {
   if (! al_init_image_addon ())
-    error (-1, 0, "%s (void): failed to initialize image addon",
-            __func__);
+    failure ("failed to initialize image addon");
 
   al_set_new_display_flags (al_get_new_display_flags ()
                             | (display_mode < 0 ? ALLEGRO_WINDOWED
@@ -89,7 +88,7 @@ init_video (void)
 
   display = al_create_display (display_width, display_height);
   if (! display)
-    error (-1, 0, "%s (void): failed to initialize display", __func__);
+    failure ("failed to initialize display");
 
   al_register_event_source (event_queue,
                             al_get_display_event_source (display));
@@ -127,11 +126,10 @@ init_video (void)
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
-    error (0, 0, "%s (void): cannot create builtin font", __func__);
+    warning ("cannot create builtin font");
 
   if (! al_init_primitives_addon ())
-    error (0, 0, "%s (void): failed to initialize primitives addon",
-           __func__);
+    warning ("failed to initialize primitives addon");
 
 #if MACOSX_EDITION
   /* workaround to make Mac OS X render the title screen cutscene
@@ -222,7 +220,8 @@ load_memory_bitmap (char *filename)
     load_resource (filename, (load_resource_f) al_load_bitmap, true);
 
   if (! bitmap)
-    fprintf (stderr, "cannot load bitmap file '%s'\n", filename);
+    warning ("cannot load bitmap file '%s'",
+             filename);
 
   al_set_new_bitmap_flags (flags);
 
@@ -298,7 +297,8 @@ load_bitmap (const char *filename)
   al_set_new_bitmap_flags (flags);
 
   if (! bitmap)
-    fprintf (stderr, "cannot load bitmap file '%s'\n", filename);
+    warning ("cannot load bitmap file '%s'",
+             filename);
 
   /* validate_bitmap_for_windows (bitmap); */
 
@@ -368,7 +368,8 @@ load_font (const char *filename)
   al_set_new_bitmap_flags (flags);
 
   if (! font)
-    fprintf (stderr, "error: cannot load bitmap font file '%s'\n", filename);
+    warning ("cannot load bitmap font file '%s'",
+             filename);
 
   if (load_callback) load_callback ();
 
@@ -885,8 +886,8 @@ void
 save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap)
 {
   if (! al_save_bitmap (filename, bitmap))
-    error (0, 0, "%s: cannot save bitmap file '%s'",
-           __func__, filename);
+    warning ("cannot save bitmap file '%s'",
+             filename);
 }
 
 ALLEGRO_COLOR

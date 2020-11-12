@@ -710,10 +710,12 @@ load_legacy_level_file (int n)
   ALLEGRO_FILE *lvf = (ALLEGRO_FILE *)
     load_resource (filename, (load_resource_f) xfopen_r, true);
 
-  if (! lvf) {
-    error (0, 0, "cannot read legacy level file %s", filename);
-    return NULL;
-  }
+  if (! lvf)
+    {
+      warning ("cannot read legacy level file %s",
+	       filename);
+      return NULL;
+    }
 
   al_fread (lvf, &lv, sizeof (lv));
   al_fclose (lvf);
@@ -835,8 +837,8 @@ interpret_legacy_level (struct level *l, int n)
           set_bg (&p, TORCH); break;
         case LT_NULL: break;    /* needless */
         default:
-          error (0, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
-                 __func__, t, n, p.room, p.floor, p.place);
+          warning ("unknown tile group (%i) at position (%i, %i, %i, %i)",
+		   t, n, p.room, p.floor, p.place);
         }
 
         /* eprintf ("(%i, %i, %i): TILE!!!\n", */
@@ -1037,8 +1039,8 @@ interpret_legacy_level (struct level *l, int n)
         case LG_EVENT:
           set_ext (&p, b); break; /* ok */
         default:
-          error (0, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
-                 __func__, g, n, p.room, p.floor, p.place);
+          warning ("unknown tile group (%i) at position (%i, %i, %i, %i)",
+		   g, n, p.room, p.floor, p.place);
         }
       }
 
@@ -1277,7 +1279,7 @@ get_group (enum ltile t)
   case LT_EXIT_LEFT: case LT_EXIT_RIGHT: return LG_EXIT;
   case LT_DROP_BUTTON: case LT_RAISE_BUTTON: return LG_EVENT;
   default:
-    error (0, 0, "%s: unknown tile (%i)", __func__, t);
+    warning ("unknown tile (%i)", t);
   }
   return LG_NONE;
 }

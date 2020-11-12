@@ -69,7 +69,7 @@ BEGIN_LUA (L_mininim_video_shader)
   ALLEGRO_SHADER *s = al_create_shader (ALLEGRO_SHADER_AUTO);
 
   if (! s) {
-    fprintf (stderr, "cannot create shader\n");
+    warning ("cannot create shader");
     return 0;
   }
 
@@ -83,17 +83,20 @@ BEGIN_LUA (L_mininim_video_shader)
     if (! attach_shader_source_file (s, filename)) {
       const char *log = al_get_shader_log (s);
       if (strcmp (log, ""))
-        fprintf (stderr, "cannot attach shader source file '%s'\n%s\n",
-                 filename, log);
-      else fprintf (stderr, "cannot find shader source file '%s'\n",
-                    filename);
+        warning ("cannot attach shader source file '%s'\n%s",
+                 filename,
+		 log);
+      else
+	warning ("cannot find shader source file '%s'",
+		 filename);
       al_destroy_shader (s);
       return 0;
     }
   }
 
   if (! al_build_shader (s)) {
-    fprintf (stderr, "cannot build shader\n%s\n", al_get_shader_log (s));
+    warning ("cannot build shader\n%s",
+	     al_get_shader_log (s));
     al_destroy_shader (s);
     return 0;
   }

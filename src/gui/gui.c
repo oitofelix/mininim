@@ -275,8 +275,12 @@ load_led (const char *filename)
   bool success = load_resource (filename, (load_resource_f) load_led_sub,
                                 true);
   if (success) return true;
-  if (load_led_error_msg) error (0, 0, "%s", load_led_error_msg);
-  else error (0, 0, "LED file \"%s\" not found", filename);
+  if (load_led_error_msg)
+    warning ("%s",
+	     load_led_error_msg);
+  else
+    warning ("LED file '%s' not found",
+	     filename);
   return false;
 }
 

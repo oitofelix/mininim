@@ -440,7 +440,9 @@ load_icon (char *filename)
 
   b = load_scaled_memory_bitmap (filename, w, h, 0);
 
-  if (! b) error (0, 0, "Cannot load icon \"%s\"", filename);
+  if (! b)
+    warning ("Cannot load icon '%s'",
+	     filename);
 
   return b;
 }

@@ -36,10 +36,12 @@ load_native_level (struct level *l, int n)
     load_resource (filename, (load_resource_f) al_load_config_file,
                    true);
 
-  if (! c) {
-    error (0, 0, "cannot read native level file %s", filename);
-    return NULL;
-  }
+  if (! c)
+    {
+      warning ("cannot read native level file %s",
+	       filename);
+      return NULL;
+    }
 
   al_free (filename);
 

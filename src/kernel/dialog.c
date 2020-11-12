@@ -25,8 +25,7 @@ void
 init_dialog (void)
 {
   if (! al_init_native_dialog_addon())
-    error (0, 0, "%s (void): failed to initialize dialog addon",
-           __func__);
+    warning ("failed to initialize dialog addon");
 
 #if GNU_EDITION
   /* Gtk inadvertently sets the application locale */

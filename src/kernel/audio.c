@@ -34,9 +34,9 @@ void
 init_audio (void)
 {
   if (! al_install_audio ())
-    error (0, 0, "%s (void): cannot initialize audio", __func__);
+    warning ("cannot initialize audio");
   if (! al_init_acodec_addon ())
-    error (0, 0, "%s (void): cannot initialize audio codecs", __func__);
+    warning ("cannot initialize audio codecs");
   al_reserve_samples (RESERVED_AUDIO_SAMPLES);
   set_audio_volume (audio_volume);
 }
@@ -95,8 +95,8 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
     as->data.sample = (ALLEGRO_SAMPLE *)
       load_resource (filename, (load_resource_f) al_load_sample, true);
     if (! as->data.sample) {
-      error (0, 0, "%s (\"%s\"): cannot load sample",
-             __func__, filename);
+      warning ("cannot load sample '%s'",
+	       filename);
       return NULL;
     }
     break;
@@ -154,8 +154,7 @@ play_audio (struct audio_source *as, struct pos *p, int actor_id)
       load_resource
       (as->data.stream, (load_resource_f) load_audio_stream, true);
     if (! ai.data.stream) {
-      error (0, 0, "%s (\"%s\"): cannot load audio stream", __func__,
-             as->data.stream);
+      warning ("cannot load audio stream");
       return (union audio_instance_data) {.stream = NULL};
     }
     break;

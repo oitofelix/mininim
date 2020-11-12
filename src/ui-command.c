@@ -1011,8 +1011,9 @@ ui_save_setting (char *section, char *key, char *value)
 
  error:
   if (config) al_destroy_config (config);
-  error (0, al_get_errno (), "can't save setting '[%s] %s=%s' to '%s'",
-         section, key, value, config_filename);
+  warnerr (al_get_errno (),
+	   "can't save setting '[%s] %s=%s' to '%s'",
+	   section, key, value, config_filename);
   return false;
 }
 
@@ -1037,9 +1038,11 @@ ui_get_setting (char *section, char *key)
   return (char *) value;
 
  error:
-  if (config) al_destroy_config (config);
-  /* error (0, al_get_errno (), "can't get setting '[%s] %s' from '%s'", */
-  /*        section, key, config_filename); */
+  if (config)
+    al_destroy_config (config);
+  /* warnerr (al_get_errno (),  */
+  /* 	   "can't get setting '[%s] %s' from '%s'", */
+  /*          section, key, config_filename); */
   return NULL;
 }
 

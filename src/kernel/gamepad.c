@@ -78,18 +78,18 @@ void
 init_gamepad (void)
 {
   if (! al_install_keyboard ())
-    error (0, 0, "%s (void): cannot install keyboard", __func__);
+    warning ("cannot install keyboard");
 
   al_register_event_source (event_queue, al_get_keyboard_event_source ());
 
   if (! al_install_joystick ())
-    error (0, 0, "%s (void): cannot install joystick", __func__);
+    warning ("cannot install joystick");
 
   al_register_event_source (event_queue, al_get_joystick_event_source ());
 
 #if HAPTIC_FEATURE
   if (! al_install_haptic ())
-    error (0, 0, "%s (void): cannot install haptic", __func__);
+    warning ("cannot install haptic");
 #endif
 
   calibrate_joystick ();

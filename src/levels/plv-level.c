@@ -35,10 +35,12 @@ load_plv_level (struct level *l, int n)
   int8_t *plv = (int8_t *)
     load_resource (filename, (load_resource_f) load_file, true);
 
-  if (! plv) {
-    error (0, 0, "cannot read plv level file %s", filename);
-    return NULL;
-  }
+  if (! plv)
+    {
+      warning ("cannot read plv level file %s",
+	       filename);
+      return NULL;
+    }
 
   al_free (filename);
 

@@ -1028,7 +1028,8 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case JOYSTICK_INFO_OPTION:
-    if (joystick_info ()) error (-1, 0, "Joystick not found");
+    if (joystick_info ())
+      failure ("Joystick not found");
     exit (EXIT_SUCCESS);
     break;
   case SEMANTICS_OPTION:
@@ -1065,7 +1066,7 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case REPLAY_FAVORITE_OPTION:
     if (! replay_favorite_nmemb)
-      error (-1, 0, "no replay favorites available");
+      failure ("no replay favorites available");
     e = optval_to_int (&i, key, arg, state, &replay_favorites_range, 0);
     if (e) return e;
     start_replay_favorite = i;
@@ -1394,8 +1395,9 @@ main (int _argc, char **_argv)
   int e = get_config_args (&cargc, &cargv, options, config_filename,
                            &file_type);
   if (e && e != ENOENT)
-    error (0, e, "can't load %s '%s'", file_type2str (file_type),
-           config_filename);
+    warnerr (e, "can't load %s '%s'",
+	     file_type2str (file_type),
+	     config_filename);
 
   /* get environment variable arguments */
   get_env_args (&eargc, &eargv, options);
@@ -1427,7 +1429,7 @@ main (int _argc, char **_argv)
 
   if (replay_info) {
     if (replay_chain_nmemb == 0)
-      error (-1, 0, "empty replay chain");
+      failure ("empty replay chain");
     print_replay_chain_info ();
     exit (EXIT_SUCCESS);
   }
@@ -2038,21 +2040,21 @@ save_level (struct level *l)
 {
   char *f, *d;
   d = xasprintf ("%sdata/levels/", user_data_dir);
-  if (! al_make_directory (d)) {
-    error (0, al_get_errno (),
-           "%s (%s): failed to create native level directory",
-           __func__, d);
-    al_free (d);
-    return false;
-  }
+  if (! al_make_directory (d))
+    {
+      warnerr (al_get_errno (),
+	       "failed to create native level directory");
+      al_free (d);
+      return false;
+    }
   f = xasprintf ("%s%02d.mim", d, l->n);
-  if (! save_native_level (l, f)) {
-    error (0, al_get_errno (),
-           "%s (%s): failed to save native level file",
-           __func__, f);
-    al_free (f);
-    al_free (d);
-    return false;
-  }
+  if (! save_native_level (l, f))
+    {
+      warnerr (al_get_errno (),
+	       "failed to save native level file");
+      al_free (f);
+      al_free (d);
+      return false;
+    }
   return true;
 }

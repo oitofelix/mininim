@@ -277,8 +277,11 @@ video_command_error (const char *command, const char *object,
     else part_str = xasprintf (" %s", (char *) part);
   } else part_str = xasprintf ("%s", "");
 
-  fprintf (stderr, "error: video command \"%s%s%s%s\" failed\n",
-           command, object_str, index_str, part_str);
+  warning ("video command '%s%s%s%s' failed",
+	   command,
+	   object_str,
+	   index_str,
+	   part_str);
 
   al_free (object_str);
   al_free (index_str);
