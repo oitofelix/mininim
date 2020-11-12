@@ -93,8 +93,7 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h	\
 	  src/levels/dat-level.h src/levels/plv-level.c			\
 	  src/levels/plv-level.h src/kernel/event.c			\
 	  src/kernel/event.h src/kernel/video.c src/kernel/video.h	\
-	  src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c	\
-	  src/kernel/memory.h src/kernel/gamepad.c			\
+	  src/kernel/audio.c src/kernel/audio.h src/kernel/gamepad.c	\
 	  src/kernel/gamepad.h src/kernel/pointer.c			\
 	  src/kernel/pointer.h src/kernel/random.c			\
 	  src/kernel/random.h src/kernel/array.c src/kernel/array.h	\
