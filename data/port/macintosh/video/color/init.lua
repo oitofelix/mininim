@@ -1,8 +1,7 @@
 --[[
-   vga.lua -- VGA video mode;
+   vm-mac.lua -- Macintosh video mode;
 
-   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
-   <oitofelix@gnu.org>
+   Copyright (C) Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +18,7 @@
 --]]
 
 -- header
-local P = {package_type = "VIDEO MODE", package_name = "VGA",
+local P = {package_type = "VIDEO MODE", package_name = "MAC",
            package_file = MININIM.debugger.src}
 
 -- imports
@@ -48,6 +47,7 @@ local rect = MININIM.video.rectangle
 local pos = MININIM.level.position
 local bitmap = MININIM.video.bitmap
 local font = MININIM.video.font
+local shader = MININIM.video.shader
 
 local TRANSPARENT = C (0, 0, 0, 0)
 
@@ -57,13 +57,14 @@ local instanceof = common.instanceof
 local meta = common.meta
 local to_color_range = common.to_color_range
 local palette_table_color = common.palette_table_color
+local palette_table_to_shader = common.palette_table_to_shader
 local safenav = common.safenav
 
 -- body
 local _ENV = P
 
-local REAL_WIDTH = 320
-local REAL_HEIGHT = 200
+local REAL_WIDTH = 640
+local REAL_HEIGHT = 400
 
 local PLACE_WIDTH = 32
 local PLACE_HEIGHT = 63
@@ -81,6 +82,10 @@ local offset
 local apply_palettes_to_color
 local apply_palettes
 local draw
+
+function load_shader (...)
+   return common.load_shader (P, ...)
+end
 
 function load_bitmap (filename, ...)
    return common.load_bitmap (P, filename, ...)
@@ -169,7 +174,7 @@ function prandom (max)
 end
 
 function seedp (p)
-   np = p.normal
+   local np = p.normal
    random_seedb = random_seed
    random_seed = mod (np.room + np.floor * PLACES + np.place, 2 ^ 32)
    if random_seed == 0 then random_seed = 1 end
@@ -206,11 +211,6 @@ function prandom_seq_pos (p, n, pr, max)
 end
 
 -- Palettes
-local function blood_palette (c)
-   if c == C ("white") then return C (228, 0, 0)
-   else return c end
-end
-
 function hue.GREEN (c)
    if c.a == 0 then return c end
    return C (to_color_range (c.r - 12, c.g + 16, c.b - 29))
@@ -241,9 +241,8 @@ function selection.PALACE (c)
    return C (to_color_range (c.r + 32, c.g + 32, c.b + 32))
 end
 
-
 -- Video
-local video = {}
+local video = new ()
 
 -- VALUE
 video.VALUE = {
@@ -273,196 +272,77 @@ video.PT.kid_splash = {
 video.PT.style = {}
 
 -- Salmon
-video.PT.style[0] = {
-   -- Kid
-   [C (252, 252, 216)] = C (64, 64 , 64),
-   [C (216, 184, 160)] = C (32, 32, 32),
-   -- Skeleton
-   [C (252, 252, 240)] = C (252, 252, 240),
-   -- Guards
-   [C (80, 248, 255)] = C (232, 184, 112),
-   [C (0, 0, 160)] = C (252, 104, 120),
-   [C (0, 167, 0)] = C (188, 76, 124),
-   [C (80, 80, 255)] = C (252, 216, 252),
-   [C (160, 167, 160)] = C (208, 180, 208),
-   [C (80, 80, 80)] = C (144, 124, 144),
-   [C (255, 80, 80)] = C (176, 68, 232),
-   [C (0, 167, 160)] = C (176, 68, 232),
-   [C (255, 248, 80)] = C (116, 44, 152),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (160, 128, 76),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (188, 76, 124)}
+video.PT.style[0] = nil
 
 -- Light blue
-video.PT.style[1] = {
-   -- Kid
-   [C (252, 252, 216)] = C (72, 144, 252),
-   [C (216, 184, 160)] = C (104, 128, 176),
-   -- Skeleton
-   [C (252, 252, 240)] = C (72, 144, 252),
-   -- Guards
-   [C (80, 248, 255)] = C (232, 184, 112),
-   [C (0, 0, 160)] = C (72, 144, 252),
-   [C (0, 167, 0)] = C (104, 128, 176),
-   [C (80, 80, 255)] = C (252, 216, 252),
-   [C (160, 167, 160)] = C (208, 180, 208),
-   [C (80, 80, 80)] = C (144, 124, 144),
-   [C (255, 80, 80)] = C (128, 40, 120),
-   [C (0, 167, 160)] = C (252, 252, 252),
-   [C (255, 248, 80)] = C (192, 192, 192),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (160, 128, 72),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (104, 128, 176)}
+video.PT.style[1] = nil
 
 -- Red
 video.PT.style[2] = {
-   -- Kid
-   [C (252, 252, 216)] = C (168, 48, 0),
-   [C (216, 184, 160)] = C (128, 36, 0),
-   -- Skeleton
-   [C (252, 252, 240)] = C (168, 48, 0),
-   -- Guards
-   [C (80, 248, 255)] = C (168, 112, 112),
-   [C (0, 0, 160)] = C (168, 48, 0),
-   [C (0, 167, 0)] = C (128, 36, 0),
-   [C (80, 80, 255)] = C (176, 136, 252),
-   [C (160, 167, 160)] = C (132, 104, 192),
-   [C (80, 80, 80)] = C (116, 92, 168),
-   [C (255, 80, 80)] = C (184, 40, 188),
-   [C (0, 167, 160)] = C (252, 120, 120),
-   [C (255, 248, 80)] = C (200, 96, 96),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (120, 80, 80),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (128, 36, 0)}
+   -- Guard's turban and pants
+   [C (171, 207, 89)] = C (208, 60, 0),
+   [C (127, 127, 0)] = C (168, 48, 0),
+   [C (121, 70, 0)] = C (128, 36, 0),
+
+   -- -- Guard's coat
+   [C (92, 255, 120)] = C (220, 168, 255),
+   [C (0, 220, 74)] = C (176, 136, 252),
+   [C (0, 120, 0)] = C (132, 104, 192),
+
+   -- Guard's belt
+   [C (255, 0, 255)] = C (225, 82, 230),
+   [C (128, 42, 122)] = C (184, 40, 188),
+
+   -- -- Guard's sleeves and shoes
+   [C (5, 167, 232)] = C (255, 144, 144),
+   [C (2, 124, 244)] = C (252, 120, 120),
+   [C (0, 81, 255)] = C (200, 96, 96),
+
+   -- -- Skeleton
+   -- [C (250, 250, 250)] = C (),
+   -- [C (255, 197, 120)] = C (),
+   -- [C (174, 102, 0)] = C (),
+   -- [C (110, 48, 0)] = C (),
+
+   -- Shadow's turban
+   [C (110, 184, 255)] = C (208, 60, 0),
+   [C (38, 94, 255)] = C (168, 48, 0),
+   [C (0, 0, 135)] = C (128, 36, 0),
+
+   -- -- Shadow's shirt
+   [C (255, 16, 0)] = C (176, 136, 252),
+   [C (189, 0, 4)] = C (132, 104, 192),
+
+   -- -- Shadow's pants
+   [C (248, 248, 248)] = C (208, 60, 0),
+   [C (189, 194, 202)] = C (168, 48, 0),
+   [C (120, 125, 125)] = C (128, 36, 0),
+
+   -- Shadow's shoes
+   [C (255, 139, 70)] = C (252, 120, 120),
+   [C (220, 74, 0)] = C (200, 96, 96),
+}
 
 -- Orange
-video.PT.style[3] = {
-   -- Kid
-   [C (252, 252, 216)] = C (252, 80, 0),
-   [C (216, 184, 160)] = C (188, 56, 0),
-   -- Skeleton
-   [C (252, 252, 240)] = C (252, 80, 0),
-   -- Guards
-   [C (80, 248, 255)] = C (232, 184, 112),
-   [C (0, 0, 160)] = C (252, 80, 0),
-   [C (0, 167, 0)] = C (188, 56, 0),
-   [C (80, 80, 255)] = C (252, 184, 0),
-   [C (160, 167, 160)] = C (208, 152, 0),
-   [C (80, 80, 80)] = C (168, 124, 0),
-   [C (255, 80, 80)] = C (108, 40, 152),
-   [C (0, 167, 160)] = C (252, 252, 252),
-   [C (255, 248, 80)] = C (200, 200, 208),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (160, 128, 72),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (188, 56, 0)}
+video.PT.style[3] = nil
 
 -- Green
-video.PT.style[4] = {
-   -- Kid
-   [C (252, 252, 216)] = C (12, 144, 0),
-   [C (216, 184, 160)] = C (12, 112, 0),
-   -- Skeleton
-   [C (252, 252, 240)] = C (12, 144, 0),
-   -- Guards
-   [C (80, 248, 255)] = C (232, 184, 112),
-   [C (0, 0, 160)] = C (12, 144, 0),
-   [C (0, 167, 0)] = C (12, 112, 0),
-   [C (80, 80, 255)] = C (252, 216, 96),
-   [C (160, 167, 160)] = C (200, 172, 76),
-   [C (80, 80, 80)] = C (144, 124, 56),
-   [C (255, 80, 80)] = C (152, 0, 32),
-   [C (0, 167, 160)] = C (252, 208, 252),
-   [C (255, 248, 80)] = C (176, 144, 176),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (160, 128, 72),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (12, 112, 0)}
+video.PT.style[4] = nil
 
 -- Dark blue
-video.PT.style[5] = {
-   -- Kid
-   [C (252, 252, 216)] = C (96, 0, 252),
-   [C (216, 184, 160)] = C (96, 0, 168),
-   -- Skeleton
-   [C (252, 252, 240)] = C (96, 0, 252),
-   -- Guards
-   [C (80, 248, 255)] = C (184, 136, 64),
-   [C (0, 0, 160)] = C (96, 0, 252),
-   [C (0, 167, 0)] = C (96, 0, 168),
-   [C (80, 80, 255)] = C (252, 232, 176),
-   [C (160, 167, 160)] = C (200, 184, 140),
-   [C (80, 80, 80)] = C (152, 140, 108),
-   [C (255, 80, 80)] = C (128, 40, 120),
-   [C (0, 167, 160)] = C (188, 60, 176),
-   [C (255, 248, 80)] = C (136, 44, 128),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (144, 108, 48),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (96, 0, 168)}
+video.PT.style[5] = nil
 
 -- Purple
-video.PT.style[6] = {
-   -- Kid
-   [C (252, 252, 216)] = C (200, 88, 252),
-   [C (216, 184, 160)] = C (152, 68, 192),
-   -- Skeleton
-   [C (252, 252, 240)] = C (200, 88, 252),
-   -- Guards
-   [C (80, 248, 255)] = C (232, 184, 112),
-   [C (0, 0, 160)] = C (200, 88, 252),
-   [C (0, 167, 0)] = C (152, 68, 192),
-   [C (80, 80, 255)] = C (252, 252, 216),
-   [C (160, 167, 160)] = C (208, 180, 208),
-   [C (80, 80, 80)] = C (176, 176, 152),
-   [C (255, 80, 80)] = C (92, 108, 160),
-   [C (0, 167, 160)] = C (144, 168, 252),
-   [C (255, 248, 80)] = C (120, 140, 208),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (160, 128, 72),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (152, 68, 192)}
+video.PT.style[6] = nil
 
 -- Yellow
-video.PT.style[7] = {
-   -- Kid
-   [C (252, 252, 216)] = C (252, 252, 0),
-   [C (216, 184, 160)] = C (200, 216, 0),
-   -- Skeleton
-   [C (252, 252, 240)] = C (252, 252, 0),
-   -- Guards
-   [C (80, 248, 255)] = C (184, 120, 252),
-   [C (0, 0, 160)] = C (252, 252, 0),
-   [C (0, 167, 0)] = C (200, 216, 0),
-   [C (80, 80, 255)] = C (252, 192, 0),
-   [C (160, 167, 160)] = C (208, 156, 0),
-   [C (80, 80, 80)] = C (240, 156, 0),
-   [C (255, 80, 80)] = C (96, 0, 176),
-   [C (0, 167, 160)] = C (176, 48, 224),
-   [C (255, 248, 80)] = C (132, 36, 168),
-   [C (160, 80, 0)] = C (216, 136, 104),
-   [C (160, 0, 160)] = C (168, 108, 80),
-   [C (160, 0, 0)] = C (120, 92, 56),
-   [C (80, 248, 80)] = C (112, 76, 160),
-   [C (255, 255, 255)] = C (228, 0, 0),
-   [C (255, 80, 255)] = C (200, 216, 0)}
+video.PT.style[7] = nil
+
+-- Build style shaders
+video.SHADER = {style = {}}
+for i = 0, 7 do
+   video.SHADER.style[i] = palette_table_to_shader (video.PT.style[i])
+end
 
 -- OBJECT
 video.OBJECT = new ()
@@ -568,13 +448,13 @@ end
 
 function video.SWORD_ITEM.normal:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 50,
+                 PLACE_HEIGHT * p.floor + 54,
                  p.room)
 end
 
 function video.SWORD_ITEM.shiny:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 50,
+                 PLACE_HEIGHT * p.floor + 52.5,
                  p.room)
 end
 
@@ -584,12 +464,12 @@ video.POTION = new (video.OBJECT)
 function video.POTION:DRAW (p)
    local bottle = self.bitmap
    bottle.draw (self:rect (p))
-   local i = mod (MININIM.cycle, 7) + 1
+
+   local i = mod (MININIM.cycle, 6) + 1
    if self[i] and self[i].bitmap then
       local bubble = self[i].bitmap
       if self.palette then
-         bubble = bubble.apply_palette (self.palette, true)
-      end
+         bubble = bubble.apply_palette (self.palette, true) end
       bubble.DRAW (self[i]:rect (p))
    end
 end
@@ -597,7 +477,7 @@ end
 -- SMALL POTION
 video.SMALL_POTION = new (video.POTION)
 
-for i = 1, 7 do
+for i = 1, 6 do
    video.SMALL_POTION[i] = new (video.OBJECT)
 end
 
@@ -608,99 +488,42 @@ function video.SMALL_POTION:rect (p)
 end
 
 video.SMALL_POTION[1].rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1) - 7,
-                 PLACE_HEIGHT * p.floor + 38,
-                 p.room)
+   local c = self._parent:rect (p)
+   return c + offset (5, -2)
 end
 
-for i = 1, 7 do
-   video.SMALL_POTION[i].rect = video.SMALL_POTION[1].rect
+video.SMALL_POTION[2].rect = function (self, p)
+   local c = self._parent:rect (p)
+   return c + offset (2, -5)
+end
+
+video.SMALL_POTION[3].rect = function (self, p)
+   local c = self._parent:rect (p)
+   return c + offset (0, -9)
+end
+
+video.SMALL_POTION[4].rect = function (self, p)
+   local c = self._parent:rect (p)
+   return c + offset (2, -9)
+end
+
+video.SMALL_POTION[5].rect = function (self, p)
+   local c = self._parent:rect (p)
+   return c + offset (0.5, -9.5)
+end
+
+video.SMALL_POTION[6].rect = function (self, p)
+   local c = self._parent:rect (p)
+   return c + offset (1, -9)
 end
 
 -- BIG POTION
 video.BIG_POTION = new (video.POTION)
 
-for i = 1, 7 do
-   video.BIG_POTION[i] = new (video.OBJECT)
-end
-
 function video.BIG_POTION:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1) - 10,
-                 PLACE_HEIGHT * p.floor + 43,
+   return coord (PLACE_WIDTH * (p.place + 1) - 9,
+                 PLACE_HEIGHT * p.floor + 39,
                  p.room)
-end
-
-video.BIG_POTION[1].rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1) - 7,
-                 PLACE_HEIGHT * p.floor + 34,
-                 p.room)
-end
-
-for i = 1, 7 do
-   video.BIG_POTION[i].rect = video.BIG_POTION[1].rect end
-
--- EMPTY POTION
-video.EMPTY_POTION = new (video.SMALL_POTION)
-
-function video.EMPTY_POTION.palette (c)
-   if c == C ("white") then return TRANSPARENT
-   else return c end
-end
-
--- SMALL HP POTION
-video.SMALL_HP_POTION = new (video.SMALL_POTION)
-
-function video.SMALL_HP_POTION.palette (c)
-   if c == C ("white") then return C (224, 0, 48)
-   else return c end
-end
-
--- SMALL POISON POTION
-video.SMALL_POISON_POTION = new (video.SMALL_POTION)
-
-function video.SMALL_POISON_POTION.palette (c)
-   if c == C ("white") then return C (80, 84, 248)
-   else return c end
-end
-
--- ACTIVATION POTION
-video.ACTIVATION_POTION = new (video.SMALL_POTION)
-
-function video.ACTIVATION_POTION.palette (c)
-   if c == C ("white") then return C (80, 84, 248)
-   else return c end
-end
-
--- BIG HP POTION
-video.BIG_HP_POTION = new (video.BIG_POTION)
-
-function video.BIG_HP_POTION.palette (c)
-   if c == C ("white") then return C (224, 0, 48)
-   else return c end
-end
-
--- BIG POISON POTION
-video.BIG_POISON_POTION = new (video.BIG_POTION)
-
-function video.BIG_POISON_POTION.palette (c)
-   if c == C ("white") then return C (80, 84, 248)
-   else return c end
-end
-
--- FLOAT POTION
-video.FLOAT_POTION = new (video.BIG_POTION)
-
-function video.FLOAT_POTION.palette (c)
-   if c == C ("white") then return C (84, 252, 84)
-   else return c end
-end
-
--- FLIP POTION
-video.FLIP_POTION = new (video.BIG_POTION)
-
-function video.FLIP_POTION.palette (c)
-   if c == C ("white") then return C (255, 255, 0)
-   else return c end
 end
 
 -- BRICKS (DUNGEON)
@@ -751,13 +574,13 @@ end
 video.BRICKS_PALACE[1].ignore = true
 video.BRICKS_PALACE[1].rect = function (self, p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 29,
+                 PLACE_HEIGHT * p.floor + 22,
                  p.room)
 end
 
 video.BRICKS_PALACE[2].rect = function (self, p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 26,
+                 PLACE_HEIGHT * p.floor + 18,
                  p.room)
 end
 
@@ -769,8 +592,8 @@ video.BRICKS_PALACE[5].rect = video.BRICKS_PALACE[1].rect
 video.TORCH_DUNGEON = new (video.OBJECT)
 
 function video.TORCH_DUNGEON:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1) + 12,
-                 PLACE_HEIGHT * p.floor + 23,
+   return coord (PLACE_WIDTH * (p.place + 1) + 11.5,
+                 PLACE_HEIGHT * p.floor + 20.5,
                  p.room)
 end
 
@@ -779,7 +602,7 @@ video.TORCH_PALACE = new (video.OBJECT)
 
 function video.TORCH_PALACE:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 23,
+                 PLACE_HEIGHT * p.floor + 20.5,
                  p.room)
 end
 
@@ -787,8 +610,8 @@ end
 video.FIRE = new (video.OBJECT)
 
 function video.FIRE:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1) + 8,
-                 PLACE_HEIGHT * p.floor + 5,
+   return coord (PLACE_WIDTH * (p.place + 1) + 9,
+                 PLACE_HEIGHT * p.floor + 3.5,
                  p.room)
 end
 
@@ -830,12 +653,6 @@ function video.BALCONY:rect (p)
 end
 
 -- STARS
-
--- Princess' room star coordinates
---    static struct star s[6] = {
---     {20,97,0}, {16,104,1}, {23,110,0},
---      {17,116,1}, {24,120,2}, {18,128,2}};
-
 video.STARS = new (video.OBJECT)
 
 video.STARS.color = {C (80, 84, 80), C (168, 168, 168), C (255, 255, 255)}
@@ -932,20 +749,35 @@ video.SKELETON_FLOOR = new (video.OBJECT)
 
 function video.SKELETON_FLOOR:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 44,
+                 PLACE_HEIGHT * p.floor + 44.5,
                  p.room)
 end
 
--- BROKEN FLOOR
-video.BROKEN_FLOOR = new (video.OBJECT, {MAIN = {}, FRONT = {}})
+-- BROKEN FLOOR (DUNGEON)
+video.BROKEN_FLOOR_DUNGEON = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
-function video.BROKEN_FLOOR.MAIN:rect (p)
+function video.BROKEN_FLOOR_DUNGEON.MAIN:rect (p)
+   return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 48.5,
+                 p.room)
+end
+
+function video.BROKEN_FLOOR_DUNGEON.FRONT:rect (p)
+   return coord (PLACE_WIDTH * p.place + 0.5,
+                 PLACE_HEIGHT * p.floor + 53.5,
+                 p.room)
+end
+
+-- BROKEN FLOOR (PALACE)
+video.BROKEN_FLOOR_PALACE = new (video.OBJECT, {MAIN = {}, FRONT = {}})
+
+function video.BROKEN_FLOOR_PALACE.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 49,
                  p.room)
 end
 
-function video.BROKEN_FLOOR.FRONT:rect (p)
+function video.BROKEN_FLOOR_PALACE.FRONT:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 54,
                  p.room)
@@ -1015,56 +847,56 @@ video.SPIKES_FLOOR_DUNGEON[2].MAIN.rect = function (self, p)
 end
 
 video.SPIKES_FLOOR_DUNGEON[2].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 9,
-                 PLACE_HEIGHT * p.floor + 56,
+   return coord (PLACE_WIDTH * p.place + 9.5,
+                 PLACE_HEIGHT * p.floor + 55,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[3].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 41,
+                 PLACE_HEIGHT * p.floor + 40,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[3].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 8,
-                 PLACE_HEIGHT * p.floor + 48,
+   return coord (PLACE_WIDTH * p.place + 8.5,
+                 PLACE_HEIGHT * p.floor + 47,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[4].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 34,
+                 PLACE_HEIGHT * p.floor + 33,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[4].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
-                 PLACE_HEIGHT * p.floor + 37,
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 36,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[5].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
+                 PLACE_HEIGHT * p.floor + 34,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[5].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
-                 PLACE_HEIGHT * p.floor + 38,
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 37,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[6].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
+                 PLACE_HEIGHT * p.floor + 34,
                  p.room)
 end
 
 video.SPIKES_FLOOR_DUNGEON[6].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
-                 PLACE_HEIGHT * p.floor + 40,
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 39,
                  p.room)
 end
 
@@ -1084,60 +916,60 @@ end
 
 video.SPIKES_FLOOR_PALACE[2].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 49,
+                 PLACE_HEIGHT * p.floor + 50,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[2].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 9,
+   return coord (PLACE_WIDTH * p.place + 9.5,
                  PLACE_HEIGHT * p.floor + 55,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[3].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 42,
+                 PLACE_HEIGHT * p.floor + 40,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[3].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 8,
-                 PLACE_HEIGHT * p.floor + 48,
+   return coord (PLACE_WIDTH * p.place + 8.5,
+                 PLACE_HEIGHT * p.floor + 47,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[4].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 34,
+                 PLACE_HEIGHT * p.floor + 33,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[4].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
-                 PLACE_HEIGHT * p.floor + 37,
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 36,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[5].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
+                 PLACE_HEIGHT * p.floor + 34,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[5].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
-                 PLACE_HEIGHT * p.floor + 38,
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 37,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[6].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
+                 PLACE_HEIGHT * p.floor + 34,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[6].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 7,
+   return coord (PLACE_WIDTH * p.place + 7.5,
                  PLACE_HEIGHT * p.floor + 39,
                  p.room)
 end
@@ -1147,12 +979,12 @@ video.PILLAR_DUNGEON = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.PILLAR_DUNGEON.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 4,
+                 PLACE_HEIGHT * p.floor - 3.5,
                  p.room)
 end
 
 function video.PILLAR_DUNGEON.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 8,
+   return coord (PLACE_WIDTH * p.place + 7.5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -1167,7 +999,7 @@ function video.PILLAR_PALACE.MAIN:rect (p)
 end
 
 function video.PILLAR_PALACE.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 8,
+   return coord (PLACE_WIDTH * p.place + 12.5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -1177,13 +1009,13 @@ video.BIG_PILLAR_BOTTOM = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.BIG_PILLAR_BOTTOM.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 3,
+                 PLACE_HEIGHT * p.floor,
                  p.room)
 end
 
 function video.BIG_PILLAR_BOTTOM.FRONT:rect (p)
    return coord (PLACE_WIDTH * p.place + 8,
-                 PLACE_HEIGHT * p.floor + 3,
+                 PLACE_HEIGHT * p.floor,
                  p.room)
 end
 
@@ -1191,13 +1023,13 @@ end
 video.BIG_PILLAR_TOP_DUNGEON = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.BIG_PILLAR_TOP_DUNGEON.MAIN:rect (p)
-   return coord (PLACE_WIDTH * p.place + 9,
-                 PLACE_HEIGHT * p.floor - 3,
+   return coord (PLACE_WIDTH * p.place + 8.5,
+                 PLACE_HEIGHT * p.floor - 4.5,
                  p.room)
 end
 
 function video.BIG_PILLAR_TOP_DUNGEON.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 9,
+   return coord (PLACE_WIDTH * p.place + 8.5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -1206,13 +1038,13 @@ end
 video.BIG_PILLAR_TOP_PALACE = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.BIG_PILLAR_TOP_PALACE.MAIN:rect (p)
-   return coord (PLACE_WIDTH * p.place + 10,
-                 PLACE_HEIGHT * p.floor - 6,
+   return coord (PLACE_WIDTH * p.place + 8,
+                 PLACE_HEIGHT * p.floor - 4.5,
                  p.room)
 end
 
 function video.BIG_PILLAR_TOP_PALACE.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 10,
+   return coord (PLACE_WIDTH * p.place + 8,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -1226,7 +1058,7 @@ local DOOR_STEPS = 48
 
 function video.DOOR.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
@@ -1279,14 +1111,12 @@ function video.DOOR.GRID:create_bitmap (i)
    for j = 0, q do self.slice.draw (b, 0, j * h + r + 1) end
    self.tip.draw (b, 0, (q + 1) * h + r + 1)
 
-   local t = {17, 13, 13, 11, 7, 7, 5, 1}
-
-   local function eraser (row, max_col)
-
-   end
+   local t = {40, 40, 35, 33, 31, 31, 27, 25, 23, 21, 19, 19, 15, 13,
+              11, 9, 7, 7}
 
    for row, max_col in ipairs (t)
-   do for x = 0, max_col do b.set_pixel (x, row - 1, TRANSPARENT) end
+   do
+      for x = 0, max_col - 7 do b.set_pixel (x, row - 1, TRANSPARENT) end
    end
 
    return b
@@ -1297,12 +1127,6 @@ video.LEVEL_DOOR = new (
    video.OBJECT, {ENTER = {}, EXIT = {}, FRONT = {}, SLIDE = {}})
 
 local LEVEL_DOOR_STEPS = 44
-
-function video.LEVEL_DOOR.SLIDE:rect (p)
-   return coord (PLACE_WIDTH * p.place + 8,
-                 PLACE_HEIGHT * p.floor - 1,
-                 p.room)
-end
 
 function video.LEVEL_DOOR.SLIDE:create ()
    local parent = self._parent
@@ -1327,16 +1151,7 @@ function video.LEVEL_DOOR.SLIDE:create ()
 end
 
 function video.LEVEL_DOOR.SLIDE:create_bitmap (i)
-   local q = div (i, 4)
-   local r = mod (i, 4)
-
-   local w = self.slice.width
-   local b = bitmap (w, r + 1 + (q + 2) * 4)
-
-   self.slice.draw (b, 0, 0, 0, 3 - r, w, r + 1)
-   for j = 0, q do self.slice.draw (b, 0, j * 4 + r + 1) end
-
-   return b
+   return self.slice.sub (0, 86 - 2 * (i - 1))
 end
 
 -- LEVEL DOOR (DUNGEON)
@@ -1344,40 +1159,53 @@ video.LEVEL_DOOR_DUNGEON = new (video.LEVEL_DOOR)
 
 function video.LEVEL_DOOR_DUNGEON.ENTER:rect (p)
    return coord (PLACE_WIDTH * p.place + 1,
-                 PLACE_HEIGHT * p.floor - 13,
+                 PLACE_HEIGHT * p.floor - 20,
                  p.room)
 end
 
 function video.LEVEL_DOOR_DUNGEON.EXIT:rect (p)
    return coord (PLACE_WIDTH * p.place + 1,
-                 PLACE_HEIGHT * p.floor - 13,
+                 PLACE_HEIGHT * p.floor - 20,
                  p.room)
 end
 
 function video.LEVEL_DOOR_DUNGEON.FRONT:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 13,
+   return coord (PLACE_WIDTH * (p.place + 1) + 4,
+                 PLACE_HEIGHT * p.floor - 20,
                  p.room)
 end
+
+function video.LEVEL_DOOR_DUNGEON.SLIDE:rect (p)
+   return coord (PLACE_WIDTH * p.place + 17,
+                 PLACE_HEIGHT * p.floor - 3.5,
+                 p.room)
+end
+
 
 -- LEVEL DOOR (PALACE)
 video.LEVEL_DOOR_PALACE = new (video.LEVEL_DOOR)
 
 function video.LEVEL_DOOR_PALACE.ENTER:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
                  p.room)
 end
 
 function video.LEVEL_DOOR_PALACE.EXIT:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
                  p.room)
 end
 
 function video.LEVEL_DOOR_PALACE.FRONT:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
+                 p.room)
+end
+
+function video.LEVEL_DOOR_PALACE.SLIDE:rect (p)
+   return coord (PLACE_WIDTH * p.place + 13,
+                 PLACE_HEIGHT * p.floor - 5,
                  p.room)
 end
 
@@ -1394,32 +1222,32 @@ end
 video.CHOMPER = new (video.OBJECT, o)
 
 video.CHOMPER[1].BLOOD.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 12,
-                 PLACE_HEIGHT * p.floor  + 48,
+   return coord (PLACE_WIDTH * p.place + 6,
+                 PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
 
 video.CHOMPER[2].BLOOD.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 12,
-                 PLACE_HEIGHT * p.floor  + 39,
+   return coord (PLACE_WIDTH * p.place + 6,
+                 PLACE_HEIGHT * p.floor + 9.5,
                  p.room)
 end
 
 video.CHOMPER[3].BLOOD.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 12,
-                 PLACE_HEIGHT * p.floor  + 28,
+   return coord (PLACE_WIDTH * p.place + 6.5,
+                 PLACE_HEIGHT * p.floor + 20.5,
                  p.room)
 end
 
 video.CHOMPER[4].BLOOD.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 12,
-                 PLACE_HEIGHT * p.floor  + 32,
+   return coord (PLACE_WIDTH * p.place + 6,
+                 PLACE_HEIGHT * p.floor + 15,
                  p.room)
 end
 
 video.CHOMPER[5].BLOOD.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place + 12,
-                 PLACE_HEIGHT * p.floor  + 52,
+   return coord (PLACE_WIDTH * p.place + 6,
+                 PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
 
@@ -1433,7 +1261,7 @@ function video.ARCH_BOTTOM.MAIN:rect (p)
 end
 
 function video.ARCH_BOTTOM.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 9,
+   return coord (PLACE_WIDTH * p.place + 8.5,
                  PLACE_HEIGHT * p.floor,
                  p.room)
 end
@@ -1453,19 +1281,19 @@ local carpet = new (video.OBJECT, {MAIN = {}, MAIN_TRAVERSABLE = {},
 
 function carpet.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
 function carpet.MAIN_TRAVERSABLE:rect (p)
    return coord (PLACE_WIDTH * p.place + 25,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
 function carpet.FACE:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 7,
+                 PLACE_HEIGHT * p.floor - 6.5,
                  p.room)
 end
 
@@ -1490,7 +1318,7 @@ video.CARPET[4].FACE.rect = video.CARPET[3].FACE.rect
 
 video.CARPET[5].MAIN_TRAVERSABLE.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
@@ -1516,7 +1344,7 @@ function video.MIRROR.MAIN:rect (p)
 end
 
 function video.MIRROR.FACE:rect (p)
-   return coord (PLACE_WIDTH * p.place,
+   return coord (PLACE_WIDTH * p.place + .5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -1533,114 +1361,13 @@ end
 -- WALL (DUNGEON)
 video.WALL_DUNGEON = new (video.WALL)
 
-function video.WALL_DUNGEON:draw_divider_00 (p)
-   local function divider_00_coord (self, p)
-      return coord (PLACE_WIDTH * p.place + self.r3,
-                    PLACE_HEIGHT * p.floor + 45,
-                    p.room)
-   end
-   draw (self, self.divider_00, divider_00_coord, p)
-end
-
-function video.WALL_DUNGEON:draw_divider_01 (p)
-   local function divider_01_coord (self, p)
-      return coord (PLACE_WIDTH * p.place + 8 + self.r1,
-                    PLACE_HEIGHT * p.floor + 24,
-                    p.room)
-   end
-   draw (self, self.divider_01, divider_01_coord, p)
-end
-
-function video.WALL_DUNGEON:draw_random_block (p)
-   draw (self, self.random_block, self.FRONT.rect, p)
-end
-
-function video.WALL_DUNGEON:draw_left_mark (p, r)
-   local mark = self.mark_top_left
-   local floor_offset = {58, 41, 37, 20, 16}
-   local place_offset = 0
-
-   if mod (r, 2) ~= 0 then
-      mark = self.mark_bottom_left end
-   if r > 3 then place_offset = self.r3 - self.r2 + 6
-   elseif r > 1 then place_offset = self.r1 - self.r0 + 6 end
-
-   local function mark_left_coord (self, p)
-      return coord (PLACE_WIDTH * p.place + place_offset
-                       + 8 * (((r == 2) or (r == 3)) and 1 or 0),
-                    PLACE_HEIGHT * p.floor + 61 - floor_offset[r + 1],
-                    p.room)
-   end
-
-   draw (self, mark, mark_left_coord, p)
-end
-
-function video.WALL_DUNGEON:draw_right_mark (p, r)
-   local floor_offset, mark = {52, 42, 31, 21}
-
-   if mod (r, 2) == 0 then mark = self.mark_top_right
-   else mark = self.mark_bottom_right end
-
-   local function mark_right_coord (self, p)
-      return coord (PLACE_WIDTH * p.place + 8 * ((r > 1) and 1 or 0)
-                       + ((r < 2) and 24 or self.r1 - 3),
-                    PLACE_HEIGHT * p.floor + 56 - floor_offset[r + 1],
-                    p.room)
-   end
-
-   draw (self, mark, mark_right_coord, p)
-end
-
-function video.WALL_DUNGEON.FRONT:draw_randomization (p)
-   local parent = self._parent
-   local narrow_divider = parent.narrow_divider
-   local wide_divider = parent.wide_divider
-
-   seedp (p)
-   prandom (1)
-   parent.r0 = prandom (1)
-   parent.r1 = prandom (4)
-   parent.r2 = prandom (1)
-   parent.r3 = prandom (4)
-
-   if parent.r2 == 0 then parent.divider_00 = wide_divider
-   else parent.divider_00 = narrow_divider end
-
-   if parent.r0 == 0 then parent.divider_01 = wide_divider
-   else parent.divider_01 = narrow_divider end
-
-   local wc = p.wall_correlation
-   if wc == "WWW" then
-      if prandom (4) == 0 then parent:draw_random_block (p) end
-      parent:draw_divider_01 (p)
-      parent:draw_divider_00 (p)
-      if prandom (4) == 0 then parent:draw_right_mark (p, prandom (3)) end
-      if prandom (4) == 0 then parent:draw_left_mark (p, prandom (4)) end
-   elseif wc == "SWS" then
-      if prandom (6) == 0 then parent:draw_left_mark (p, prandom (1)) end
-   elseif wc == "SWW" then
-      if prandom (4) == 0 then parent:draw_random_block (p) end
-      parent:draw_divider_01 (p)
-      if prandom (4) == 0 then parent:draw_right_mark (p, prandom (3)) end
-      if prandom (4) == 0 then parent:draw_left_mark (p, prandom (3)) end
-   elseif wc == "WWS" then
-      parent:draw_divider_01 (p)
-      parent:draw_divider_00 (p)
-      if prandom (4) == 0 then parent:draw_right_mark (p, prandom (1) + 2) end
-      if prandom (4) == 0 then parent:draw_left_mark (p, prandom (4)) end
-   end
-
-   unseedp ()
-end
-
 function video.WALL_DUNGEON.FRONT:DRAW (p, width)
    draw (self, self[p.wall_correlation], self.rect, p)
-   self:draw_randomization (p)
 end
 
 function video.WALL_DUNGEON.FACE:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 9,
+                 PLACE_HEIGHT * p.floor - 9.5,
                  p.room)
 end
 
@@ -1648,14 +1375,14 @@ end
 video.WALL_PALACE = new (video.WALL, {mark = {}})
 
 video.WALL_PALACE.color =
-   {C (216, 168, 88),
-    C (224, 164, 92),
-    C (224, 168, 96),
-    C (216, 160, 84),
-    C (224, 164, 92),
-    C (216, 164, 88),
-    C (224, 168, 88),
-    C (216, 168, 96)}
+   {C (222, 148, 79),
+    C (235, 151, 71),
+    C (220, 138, 66),
+    C (225, 145, 74),
+    C (232, 158, 76),
+    C (222, 151, 66), -- made up color
+    C (230, 138, 58),
+    C (204, 125, 56)}
 
 video.WALL_PALACE.color_cache = {}
 
@@ -1689,8 +1416,8 @@ function video.WALL_PALACE:generate_colors_for_room (room)
 		  self.color_cache[room][floor.."\0"..
 					 row.."\0"..
 					 col]
-               = self.color[color + 1]
-            ocolor = color
+		     = self.color[color + 1]
+		  ocolor = color
          end
       end
    end
@@ -1699,7 +1426,7 @@ function video.WALL_PALACE:generate_colors_for_room (room)
 end
 
 function video.WALL_PALACE:cached_color (p, row, col)
-   np = p.normal
+   local np = p.normal
    if not self.color_cache[np.room] then
       self:generate_colors_for_room (np.room) end
    return
@@ -1720,8 +1447,8 @@ function video.WALL_PALACE:brick_rect (p, row, col)
 
    return rect (x + t[row + 1].x,
                 y + t[row + 1].y,
-                t[row + 1].w,
-                t[row + 1].h,
+                t[row + 1].w + .5,
+                t[row + 1].h + .5,
                 p.room)
 end
 
@@ -1729,20 +1456,20 @@ function video.WALL_PALACE:mark_frame (p, i)
    local r = prandom_seq_pos (p, i, 1, 2) + 1
    local t = {
       {self.mark[r],
-       function (self, p) return coord (PLACE_WIDTH * (p.place + 1) - 8,
+       function (self, p) return coord (PLACE_WIDTH * (p.place + 1) - .5,
                                         PLACE_HEIGHT * p.floor + 3,
                                         p.room) end},
       {self.mark[r + 3],
        function (self, p) return coord (PLACE_WIDTH * p.place,
-                                        PLACE_HEIGHT * p.floor + 17,
+                                        PLACE_HEIGHT * p.floor + 16,
                                         p.room) end},
       {self.mark[r + 6],
        function (self, p) return coord (PLACE_WIDTH * p.place,
-                                        PLACE_HEIGHT * p.floor + 38,
+                                        PLACE_HEIGHT * p.floor + 37,
                                         p.room) end},
       {self.mark[r + 9],
        function (self, p) return coord (PLACE_WIDTH * p.place,
-                                        PLACE_HEIGHT * p.floor + 58,
+                                        PLACE_HEIGHT * p.floor + 56,
                                         p.room) end},
       {self.mark[r + 12],
        function (self, p) return coord (PLACE_WIDTH * p.place,
@@ -1759,9 +1486,9 @@ function video.WALL_PALACE:draw_brick (p, row, col)
    wc = apply_palettes_to_color (wc, p)
    self:brick_rect (p, row, col).draw (wc)
    local b0, c0 = self:mark_frame (p, row)
-   draw (self, b0, c0, p)
+   if b0 then draw (self, b0, c0, p) end
    local b1, c1 = self:mark_frame (p, row + 1)
-   draw (self, b1, c1, p)
+   if b1 then draw (self, b1, c1, p) end
 end
 
 function video.WALL_PALACE.FRONT:DRAW (p, width)
@@ -1824,31 +1551,31 @@ function video.KID.MAIN:DRAW (a)
    local bitmap = a.bitmap
    local xbitmap = a.xbitmap
 
-   local shadow_palette
-   local shadow_pt
-   if a.is_shadow then
-      shadow_pt = video.PT.style[a.style]
-      function shadow_palette (c)
-         return palette_table_color (shadow_pt, c)
-      end
+   -- local shadow_palette
+   -- local shadow_pt
+   -- if a.is_shadow then
+   --    shadow_pt = video.PT.style[a.style]
+   --    function shadow_palette (c)
+   --       return palette_table_color (shadow_pt, c)
+   --    end
 
-      bitmap = bitmap.apply_palette (shadow_palette, shadow_pt)
-      if xbitmap then
-         xbitmap = xbitmap.apply_palette (shadow_palette, shadow_pt) end
-   end
+   --    bitmap = bitmap.apply_palette (shadow_palette, shadow_pt)
+   --    if xbitmap then
+   --       xbitmap = xbitmap.apply_palette (shadow_palette, shadow_pt) end
+   -- end
 
    local splash
    if a.should_draw_splash then
       splash = self[1].bitmap
-      if shadow_palette then
-         splash = splash.apply_palette (shadow_palette, shadow_pt)
-      else
-         local pt = video.PT.kid_splash
-         local function palette (c)
-            return palette_table_color (pt, c)
-         end
-         splash = splash.apply_palette (palette, pt)
-      end
+      -- if shadow_palette then
+      --    splash = splash.apply_palette (shadow_palette, shadow_pt)
+      -- else
+      --    local pt = video.PT.kid_splash
+      --    local function palette (c)
+      --       return palette_table_color (pt, c)
+      --    end
+      --    splash = splash.apply_palette (palette, pt)
+      -- end
    end
 
    a.draw (bitmap, xbitmap, splash)
@@ -1866,48 +1593,58 @@ function video.KID.HP:DRAW (a)
    local total_hp = math.max (0, a.total_hp)
    total_hp = math.min (10, total_hp)
 
-   local bg = rect (0, REAL_HEIGHT - 8, 7 * total_hp, 8)
-   bg.draw (C (0, 0, 0))
-
    local full = self[1].bitmap
    local empty = self[2].bitmap
 
-   local pt
-   if a.is_shadow then
-      if a.style > 0 then
-         pt = video.PT.style[a.style]
-      else pt = video.PT.shadow_hp end
-   else pt = video.PT.kid_hp end
+   local x = 0
+   local y = REAL_HEIGHT - full.height - 1
+   local w = (full.width + OW (1)) * total_hp
+   local h = full.height + 1
 
-   local function palette (c)
-      return palette_table_color (pt, c)
+   local bg = rect (x, y, w, h).draw (C (0, 0, 0))
+
+   -- local pt
+   -- if a.is_shadow then
+   --    if a.style > 0 then
+   --       pt = video.PT.style[a.style]
+   --    else pt = video.PT.shadow_hp end
+   -- else pt = video.PT.kid_hp end
+
+   -- local function palette (c)
+   --    return palette_table_color (pt, c)
+   -- end
+
+   -- full = full.apply_palette (palette, pt)
+   -- empty = empty.apply_palette (palette, pt)
+
+   local function x (i)
+      return (full.width + OW (1)) * (i - 1)
    end
 
-   full = full.apply_palette (palette, pt)
-   empty = empty.apply_palette (palette, pt)
+   local y = REAL_HEIGHT - full.height
 
    for i = 1, total_hp do
-      empty.draw (7 * (i - 1), REAL_HEIGHT - 6);
+      empty.draw (x (i), y);
    end
 
    if current_hp <= 1 and mod (MININIM.cycle, 2) == 0
    then return end
 
    for i = 1, current_hp do
-      full.draw (7 * (i - 1), REAL_HEIGHT - 6);
+      full.draw (x (i), y);
    end
 end
 
 -- KID START RUN
 video.KID.START_RUN = new (
    video.FRAMESET, {},
-   {{1, 0}, {2, 0}, {5, 0}, {1, 0}, {7, 0}, {6, 0}})
+   {{1, 0}, {3.5, 0}, {2.5, 0}, {3, 0}, {5.5, 0}, {6, 0}})
 
 video.KID.START_RUN[1].rect = function (self, a)
    if a.previous_action == "TURN" then
       return offset ()
    elseif a.previous_action == "STABILIZE" then
-      local t = {-2, -6, -4, 0}
+      local t = {-5, -6.5, -4, -2.5}
       return offset (t[a.previous_index])
    else return video.FRAME.rect (self, a) end
 end
@@ -1915,29 +1652,40 @@ end
 -- KID RUN
 video.KID.RUN = new (
    video.FRAMESET, {},
-   {{10, 0}, {7, 0}, {6, 0}, {4, 0}, {8, 0}, {11, 0}, {4, 0}, {8, 0};
-      EDGE_DETECTION_THRESHOLD = {60, 0},
-      CONSTRAINED_TURN_RUN = {-4, 0},
-      CONSTRAINED_RUN_JUMP = {-4, 0}})
+   {{8, 0}, {6, 0}, {7, 0}, {3, 0}, {9.5, 0}, {7.5, 0}, {7, 0}, {7, 0};
+      EDGE_DETECTION_THRESHOLD = {},
+      CONSTRAINED_TURN_RUN = {-6, 0},
+      CONSTRAINED_RUN_JUMP = {-7, 0}})
+
+function video.KID.RUN.EDGE_DETECTION_THRESHOLD:rect (a)
+   if a.direction == "LEFT" then return offset (67)
+   else return offset (52) end
+end
 
 video.KID.RUN[1].rect = function (self, a)
    if a.previous_action == "START_RUN" then
       return offset (6)
    elseif a.previous_action == "RUN_JUMP" then
-      return offset (15)
+      return offset (13)
+   else return video.FRAME.rect (self, a) end
+end
+
+video.KID.RUN[7].rect = function (self, a)
+   if a.previous_action == "TURN_RUN" then
+      return offset (2)
    else return video.FRAME.rect (self, a) end
 end
 
 -- KID STOP RUN
 video.KID.STOP_RUN = new (
    video.FRAMESET, {},
-   {{0, 0}, {1, 0}, {21, 0}, {2, 0};
-      CONSTRAINED_TURN_RUN = {-12, 0}})
+   {{0, 0}, {0.5, 0}, {21, 0}, {2.5, 0};
+      CONSTRAINED_TURN_RUN = {-14, 0}})
 
 -- KID STABILIZE
 video.KID.STABILIZE = new (
    video.FRAMESET, {},
-   {{3, 0}, {4, 0}, {-2, 0}, {-4, 0}})
+   {{3, 0}, {1.5, 0}, {-2.5, 0}, {-1.5, 0}})
 
 video.KID.STABILIZE[1].rect = function (self, a)
    if a.previous_action == "STOP_RUN" then
@@ -1948,13 +1696,13 @@ end
 -- KID TURN
 video.KID.TURN = new (
    video.FRAMESET, {},
-   {{-2, 0}, {-1, 0}, {3, 0}, {0, 0}})
+   {{1, 0}, {1, 0}, {1, 0}, {1, 0}})
 
 video.KID.TURN[1].rect = function (self, a)
    if a.previous_action == "KEEP_SWORD" then
       return offset (2)
    elseif a.previous_action == "STABILIZE" then
-      local t = {-6, -10, -8, -4}
+      local t = {-5, -6.5, -4, -2.5}
       return offset (t[a.previous_index])
    elseif a.previous_action == "TURN" then
       return offset (-2)
@@ -1964,23 +1712,23 @@ end
 -- KID RUN JUMP
 video.KID.RUN_JUMP = new (
    video.FRAMESET, {}, {
-      {10, 0}, {11, 0}, {13, 0}, {7, 0}, {12, 0},
-      {15, 0}, {29, 3}, {17, 9}, {18, 2}, {10, -11},
+      {12, 0}, {11, 0}, {13, 0}, {10, 0}, {6, 0},
+      {19, 0}, {26, 3}, {24, 9}, {14, 2}, {10, -11},
       {8, -3}})
 
 -- KID TURN RUN
 video.KID.TURN_RUN = new (
    video.FRAMESET, {}, {
       {18, 0}, {6, 0}, {4, 0}, {-2, 0}, {6, 0},
-      {-3, 0}, {1, 0}, {0, 0}, {-4, 0}})
+      {-1, 0}, {1, 0}, {1, 0}, {-0.5, 0}})
 
 -- KID JUMP
 video.KID.JUMP = new (
    video.FRAMESET, {}, {
-      {0, 0}, {2, 0}, {3, 0}, {6, 0}, {2, 0},
-      {4, 0}, {1, 0}, {12, 0}, {19, 0}, {16, 6},
-      {2, -6}, {11, 0}, {-5, 0}, {13, 0}, {0, 0},
-      {1, 0}, {1, 0}, {0, 0}})
+      {1, 0}, {1.5, 0}, {2.5, 0}, {4, 0}, {4, 0},
+      {3, 0}, {1.5, 0}, {13, 0}, {16, 0}, {20, 4},
+      {6, -2}, {6, 0}, {-2, 0}, {13, 0}, {1, 0},
+      {0, 0}, {0, 0}, {0, 0}})
 
 video.KID.JUMP[1].rect = function (self, a)
    if a.previous_action == "STABILIZE" then
@@ -1992,19 +1740,25 @@ end
 -- KID MISSTEP
 video.KID.MISSTEP = new (
    video.FRAMESET, {}, {
-      {1, 0}, {1, 0}, {0, 0}, {8, 0}, {7, 0}, {4, 0},
-      {-8, 0}, {-8, 0}, {-3, 0}, {0, 0}, {-4, 0}})
+      {1.5, 0}, {-1, 0}, {2.5, 0}, {7, 0}, {6.5, 0}, {2, 0},
+      {-4.5, 0}, {-10, 0}, {-2, 0}, {-0.5, 0}, {-3, 0}})
 
 -- KID CROUCH
 video.KID.CROUCH = new (
    video.FRAMESET, {}, {
-      {3, 0}, {4, 0}, {0, 0}, {4, 0}, {1, 0}, {4, 0},
-      {-1, 0}, {2, 0}, {1, 0}, {0, 0}, {-3, 0}, {0, 0},
-      {-4, 0}})
+      {4, 0}, {4, 0}, {0, 0}, {2, 0}, {1, 0}, {5, 0},
+      {0, 0}, {2, 0}, {1, 0}, {-1.5, 0}, {-1, 0}, {-0.5, 0},
+      {-3, 0}})
+
+video.KID.CROUCH[3].rect = function (self, a)
+   if a.previous_index == 2 then
+      return offset (1.5)
+   else return video.FRAME.rect (self, a) end
+end
 
 video.KID.CROUCH[12].rect = function (self, a)
    if a.previous_action == "CLIMB" then
-      return offset (-10)
+      return offset (-11, 0)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -2016,14 +1770,14 @@ video.KID.FALL = new (
 video.KID.FALL[1].rect = function (self, a)
    if a.previous_action == "JUMP"
       and (a.previous_index == 10 or a.previous_index == 11)
-   then return offset (8, -8)
+   then return offset (10, -6)
    elseif a.previous_action == "RUN_JUMP"
    and a.previous_index == 10 then
       return offset (8, -4)
    elseif a.previous_action == "TURN_RUN" then
       return offset (a.float_timer > 0 and -26 or -20)
    elseif a.previous_action == "CROUCH" then
-      return offset (a.has_collided and 10 or 12)
+      return offset (a.has_collided and 12 or 12)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -2033,66 +1787,69 @@ video.KID.NORMAL = new (
       {0, 0}})
 
 video.KID.NORMAL[1].rect = function (self, a)
-   local t = {STABILIZE = -2, JUMP = 2,
-              CROUCH = 2, VJUMP = -2, KEEP_SWORD = -2}
+   local t = {STABILIZE = -3.5, JUMP = 1.5,
+              CROUCH = 1.5, VJUMP = -2, KEEP_SWORD = -2,
+              MISSTEP = 1.5, DRINK = -2.5}
 
    if t[a.previous_action] then
       return offset (t[a.previous_action]) end
 
    if a.previous_action == "WALK"
    and a.previous_index == 12 then
-      return offset (1) end
+      return offset (0.5) end
 
-   return video.FRAME.rect (self, a)
+   return offset ()
 end
 
 -- KID VJUMP
 video.KID.VJUMP = new (
    video.FRAMESET, {}, {
-      {-3, 0}, {1, 0}, {1, 0}, {-2, 0}, {0, 0},
-      {1, 0}, {1, 0}, {3, 0}, {1, 0}, {6, 0},
-      {0, 0}, {-2, 3}, {-3, 7}, {0, -8}, {-3, -2},
-      {1, 0}, {0, 0}, {0, 0};
+      {-1.5, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0},
+      {2, 0}, {0, 0}, {2.5, 0}, {0.5, 0}, {6.5, 0},
+      {-2.5, 0}, {-0.5, 3}, {-4, 7}, {-0.5, -8}, {-1.5, -2},
+      {0, 0}, {1.5, 0}, {-0.5, 0};
       HANG_FRONT = {}, HANG_BACK = {}})
 
 video.KID.VJUMP[14].rect = function (self, a)
    if a.previous_action == "HANG_FREE" and a.hang_position.is_critical
-   then return offset (a.direction == "LEFT" and 10 or 14, -8)
+   then return offset (a.direction == "LEFT" and 3 or 8, -8)
    else return video.FRAME.rect (self, a) end
 end
 
 function video.KID.VJUMP.HANG_FRONT:rect (a)
-   return offset (a.direction == "LEFT" and 11 or 38)
+   if not a.hang_position.is_free_at (a.direction)
+   then return offset (a.direction == "LEFT" and 12 or 38)
+   else return offset (a.direction == "LEFT" and 10 or 38) end
 end
 
 function video.KID.VJUMP.HANG_BACK:rect (a)
    if a.hang_position.is_critical
-   then return offset (a.direction == "LEFT" and 8 or 44)
-   else return offset (a.direction == "LEFT" and 11 or 38) end
+   then return offset (a.direction == "LEFT" and 10 or 42)
+   else return offset (a.direction == "LEFT" and 10 or 38) end
 end
 
 -- KID WALK
 video.KID.WALK = new (
    video.FRAMESET, {}, {
-      {1, 0}, {1, 0}, {0, 0}, {8, 0}, {7, 0}, {6, 0},
-      {-3, 0}, {2, 0}, {1, 0}, {1, 0}, {2, 0}, {0, 0}})
+      {1.5, 0}, {-1, 0}, {2.5, 0}, {7, 0}, {6.5, 0}, {2, 0},
+      {1.5, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {1, 0}})
 
 -- KID CLIMB
 video.KID.CLIMB = new (
    video.FRAMESET, {}, {
-      {-1, 0}, {0, 9}, {2, 3}, {4, 6}, {4, 4}, {1, 6},
-      {0, 5}, {4, 8}, {3, 4}, {0, 1}, {2, 5}, {1, 0},
-      {0, 0}, {1, 0}, {1, 0};
+      {0, 0}, {0, 9}, {1, 3}, {2, 5.5}, {5, 5}, {3, 5},
+      {0, 6}, {6, 8}, {3, 4.5}, {0, -1}, {1, 5.5}, {2, 0},
+      {-3, 0}, {2.5, 0}, {2, 0};
       CLIMB = {}, UNCLIMB = {}})
 
 function video.KID.CLIMB.CLIMB:rect (a)
-   local dx = a.direction == "LEFT" and 9 or 41
-   local dy = -9
+   local dx = a.direction == "LEFT" and 11 or 37
+   local dy = -10
    return offset (dx, dy)
 end
 
 function video.KID.CLIMB.UNCLIMB:rect (a)
-   local dx = a.direction == "LEFT" and 19 or 14
+   local dx = a.direction == "LEFT" and 18.5 or 14
    local dy = 25
    return offset (dx, dy)
 end
@@ -2100,16 +1857,16 @@ end
 -- KID HANG
 video.KID.HANG = new (
    video.FRAMESET, {}, {
-      {0, 0}, {0, -2}, {-4, 0}, {-3, -2}, {-3, 0},
-      {-1, 0}, {-1, 1}, {-2, 0}, {0, 3}, {0, 0},
-      {-1, 1}, {0, 0}, {3, 0}, {0, 0};
+      {0, 0}, {0.5, -2}, {-4.5, 0}, {-3, -2}, {-2.5, 0},
+      {-2.5, 0}, {-0.5, 1.5}, {0, 1}, {0, 2.5}, {0, -0.5},
+      {0, 0.5}, {0, 0}, {0, 1}, {0, 0};
       HANG = {}, NON_FREE_FALL = {}, NON_FREE_VJUMP = {},
       FREE_VJUMP = {}, FREE_VJUMP_FRONT = {}, FREE_FALL = {},
       FREE_FALL_FRONT = {}})
 
 video.KID.HANG[5].rect = function (self, a)
    -- This is for HANG_NON_FREE action
-   if a.previous_action == "HANG" then return offset (0, -1)
+   if a.previous_action == "HANG" then return offset (-0.5, -1)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -2117,24 +1874,24 @@ video.KID.HANG[6].rect = function (self, a)
    -- when hanging free the movement is initially reversed so
    -- coordinate of frame n + 1 corresponds to frame number n;
    -- furthermore their offsets are taken with opposite sign
-   if a.previous_action == "HANG" then return offset (0, 1)
+   if a.previous_action == "HANG" then return offset (0.5, 1)
    else return video.FRAME.rect (self, a) end
 end
 
 function video.KID.HANG.HANG:rect (a)
-   local dx = a.direction == "LEFT" and 7 or 38
-   local dy = -9
+   local dx = a.direction == "LEFT" and 7.5 or 35
+   local dy = -10
    return offset (dx, dy)
 end
 
 function video.KID.HANG.NON_FREE_FALL:rect (a)
-   local dx = a.direction == "LEFT" and 10 or 22
+   local dx = a.direction == "LEFT" and 6 or 16
    local dy = 4
    return offset (dx, dy)
 end
 
 function video.KID.HANG.NON_FREE_VJUMP:rect (a)
-   local dx = a.direction == "LEFT" and 12 or 30
+   local dx = a.direction == "LEFT" and 10 or 34
    local dy = -8
    return offset (dx, dy)
 end
@@ -2146,19 +1903,19 @@ function video.KID.HANG.FREE_VJUMP:rect (a)
 end
 
 function video.KID.HANG.FREE_VJUMP_FRONT:rect (a)
-   local dx = a.direction == "LEFT" and 7 or 37
+   local dx = a.direction == "LEFT" and 7 or 40
    local dy = -8
    return offset (dx, dy)
 end
 
 function video.KID.HANG.FREE_FALL:rect (a)
-   local dx = a.direction == "LEFT" and 10 or 22
+   local dx = a.direction == "LEFT" and 10 or 18
    local dy = 4
    return offset (dx, dy)
 end
 
 function video.KID.HANG.FREE_FALL_FRONT:rect (a)
-   local dx = a.direction == "LEFT" and -10 or 42
+   local dx = a.direction == "LEFT" and -6 or 32
    local dy = 12
    return offset (dx, dy)
 end
@@ -2171,31 +1928,31 @@ video.KID.DIE = new (
       CHOMPED = {}})
 
 function video.KID.DIE.CHOMPED:rect (a)
-   return offset (a.direction == "LEFT" and -8 or -7, 47)
+   return offset (a.direction == "LEFT" and -9.5 or -9.5, 44)
 end
 
 -- KID DRINK
 video.KID.DRINK = new (
    video.FRAMESET, {}, {
-      {7, 0}, {-1, -1}, {-1, 1}, {0, 0}, {-2, 0}, {1, 0},
-      {-1, 0}, {-6, 0}, {1, 0}, {-2, 1}, {2, -1}, {0, 1},
-      {1, 0}, {-1, 0}, {-1, 0}})
+      {7, 0}, {-1, 0}, {-1, 0}, {0, 0}, {-1.5, 0}, {0, 0},
+      {-2, 0}, {-2.5, 0}, {-2, 0}, {-1.5, 0}, {2, 0}, {-1, 0},
+      {0.5, 0}, {-2, 0}, {-0.5, 0}})
 
 video.KID.DRINK[8].rect = function (self, a)
-   if a.is_reversed then return offset (-1)
+   if a.is_reversed then return offset (1.5)
    else return video.FRAME.rect (self, a) end
 end
 
 video.KID.DRINK[11].rect = function (self, a)
-   if a.is_reversed then return offset (2, -1)
+   if a.is_reversed then return offset (3)
    else return video.FRAME.rect (self, a) end
 end
 
 -- KID STAIRS
 video.KID.STAIRS = new (
    video.FRAMESET, {}, {
-      {0, 0}, {1, 0}, {0, 0}, {2, 0}, {-10, 3},
-      {-8, 2}, {-4, 3}, {-7, 8}, {-4, 1}, {-5, 4},
+      {0, 0}, {0, 0}, {0, 0}, {-2, 0}, {-10, 3},
+      {-10, 3}, {-4, 4.5}, {-6, 6.5}, {-3.5, 2.5}, {-5, 4},
       {-3, 6}, {-4, 0};
       STAIRS = {}})
 
@@ -2206,23 +1963,23 @@ end
 -- KID RAISE SWORD
 video.KID.RAISE_SWORD = new (
    video.FRAMESET, {}, {
-      {4, 0}, {0, 0}, {-1, 0}, {1, 0}})
+      {4, 0}, {2, 0}, {0.5, 0}, {3, 0}})
 
 -- KID KEEP SWORD
 video.KID.KEEP_SWORD = new (
    video.FRAMESET, {}, {
-      {-2, 0}, {2, 0}, {0, 0}, {-1, 0}, {6, 0}, {-2, 0},
-      {-3, 0}, {0, 0}, {-3, 0}, {0, 0}})
+      {-0.5, 0}, {-1, 0}, {1.5, 0}, {-1.5, 0}, {-2, 0}, {-1.5, 0},
+      {-2, 0}, {-0.5, 0}, {-2, 0}, {-1, 0}})
 
 video.KID.KEEP_SWORD[1].rect = function (self, a)
-   if a.previous_action == "SWORD_NORMAL" then return offset (-10)
+   if a.previous_action == "SWORD_NORMAL" then return offset (-3)
    else return video.FRAME.rect (self, a) end
 end
 
 -- KID TAKE SWORD
 video.KID.TAKE_SWORD = new (
    video.FRAMESET, {}, {
-      {6, 0}, {0, 0}, {4, 0}, {6, 0}})
+      {5.5, 0}, {0, 0}, {4, 0}, {6, 0}})
 
 -- KID SWORD NORMAL
 video.KID.SWORD_NORMAL = new (
@@ -2230,7 +1987,8 @@ video.KID.SWORD_NORMAL = new (
       {0, 0}})
 
 video.KID.SWORD_NORMAL[1].rect = function (self, a)
-   local t = {TAKE_SWORD = 4, SWORD_WALKF = -5, SWORD_WALKB = -2}
+   local t = {TAKE_SWORD = 4, SWORD_WALKF = 2, SWORD_WALKB = 2,
+              SWORD_ATTACK = 2, SWORD_DEFENSE = 3.5}
 
    if t[a.previous_action] then
       return offset (t[a.previous_action]) end
@@ -2241,16 +1999,16 @@ end
 -- KID SWORD WALKF
 video.KID.SWORD_WALKF = new (
    video.FRAMESET, {}, {
-      {14, 0}, {6, 0}})
+      {6, 0}, {6, 0}})
 
 -- KID SWORD WALKB
 video.KID.SWORD_WALKB = new (
    video.FRAMESET, {}, {
-      {1, 0}, {-11, 0}})
+      {-8, 0}, {-4, 0}})
 
 video.KID.SWORD_WALKB[1].rect = function (self, a)
    if a.action == "SWORD_DEFENSE"
-   then return offset (-1, 0)
+   then return offset (-12, 0)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -2262,50 +2020,54 @@ video.KID.SWORD_HIT = new (
 -- KID SWORD DEFENSE
 video.KID.SWORD_DEFENSE = new (
    video.FRAMESET, {}, {
-      {0, 0}, {0, 0}, {0,0}})
+      {-0.5, 0}, {-3, 0}, {2,0}})
 
 video.KID.SWORD_DEFENSE[2].rect = function (self, a)
-   if a.xindex == 11 then return offset (-7, 0)
+   if a.xindex == 11 then return offset (5, 0)
    else return video.FRAME.rect (self, a) end
 end
 
 -- KID SWORD ATTACK
 video.KID.SWORD_ATTACK = new (
    video.FRAMESET, {}, {
-      {-1, 0}, {8, 0}, {8, 0}, {9, 0}, {-8, 0},
-      {-8, 0}, {-8, 0}, {8, 0}, {0, 0}})
+      {-1, 0}, {8.5, 0}, {9, 0}, {8.5, 0}, {-13.5, 0},
+      {-6, 0}, {-7.5, 0}, {8.5, 0}, {1, 0}})
+
+video.KID.SWORD_ATTACK[2].rect = function (self, a)
+   if a.previous_action == "SWORD_DEFENSE" then return offset (9, 0)
+   else return video.FRAME.rect (self, a) end
+end
 
 -- SWORD
 video.KID.SWORD = new (
    video.FRAMESET, {}, {
-      {0, -18}, {7, -5}, {17, -4}, {18, -20}, {16, -13},
-      {-9, -1}, {7, -18}, {0, -17}, {7, 4}, {7, 8},
-      {11, -13}, {13, -5}, {22, -12}, {28, -10},
-      {13, 5}, {1, 11}, {0, -5}, {15, -15}, {14, -4},
-      {22, -10}, {7, 11}, {14, 11}, {14, 11}, {14, 5},
-      {28, -3}, {28, -8}, {21, -7}, {14, -5}, {14, -2},
-      {0, -12}, {12, -23}, {0, 0}, {13, -10}, {5, -12}})
+      {0, -18}, {10.5, -6.5}, {17, -4}, {18, -20}, {14.5, -11},
+      {-9, -1}, {7, -18}, {1, -20}, {12, 1}, {7, 8},
+      {18.5, -14}, {13, -5}, {22, -12}, {18.5, -7.5},
+      {10, 9}, {-1.5, 16}, {-0.5, -4.5}, {16, -14.5}, {11.5, -1.5},
+      {17.5, -10.5}, {4, 11}, {5, 10}, {4, 10}, {7, 5},
+      {16, -2}, {17, -6}, {15, -11}, {3, -10}, {12.5, -2},
+      {-4, -12}, {12, -23}, {0, 0}, {10, -6}, {5, -12}})
 
 video.KID.SWORD[14].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
-      if a.index == 1 then return offset (19, -10)
-      elseif a.index == 2 then return offset (21, -10)
+      if a.index == 1 then return offset (16.5, -6.5)
+      elseif a.index == 2 then return offset (18.5, -7)
       end
    else return video.FRAME.rect (self, a) end
 end
 
 video.KID.SWORD[18].rect = function (self, a)
-   local em = MININIM.video.env_mode
    if a.action == "SWORD_ATTACK" and a.index == 5
-   then return offset (7, -17)
+   then return offset (14, -14)
    elseif a.action == "SWORD_ATTACK" and a.index == 9
-   then return offset (21, -11)
+   then return offset (18.5, -9.5)
    else return video.FRAME.rect (self, a) end
 end
 
 video.KID.SWORD[20].rect = function (self, a)
    if a.action == "SWORD_ATTACK" and a.index == 4
-   then return offset (21, -7)
+   then return offset (17.5, -8.5)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -2321,22 +2083,24 @@ function video.GUARD.MAIN:DRAW (a)
    local bitmap = a.bitmap
    local xbitmap = a.xbitmap
 
-   local pt = video.PT.style[a.style]
-   function palette (c)
-      return palette_table_color (pt, c)
-   end
+   local style_shader = video.SHADER.style[2]
 
-   bitmap = bitmap.apply_palette (palette, pt)
-   if xbitmap then
-      xbitmap = xbitmap.apply_palette (palette, pt) end
+   -- local pt = video.PT.style[a.style]
+   -- function palette (c)
+   --    return palette_table_color (pt, c)
+   -- end
+
+   -- bitmap = bitmap.apply_palette (palette, pt)
+   -- if xbitmap then
+   --    xbitmap = xbitmap.apply_palette (palette, pt) end
 
    local splash
    if a.should_draw_splash and a.type ~= "SKELETON" then
       splash = self[1].bitmap
-      splash = splash.apply_palette (palette, pt)
+      -- splash = splash.apply_palette (palette, pt)
    end
 
-   a.draw (bitmap, xbitmap, splash)
+   a.draw (bitmap, xbitmap, splash, style_shader)
 end
 
 -- GUARD HP
@@ -2351,33 +2115,42 @@ function video.GUARD.HP:DRAW (a)
    local total_hp = math.max (0, a.total_hp)
    total_hp = math.min (10, total_hp)
 
-   local bg = rect (REAL_WIDTH - 7 * current_hp, REAL_HEIGHT - 8,
-                    7 * current_hp, 8)
-   bg.draw (C (0, 0, 0))
-
    local full = self[1].bitmap
 
-   local pt
-   if (a.type == "SHADOW" and a.style == 0)
-   or a.type == "KID" then
-      pt = video.PT.shadow_hp
-   elseif a.type == "SKELETON" and a.style == 0 then
-      pt = video.PT.skeleton_hp
-   elseif a.is_guard then
-      pt = video.PT.style[a.style]
+   local x = REAL_WIDTH - (full.width + OW (1)) * current_hp
+   local y = REAL_HEIGHT - full.height - 1
+   local w = (full.width + OW (1)) * current_hp
+   local h = full.height + 1
+
+   local bg = rect (x, y, w, h).draw (C (0, 0, 0))
+
+   -- local pt
+   -- if (a.type == "SHADOW" and a.style == 0)
+   -- or a.type == "KID" then
+   --    pt = video.PT.shadow_hp
+   -- elseif a.type == "SKELETON" and a.style == 0 then
+   --    pt = video.PT.skeleton_hp
+   -- elseif a.is_guard then
+   --    pt = video.PT.style[a.style]
+   -- end
+
+   -- local function palette (c)
+   --    return palette_table_color (pt, c)
+   -- end
+
+   -- full = full.apply_palette (palette, pt)
+
+   local function x (i)
+      return REAL_WIDTH - (full.width + OW (1)) * i + OW (1)
    end
 
-   local function palette (c)
-      return palette_table_color (pt, c)
-   end
-
-   full = full.apply_palette (palette, pt)
+   local y = REAL_HEIGHT - full.height
 
    if current_hp <= 1 and mod (MININIM.cycle, 2) == 0
    then return end
 
    for i = 1, current_hp do
-      full.draw (REAL_WIDTH - 7 * i + 1, REAL_HEIGHT - 6);
+      full.draw (x (i), y);
    end
 end
 
@@ -2385,23 +2158,29 @@ end
 video.GUARD.NORMAL = new (
    video.FRAMESET, {}, {{0, 0}})
 
+video.GUARD.NORMAL[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL"
+   then return offset (-6.5)
+   else return video.FRAME.rect (self, a) end
+end
+
 -- GUARD SWORD NORMAL
 video.GUARD.SWORD_NORMAL = new (
    video.FRAMESET, {}, {{0, 0}, {0, 0}, {0, 0}})
 
 video.GUARD.SWORD_NORMAL[1].rect = function (self, a)
-   if a.previous_action == "NORMAL" then return offset (1)
-   elseif a.previous_action == "SWORD_WALKF" then return offset (-2)
+   if a.previous_action == "NORMAL" then return offset (6.5)
+   elseif a.previous_action == "SWORD_WALKF" then return offset ()
    else return video.FRAME.rect (self, a) end
 end
 
 -- GUARD SWORD WALKF
 video.GUARD.SWORD_WALKF = new (
-   video.FRAMESET, {}, {{7, 0}, {8, 0}, {1, 0}})
+   video.FRAMESET, {}, {{3.5, 0}, {6, 0}, {5, 0}})
 
 -- GUARD SWORD WALKB
 video.GUARD.SWORD_WALKB = new (
-   video.FRAMESET, {}, {{-2, 0}, {-10, 0}})
+   video.FRAMESET, {}, {{-4, 0}, {-8, 0}})
 
 -- GUARD SWORD ATTACK
 video.GUARD.SWORD_ATTACK = new (
@@ -2432,31 +2211,64 @@ video.GUARD.DIE = new (
 -- GUARD SWORD
 video.GUARD.SWORD = new (video.KID.SWORD)
 
-video.GUARD.SWORD.offset[2] = {7, -9}
+video.GUARD.SWORD.offset[1] = {2.5, -17}
+video.GUARD.SWORD.offset[4] = {20, -16}
+video.GUARD.SWORD.offset[5] = {14.5, -10}
+video.GUARD.SWORD.offset[6] = {-4, 0}
+video.GUARD.SWORD.offset[7] = {8, -16}
+video.GUARD.SWORD.offset[8] = {-1, -21}
 
 video.GUARD.SWORD[5].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
-      if a.index == 2 then return offset (6, -8)
-      elseif a.index == 3 then return offset (9, -11)
+      if a.index == 2 then return offset (9, -4.5)
+      elseif a.index == 3 then return offset (11, -8.5)
       end
    else return video.FRAME.rect (self, a) end
 end
 
-video.GUARD.SWORD.offset[8] = {0, -23}
-
 video.GUARD.SWORD[9].rect = function (self, a)
    if a.action == "SWORD_ATTACK" and a.index == 4
-   then return offset (13, 14)
+   then return offset (13, 10)
    else return video.FRAME.rect (self, a) end
 end
 
-video.GUARD.SWORD.offset[11] = {10, -16}
-video.GUARD.SWORD.offset[12] = {10, -14}
-video.GUARD.SWORD.offset[29] = {11, -5}
-video.GUARD.SWORD.offset[30] = {11, -15}
+video.GUARD.SWORD.offset[10] = {6, 7}
+video.GUARD.SWORD.offset[11] = {7, -16.5}
+video.GUARD.SWORD.offset[12] = {8, -12}
+video.GUARD.SWORD.offset[13] = {18, -8}
+video.GUARD.SWORD.offset[30] = {14, -16}
 
 -- FAT
 video.FAT = new (video.GUARD)
+
+-- FAT NORMAL
+video.FAT.NORMAL = new (
+   video.GUARD.NORMAL, {}, {{0, 0}})
+
+video.FAT.NORMAL[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL"
+   then return offset (-5.5)
+   else return video.FRAME.rect (self, a) end
+end
+
+-- FAT SWORD NORMAL
+video.FAT.SWORD_NORMAL = new (
+   video.GUARD.SWORD_NORMAL, {}, {{0, 0}, {0, 0}, {0, 0}})
+
+video.FAT.SWORD_NORMAL[1].rect = function (self, a)
+   if a.previous_action == "NORMAL" then return offset (5.5)
+   elseif a.previous_action == "SWORD_WALKF" then return offset ()
+   else return video.FRAME.rect (self, a) end
+end
+
+-- FAT SWORD WALKF
+video.FAT.SWORD_WALKF = new (
+   video.GUARD.SWORD_WALKF, {}, {{3, 0}, {7, 0}, {4, 0}})
+
+video.FAT.SWORD_WALKF[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL" then return offset (5)
+   else return video.FRAME.rect (self, a) end
+end
 
 -- FAT DIE
 video.FAT.DIE = new (
@@ -2464,13 +2276,77 @@ video.FAT.DIE = new (
       {1, 0}, {0, 0}, {3, -1}, {2, -2}, {0, 0},
       {0, 0}, {0, 0}, {0, 0}})
 
+-- FAT SWORD
+for i, v in ipairs (video.FAT.SWORD) do
+   local rect = v.rect
+   v.rect = function (self, a)
+      return rect (self, a) + offset (-.5, -1)
+   end
+end
+
 -- VIZIER
 video.VIZIER = new (video.GUARD)
 
-video.VIZIER.SWORD.offset[31] = {12, -27}
+-- VIZIER NORMAL
+video.VIZIER.NORMAL = new (
+   video.GUARD.NORMAL, {}, {{0, 0}})
+
+video.VIZIER.NORMAL[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL"
+   then return offset (-11.5)
+   else return video.FRAME.rect (self, a) end
+end
+
+-- VIZIER SWORD NORMAL
+video.VIZIER.SWORD_NORMAL = new (
+   video.GUARD.SWORD_NORMAL, {}, {{0, 0}, {0, 0}, {0, 0}})
+
+video.VIZIER.SWORD_NORMAL[1].rect = function (self, a)
+   if a.previous_action == "NORMAL" then return offset (11.5)
+   elseif a.previous_action == "SWORD_WALKF" then return offset ()
+   else return video.FRAME.rect (self, a) end
+end
+
+-- VIZIER SWORD WALKF
+video.VIZIER.SWORD_WALKF = new (
+   video.GUARD.SWORD_WALKF, {}, {{3.5, 0}, {8, 0}, {4, 0}})
+
+-- VIZIER SWORD
+for i, v in ipairs (video.VIZIER.SWORD) do
+   local rect = v.rect
+   v.rect = function (self, a)
+      return rect (self, a) + offset (0, -1)
+   end
+end
+
+video.VIZIER.SWORD.offset[29] = {12.5, 2}
 
 -- SKELETON
 video.SKELETON = new (video.GUARD)
+
+-- SKELETON NORMAL
+video.SKELETON.NORMAL = new (
+   video.GUARD.NORMAL, {}, {{0, 0}})
+
+video.SKELETON.NORMAL[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL"
+   then return offset (0.5)
+   else return video.FRAME.rect (self, a) end
+end
+
+-- SKELETON SWORD NORMAL
+video.SKELETON.SWORD_NORMAL = new (
+   video.GUARD.SWORD_NORMAL, {}, {{0, 0}, {0, 0}, {0, 0}})
+
+video.SKELETON.SWORD_NORMAL[1].rect = function (self, a)
+   if a.previous_action == "NORMAL" then return offset (-0.5)
+   elseif a.previous_action == "SWORD_WALKF" then return offset ()
+   else return video.FRAME.rect (self, a) end
+end
+
+-- SKELETON SWORD WALKF
+video.SKELETON.SWORD_WALKF = new (
+   video.GUARD.SWORD_WALKF, {}, {{3, 0}, {7, 0}, {5, 0}})
 
 -- SKELETON DIE
 video.SKELETON.DIE = new (
@@ -2482,14 +2358,36 @@ video.SKELETON.DIE = new (
 for i, v in ipairs (video.SKELETON.SWORD) do
    local rect = v.rect
    v.rect = function (self, a)
-      return rect (self, a) + offset (0, 3)
+      return rect (self, a) + offset (1.5, 2)
    end
 end
 
-video.SKELETON.SWORD.offset[31] = {17, -20}
-
 -- SHADOW
 video.SHADOW = new (video.GUARD)
+
+-- SHADOW NORMAL
+video.SHADOW.NORMAL = new (
+   video.GUARD.NORMAL, {}, {{0, 0}})
+
+video.SHADOW.NORMAL[1].rect = function (self, a)
+   if a.previous_action == "SWORD_NORMAL"
+   then return offset (-17.5)
+   else return video.FRAME.rect (self, a) end
+end
+
+-- SHADOW SWORD NORMAL
+video.SHADOW.SWORD_NORMAL = new (
+   video.GUARD.SWORD_NORMAL, {}, {{0, 0}, {0, 0}, {0, 0}})
+
+video.SHADOW.SWORD_NORMAL[1].rect = function (self, a)
+   if a.previous_action == "NORMAL" then return offset (17.5)
+   elseif a.previous_action == "SWORD_WALKF" then return offset ()
+   else return video.FRAME.rect (self, a) end
+end
+
+-- SHADOW SWORD WALKF
+video.SHADOW.SWORD_WALKF = new (
+   video.GUARD.SWORD_WALKF, {}, {{2, 0}, {8, 0}, {5, 0}})
 
 -- SHADOW DIE
 video.SHADOW.DIE = new (
@@ -2501,17 +2399,9 @@ video.SHADOW.DIE = new (
 for i, v in ipairs (video.SHADOW.SWORD) do
    local rect = v.rect
    v.rect = function (self, a)
-      return rect (self, a) + offset (0, 2)
+      return rect (self, a) + offset (-1, .5)
    end
 end
-
-video.SHADOW.SWORD[9].rect = function (self, a)
-   if a.action == "SWORD_ATTACK" and a.index == 4
-   then return offset (13, 14)
-   else return video.FRAME.rect (self, a) + offset (0, 2) end
-end
-
-video.SHADOW.SWORD.offset[30] = {0, -12}
 
 -- ASSET
 local ASSET = new ()
@@ -2663,7 +2553,7 @@ function ASSET:load_box ()
    local o = new (video.BOX)
    for i = 1, 3 do
       o[i].bitmap = load_bitmap ("box/%i.png", i)
-      .apply_palette (video.BOX.selection_palette, true)
+         .apply_palette (video.BOX.selection_palette, true)
    end
    for i = 4, 6 do
       o[i].bitmap = load_bitmap ("box/%i.png", i - 3)
@@ -2684,41 +2574,29 @@ function ASSET:load_sword_item ()
 end
 
 function ASSET:load_potions ()
-   local small_potion = new (video.SMALL_POTION)
-   small_potion.bitmap = load_bitmap ("%s/potion/small.png", self.em)
-   for i = 1, 7 do
-      small_potion[i].bitmap = load_bitmap ("%s/potion/%i.png", self.em, i)
+   local small_potion = {}
+   for i = 1, 4 do
+      small_potion[i] = new (video.SMALL_POTION)
+      small_potion[i].bitmap = load_bitmap ("%s/potion/small.png", self.em)
+      if i > 1 then
+         for j = 1, 6 do
+            small_potion[i][j].bitmap
+               = load_bitmap ("%s/potion/%i/%i.png", self.em, i, j)
+         end
+      end
    end
 
    local big_potion = new (video.BIG_POTION)
    big_potion.bitmap = load_bitmap ("%s/potion/big.png", self.em)
-   for i = 1, 7 do
-      big_potion[i].bitmap = small_potion[i].bitmap
-   end
 
-   self.EMPTY_POTION = new (video.EMPTY_POTION)
-   new (small_potion, self.EMPTY_POTION)
-
-   self.SMALL_HP_POTION = new (video.SMALL_HP_POTION)
-   new (small_potion, self.SMALL_HP_POTION)
-
-   self.SMALL_POISON_POTION = new (video.SMALL_POISON_POTION)
-   new (small_potion, self.SMALL_POISON_POTION)
-
-   self.ACTIVATION_POTION = new (video.ACTIVATION_POTION)
-   new (small_potion, self.ACTIVATION_POTION)
-
-   self.BIG_HP_POTION = new (video.BIG_HP_POTION)
-   new (big_potion, self.BIG_HP_POTION)
-
-   self.BIG_POISON_POTION = new (video.BIG_POISON_POTION)
-   new (big_potion, self.BIG_POISON_POTION)
-
-   self.FLOAT_POTION = new (video.FLOAT_POTION)
-   new (big_potion, self.FLOAT_POTION)
-
-   self.FLIP_POTION = new (video.FLIP_POTION)
-   new (big_potion, self.FLIP_POTION)
+   self.EMPTY_POTION = new (small_potion[1])
+   self.SMALL_HP_POTION = new (small_potion[2])
+   self.SMALL_POISON_POTION = new (small_potion[4])
+   self.ACTIVATION_POTION = new (small_potion[4])
+   self.BIG_HP_POTION = new (big_potion)
+   self.BIG_POISON_POTION = new (big_potion)
+   self.FLOAT_POTION = new (small_potion[3])
+   self.FLIP_POTION = new (small_potion[3])
 end
 
 function ASSET:load_bricks ()
@@ -2775,7 +2653,7 @@ function ASSET:load_skeleton_floor ()
 end
 
 function ASSET:load_broken_floor ()
-   local o = new (video.BROKEN_FLOOR)
+   local o = new (video["BROKEN_FLOOR_" .. string.upper (self.em)])
    o.MAIN.bitmap = load_bitmap ("%s/broken-floor/main.png", self.em)
    o.FRONT.bitmap = load_bitmap ("%s/broken-floor/front.png", self.em)
    self.BROKEN_FLOOR = o
@@ -2864,8 +2742,6 @@ function ASSET:load_chomper ()
          load_bitmap ("%s/chomper/%i/main.png", self.em, i)
       chomper[i].BLOOD.bitmap =
          load_bitmap ("%s/chomper/%i/blood.png", self.em, i)
-      chomper[i].BLOOD.bitmap =
-         chomper[i].BLOOD.bitmap.apply_palette (blood_palette, true)
    end
    self.CHOMPER = chomper
 end
@@ -2932,16 +2808,6 @@ function ASSET:load_dungeon_wall ()
       o.FRONT.WWS = load_bitmap ("%s/wall/front/wws.png", self.em)
       o.FRONT.WWW = load_bitmap ("%s/wall/front/www.png", self.em)
       o.FACE.bitmap = load_bitmap ("%s/wall/face.png", self.em)
-      o.narrow_divider = load_bitmap ("%s/wall/narrow-divider.png", self.em)
-      o.wide_divider = load_bitmap ("%s/wall/wide-divider.png", self.em)
-      o.random_block = load_bitmap ("%s/wall/random-block.png", self.em)
-      o.mark_top_right = load_bitmap ("%s/wall/mark-top-right.png", self.em)
-      o.mark_bottom_right =
-         load_bitmap ("%s/wall/mark-bottom-right.png", self.em)
-      o.mark_top_left =
-         load_bitmap ("%s/wall/mark-top-left.png", self.em)
-      o.mark_bottom_left =
-         load_bitmap ("%s/wall/mark-bottom-left.png", self.em)
       self.WALL = o
 end
 
@@ -2979,7 +2845,7 @@ function DRAW.TEXT (text)
    local h = OH (8)
    rect (x, y, w, h).draw (C (0, 0, 0))
    asset.font.draw (text, REAL_WIDTH / 2,
-		    REAL_HEIGHT - asset.font.height + 2)
+		    REAL_HEIGHT - asset.font.height + 3)
 end
 
 function DRAW.BACKGROUND_SELECTION (p)
@@ -2997,7 +2863,8 @@ function LOAD ()
    if loaded then return end
    asset.DUNGEON = new (ASSET, {}, "DUNGEON"):load ()
    asset.PALACE = new (ASSET, {}, "PALACE"):load ()
-   asset.font = load_font ("font.png")
+   local font_bmp = load_bitmap ("font.png")
+   asset.font = font (font_bmp, 32, 95, 97, 122)
    loaded = true
 end
 
@@ -3011,8 +2878,8 @@ function VALUE (object)
    return video.VALUE[object]
 end
 
--- VGA video mode interface
-MININIM.lua.video_mode["DOS VGA"] = function (command, object, ...)
+-- MAC video mode interface
+MININIM.lua.video_mode["Macintosh Color"] = function (command, object, ...)
    local o = safenav (asset, MININIM.video.env_mode, object)
    local f = safenav (o, command)
    if f then
