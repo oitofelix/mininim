@@ -103,7 +103,7 @@ gui_create_undo_control (struct undo *undo, char *norm_group)
 
   IupSetAttributeId (list, "", 1, "");
 
-  struct last *last = xmalloc (sizeof (*last));
+  dmalloc (struct last, last);
   last->count = 0;
   last->current = -1;
   last->desc = NULL;

@@ -152,12 +152,12 @@ static int dmadd(dmlist *ml, const char *p, size_t pn, const char *s, int suf)
   char *t = NULL;
 
   if (ml->idx+1 >= ml->allocated &&
-      !(ml->list = realloc(ml->list, sizeof(char *)*(ml->allocated += 32))))
+      !(ml->list = xrealloc(ml->list, sizeof(char *)*(ml->allocated += 32))))
     return -1;
 
   if (s) {
     size_t n = strlen(s);
-    if (!(t = (char *)malloc(sizeof(char)*(pn+n+(suf?2:1))))) return 1;
+    if (!(t = (char *)xmalloc(sizeof(char)*(pn+n+(suf?2:1))))) return 1;
     memcpy(t, p, pn);
     memcpy(t+pn, s, n);
     n += pn;
@@ -267,7 +267,7 @@ static char **mycomplete(const char *text, int start, int end)
 
   if (ml.idx > 1) {
     /* list[0] holds the common prefix of all matches (may be "") */
-    if (!(ml.list[0] = (char *)malloc(sizeof(char)*(ml.matchlen+1)))) {
+    if (!(ml.list[0] = (char *)xmalloc(sizeof(char)*(ml.matchlen+1)))) {
 error:
       lua_settop(repl_L, savetop);
       return NULL;

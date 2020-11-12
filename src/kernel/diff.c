@@ -30,14 +30,16 @@ add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
     free_diff (&diffset->diff[i]);
 
   diffset->count = diffset->current + 2;
-  diffset->diff = xrealloc (diffset->diff, diffset->count * sizeof (* diffset->diff));
+  srealloc (diffset->count,
+	    diffset->diff);
   diffset->current++;
 
   diff (ptr0, ptr1, size, unit_size, &diffset->diff[diffset->current], desc);
 
   if (! diffset->diff[diffset->current].line && ! desc) {
     diffset->count--;
-    diffset->diff = xrealloc (diffset->diff, diffset->count * sizeof (* diffset->diff));
+    srealloc (diffset->count,
+	      diffset->diff);
     diffset->current--;
   }
 }
@@ -120,7 +122,8 @@ diff (void *ptr0, void *ptr1, size_t size, size_t unit_size,
 
     if (! prev_diff) {
       d->count++;
-      d->line = xrealloc (d->line, d->count * sizeof (* d->line));
+      srealloc (d->count,
+		d->line);
       memset (&d->line[d->count - 1], 0, sizeof (* d->line));
       d->line[d->count - 1].offset = i;
     }

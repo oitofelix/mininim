@@ -467,8 +467,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
 
   IupSetAttribute (ih, "_LEVEL", (void *) level);
 
-  struct tree *tree = xmalloc (sizeof (*tree));
-  memset (tree, 0, sizeof (*tree));
+  dzalloc (struct tree, tree);
   IupSetAttribute (ih, "_TREE", (void *) tree);
   IupSetAttribute (ih, "_TREE_CTRL", (void *) tree_ctrl);
 
@@ -512,8 +511,7 @@ gui_create_editor_room_control (char *norm_group, struct level *level)
   IupSetAttribute (ih, "_FRAGMENTED_LABEL", (void *) fragmented_label);
   IupSetAttribute (ih, "_START_LABEL", (void *) start_label);
 
-  struct last *last = xmalloc (sizeof (*last));
-  memset (last, 0, sizeof (*last));
+  dzalloc (struct last, last);
   IupSetAttribute (ih, "_LAST", (void *) last);
 
   Ihandle *norm = IupGetHandle ("ROOM_NORM");

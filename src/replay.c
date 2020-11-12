@@ -123,10 +123,8 @@ store_replay_gamepad_state (struct replay *replay,
                             uint64_t cycle)
 {
   replay->packed_gamepad_state_nmemb = cycle + 1;
-  replay->packed_gamepad_state =
-    xrealloc (replay->packed_gamepad_state,
-              replay->packed_gamepad_state_nmemb
-              * sizeof (* replay->packed_gamepad_state));
+  srealloc (replay->packed_gamepad_state_nmemb,
+	    replay->packed_gamepad_state);
   replay->packed_gamepad_state[cycle] = pack_gamepad_state (gs);
   return replay;
 }

@@ -270,8 +270,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
   IupSetAttribute (ih, "_SPIN", (void *) spin);
   IupSetAttribute (ih, "_VIEW_BUTTON", (void *) view_button);
 
-  struct last *last = xmalloc (sizeof (*last));
-  memset (last, 0, sizeof (*last));
+  dzalloc (struct last, last);
   IupSetAttribute (ih, "_LAST", (void *) last);
 
   for (int i = 0; i < tile_parts; i++)

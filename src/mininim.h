@@ -355,4 +355,26 @@ extern int exit_code;
   (fprintf (stderr,				\
 	    format,				\
 	    ##__VA_ARGS__))
+
+#define dmalloc(type, name) \
+  type *name = xmalloc (sizeof (*name))
+#define smalloc(name) \
+  (name = xmalloc (sizeof (*name)))
+#define dzalloc(type, name) \
+  type *name = xzalloc (sizeof (*name))
+#define szalloc(name) \
+  (name = xzalloc (sizeof (*name)))
+#define dcalloc(type, count, name) \
+  type *name = xcalloc (count, sizeof (*name))
+#define scalloc(count, name) \
+  (name = xcalloc (count, sizeof (*name)))
+#define dnmalloc(type, count, name) \
+  type *name = xnmalloc (count, sizeof (*name))
+#define snmalloc(count, name) \
+  (name = xnmalloc (count, sizeof (*name)))
+#define drealloc(type, count, name) \
+  type name = xrealloc (name, sizeof (*name) * (count))
+#define srealloc(count, name) \
+  (name = xrealloc (name, sizeof (*name) * (count)))
+
 #endif	/* MININIM_MININIM_H */

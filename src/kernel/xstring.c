@@ -53,7 +53,7 @@ trim_string (char *s)
 char *
 repeat_char (char c, size_t n)
 {
-  char *s = xcalloc (n + 1, sizeof (*s));
+  dnmalloc (char, n + 1, s);
   size_t i;
   for (i = 0; i < n; i++) s[i] = c;
   s[n] = '\0';
@@ -95,8 +95,7 @@ void
 fmt_begin (int ncols)
 {
   assert (! fmt_width && fmt_width_nmemb == 0);
-  fmt_width = xcalloc (ncols, sizeof (*fmt_width));
-  memset (fmt_width, 0, ncols * sizeof (*fmt_width));
+  scalloc (ncols, fmt_width);
   fmt_width_nmemb = ncols;
 }
 
@@ -242,9 +241,10 @@ wchar_t *
 m2w_str (const char *s)
 {
   size_t ls = strlen (s);
-  wchar_t *r = xcalloc (ls, sizeof (wchar_t));
+  dcalloc (wchar_t, ls, r);
   mbsrtowcs (r, &s, ls, NULL);
-  r = xrealloc (r, (wcslen (r) + 1) * sizeof (*r));
+  srealloc (wcslen (r) + 1,
+	    r);
   return r;
 }
 
@@ -252,9 +252,10 @@ char *
 w2m_str (const wchar_t *s)
 {
   size_t ls = wcslen (s);
-  char *r = xcalloc (ls, sizeof (wchar_t));
+  dcalloc (char, ls, r);
   wcsrtombs (r, &s, ls * sizeof (wchar_t), NULL);
-  r = xrealloc (r, (strlen (r) + 1) * sizeof (*r));
+  srealloc (strlen (r) + 1,
+	    r);
   return r;
 }
 
@@ -266,7 +267,7 @@ shorten_str (char *s, size_t max)
   size_t le = wcslen (SHORTEN_STRING_ELLIPSIS);
   assert (max >= le + 2);
   if (lws > max) {
-    wchar_t *wr = xcalloc (max + 1, sizeof (wchar_t));
+    dcalloc (wchar_t, max + 1, wr);
     size_t lp = (max - le) / 2;
     size_t a = (max - le) % 2;
     wmemcpy (wr, ws, lp);;

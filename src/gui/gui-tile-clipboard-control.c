@@ -115,8 +115,7 @@ gui_create_tile_clipboard_control (struct pos *p,
   IupSetAttribute (ih, "_POS", (void *) p);
   IupSetAttribute (ih, "_SEL_RING", (void *) sr);
 
-  struct last *last = xmalloc (sizeof (*last));
-  memset (last, 0, sizeof (*last));
+  dzalloc (struct last, last);
   IupSetAttribute (ih, "_LAST", (void *) last);
 
   update (ih);

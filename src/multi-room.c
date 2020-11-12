@@ -110,11 +110,11 @@ mr_redim (struct mr *mr, int w, int h)
   destroy_mr_cells (mr);
 
   int x, y;
-  mr->cell = xcalloc (w, sizeof (* mr->cell));
-  mr->last.cell = xcalloc (w, sizeof (* mr->last.cell));
+  scalloc (w, mr->cell);
+  scalloc (w, mr->last.cell);
   for (x = 0; x < w; x++) {
-    mr->cell[x] = xcalloc (h, sizeof (** mr->cell));
-    mr->last.cell[x] = xcalloc (h, sizeof (** mr->last.cell));
+    scalloc (h, mr->cell[x]);
+    scalloc (h, mr->last.cell[x]);
     for (y = 0; y < h; y++) {
       mr->cell[x][y].screen = NULL;
       mr->cell[x][y].cache = NULL;
@@ -344,7 +344,7 @@ mr_set_origin (struct mr *mr, int room, int x, int y,
       (rlink, room_nmemb, &mr->room_nmemb, sizeof (* mr->rlink));
 
     al_free (mr->coord);
-    mr->coord = xcalloc (mr->room_nmemb, sizeof (* mr->coord));
+    scalloc (mr->room_nmemb, mr->coord);
   }
 
   for (int r = 0; r < mr->room_nmemb; r++)

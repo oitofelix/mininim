@@ -1497,8 +1497,7 @@ bool
 is_room_accessible (struct room_linking *rlink, size_t room_nmemb,
                     int room_from, int room_to)
 {
-  is_room_accessible_visited =
-    xcalloc (room_nmemb, sizeof (* is_room_accessible_visited));
+  scalloc (room_nmemb, is_room_accessible_visited);
   bool r = is_room_accessible_sub (rlink, room_nmemb, room_from, room_to);
   al_free (is_room_accessible_visited);
   return r;

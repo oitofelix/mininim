@@ -467,8 +467,7 @@ setup_video_mode (char *requested_vm)
   size_t ba_nmemb = 0;
   if (w != REAL_WIDTH && h != REAL_HEIGHT) {
     ba_nmemb = actor_nmemb;
-    ba = xcalloc (ba_nmemb, sizeof (*ba));
-    memset (ba, 0, ba_nmemb * sizeof (*ba));
+    scalloc (ba_nmemb, ba);
 
     for (size_t i = 0; i < actor_nmemb; i++) {
       struct actor *a = &actor[i];

@@ -134,8 +134,7 @@ load_native_level (struct level *l, int n)
   /* LINKS */
 
   /* Room 0  */
-  l->rlink = xcalloc (1, sizeof (*l->rlink));
-  memset (l->rlink, 0, 1 * sizeof (*l->rlink));
+  szalloc (l->rlink);
   l->room_nmemb = 1;
 
   for (i = 1;; i++) {
@@ -171,9 +170,7 @@ load_native_level (struct level *l, int n)
   }
 
   /* TILES */
-  l->tile = xcalloc (l->room_nmemb, sizeof (*l->tile));
-  memset (l->tile, 0, l->room_nmemb * sizeof (*l->tile));
-
+  scalloc (l->room_nmemb, l->tile);
   struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)

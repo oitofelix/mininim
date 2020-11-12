@@ -66,8 +66,8 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   int w = brx - tlx - 1;
   if (w > 0) {
     rs->w_nmemb = w;
-    rs->t = xcalloc (rs->w_nmemb, sizeof (*rs->t));
-    rs->b = xcalloc (rs->w_nmemb, sizeof (*rs->b));
+    scalloc (w, rs->t);
+    scalloc (w, rs->b);
   } else {
     rs->w_nmemb = 0;
     rs->t = rs->b = NULL;
@@ -76,15 +76,15 @@ new_rect_sel (struct mr *mr, struct rect_sel *rs,
   int h = bry - tly - 1;
   if (h > 0) {
     rs->h_nmemb = h;
-    rs->l = xcalloc (rs->h_nmemb, sizeof (*rs->l));
-    rs->r = xcalloc (rs->h_nmemb, sizeof (*rs->r));
+    scalloc (h, rs->l);
+    scalloc (h, rs->r);
   } else {
     rs->h_nmemb = 0;
     rs->l = rs->r = NULL;
   }
 
   rs->c_nmemb = rs->w_nmemb * rs->h_nmemb;
-  rs->c = xcalloc (rs->c_nmemb, sizeof (*rs->c));
+  scalloc (rs->c_nmemb, rs->c);
 
   /* fill in rooms */
   rs->tl = mr_coord_room (mr, tlx, tly);
@@ -308,7 +308,7 @@ destroy_sel_set_tail (struct sel_set *ss)
   for (size_t i = ss->c_nmemb; i < ss->nmemb; i++)
     destroy_rect_sel (&ss->rs[i]);
   ss->nmemb = ss->c_nmemb;
-  ss->rs = xrealloc (ss->rs, ss->nmemb * sizeof (* ss->rs));
+  srealloc (ss->nmemb, ss->rs);
 }
 
 void

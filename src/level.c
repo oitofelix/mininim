@@ -46,14 +46,14 @@ new_level (struct level *l, size_t room_nmemb, size_t event_nmemb,
            size_t guard_nmemb)
 {
   l->room_nmemb = room_nmemb;
-  l->tile = xcalloc (l->room_nmemb, sizeof (*l->tile));
-  l->rlink = xcalloc (l->room_nmemb, sizeof (*l->rlink));
+  scalloc (l->room_nmemb, l->tile);
+  scalloc (l->room_nmemb, l->rlink);
 
   l->event_nmemb = event_nmemb;
-  l->event = xcalloc (l->event_nmemb, sizeof (*l->event));
+  scalloc (l->event_nmemb, l->event);
 
   l->guard_nmemb = guard_nmemb;
-  l->guard = xcalloc (l->guard_nmemb, sizeof (*l->guard));
+  scalloc (l->guard_nmemb, l->guard);
 
   normalize_level (l);
 

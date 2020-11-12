@@ -101,8 +101,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
 
   IupSetAttribute (ih, "_PARENT", (void *) parent);
 
-  struct last *last = xmalloc (sizeof (*last));
-  memset (last, 0, sizeof (*last));
+  dzalloc (struct last, last);
   IupSetAttribute (ih, "_LAST", (void *) last);
 
   IupSetAttribute (ih, "_GRID", (void *) grid);

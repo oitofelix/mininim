@@ -35,7 +35,7 @@ register_undo (struct undo *u, void *data, undo_f f,
   free_undo_tail (u);
 
   u->count++;
-  u->pass = xrealloc (u->pass, u->count * sizeof (* u->pass));
+  srealloc (u->count, u->pass);
   u->current++;
 
   u->pass[u->current].data = data;
@@ -65,7 +65,7 @@ free_undo_tail (struct undo *u)
   }
 
   u->count = u->current + 1;
-  u->pass = xrealloc (u->pass, u->count * sizeof (* u->pass));
+  srealloc (u->count, u->pass);
 }
 
 void
@@ -178,7 +178,8 @@ register_tile_undo (struct undo *u, struct pos *p,
 
   if (! memcmp (tile (p), &c, sizeof (c))) return;
 
-  struct tile_undo *d = xmalloc (sizeof (struct tile_undo));
+  dmalloc (struct tile_undo, d);
+
   d->p = *p;
   d->b = *tile (p);
   d->f = c;
@@ -227,7 +228,7 @@ register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
 {
   if (peq (p0, p1)) return;
 
-  struct mirror_pos_undo *d = xmalloc (sizeof (struct mirror_pos_undo));
+  dmalloc (struct mirror_pos_undo, d);
   d->p0 = *p0;
   d->p1 = *p1;
   d->invert_dir = invert_dir;
@@ -258,8 +259,7 @@ register_level_undo (struct undo *u, struct level *l, char *desc)
 {
   if (level_eq (&global_level, l)) return;
 
-  struct level_undo *d = xmalloc (sizeof (*d));
-  memset (d, 0, sizeof (*d));
+  dzalloc (struct level_undo, d);
   copy_level (&d->b, &global_level);
   copy_level (&d->f, l);
   d->f.n = global_level.n;
@@ -283,7 +283,7 @@ register_level_exchange_undo (struct undo *u, int n, char *desc)
 {
   if (global_level.n == n) return;
 
-  int *d = xmalloc (sizeof (* d));
+  dmalloc (int, d);
   *d = n;
   register_undo (u, d, (undo_f) level_exchange_undo, NULL, desc);
   level_exchange_undo (d, +1);
@@ -321,7 +321,7 @@ register_event_undo (struct undo *u, struct level_event *event,
       && ! memcmp (event, global_level.event, event_nmemb
                    * sizeof (*event))) return;
 
-  struct event_undo *d = xmalloc (sizeof (struct event_undo));
+  dmalloc (struct event_undo, d);
   d->f_event = copy_array (event, event_nmemb, &d->f_event_nmemb,
                            sizeof (*d->f_event));
   d->b_event = copy_array (global_level.event, global_level.event_nmemb,
@@ -358,7 +358,7 @@ destroy_event_undo (struct event_undo *d)
 void
 register_h_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
-  int *room = xmalloc (sizeof (* room));
+  dmalloc (int, room);
   *room = _room;
   register_undo (u, room, (undo_f) h_room_mirror_tile_undo, NULL, desc);
   h_room_mirror_tile_undo (room, +1);
@@ -377,7 +377,7 @@ h_room_mirror_tile_undo (int *room, int dir)
 void
 register_v_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
-  int *room = xmalloc (sizeof (* room));
+  dmalloc (int, room);
   *room = _room;
   register_undo (u, room, (undo_f) v_room_mirror_tile_undo, NULL, desc);
   v_room_mirror_tile_undo (room, +1);
@@ -405,7 +405,7 @@ register_random_room_mirror_tile_undo (struct undo *u, int _room,
                                       bool invert_dir,
                                       char *desc)
 {
-  struct random_room_mirror_tile_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct random_room_mirror_tile_undo, d);
   d->room = _room;
   d->invert_dir = invert_dir;
 
@@ -454,7 +454,7 @@ register_link_undo (struct undo *u, struct room_linking *rlink, char *desc)
       (rlink, global_level.rlink, global_level.room_nmemb
        * sizeof (*global_level.rlink))) return;
 
-  struct link_undo *d = xmalloc (sizeof (*d));
+  dmalloc (struct link_undo, d);
   d->f = copy_array (rlink, global_level.room_nmemb, NULL,
                      sizeof (*d->f));
   d->b = copy_array (global_level.rlink, global_level.room_nmemb, NULL,
@@ -490,7 +490,7 @@ destroy_link_undo (struct link_undo *d)
 void
 register_new_room_undo (struct undo *u, char *desc)
 {
-  struct new_room_undo *d = xmalloc (sizeof (*d));
+  dmalloc (struct new_room_undo, d);
   d->mr_room = global_mr.room;
   register_undo (u, d, (undo_f) new_room_undo, NULL, desc);
   new_room_undo (d, +1);
@@ -540,7 +540,7 @@ register_start_pos_undo (struct undo *u, struct pos *p, char *desc)
 {
   if (peq (p, &p->l->start_pos)) return;
 
-  struct start_pos_undo *d = xmalloc (sizeof (* d));
+  dmalloc(struct start_pos_undo, d);
   d->b = p->l->start_pos;
   npos (p, &d->f);
   register_undo (u, d, (undo_f) start_pos_undo, NULL, desc);
@@ -598,7 +598,7 @@ register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc)
   struct guard *g = guard (p->l, i);
   if (peq (p, &g->p)) return;
 
-  struct guard_start_pos_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct guard_start_pos_undo, d);
   d->i = i;
   d->b = g->p;
   npos (p, &d->f);
@@ -620,7 +620,7 @@ guard_start_pos_undo (struct guard_start_pos_undo *d, int dir)
 void
 register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc)
 {
-  int *d = xmalloc (sizeof (* d));
+  dmalloc (int, d);
   *d = i;
   register_undo (u, d, (undo_f) toggle_guard_start_dir_undo, NULL, desc);
   toggle_guard_start_dir_undo (d, +1);
@@ -643,7 +643,7 @@ register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc)
   struct guard *g = guard (&global_level, i);
   if (! memcmp (s, &g->skill, sizeof (* s))) return;
 
-  struct guard_skill_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct guard_skill_undo, d);
   d->i = i;
   d->b_skill = *s;
   d->f_skill = g->skill;
@@ -670,7 +670,7 @@ register_guard_hp_undo (struct undo *u, int i, int l, char *desc)
   struct guard *g = guard (&global_level, i);
   if (g->total_hp == l) return;
 
-  struct indexed_int_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct indexed_int_undo, d);
   d->i = i;
   d->b = l;
   d->f = g->total_hp;
@@ -696,7 +696,7 @@ register_guard_type_undo (struct undo *u, int i, enum actor_type t,
   struct guard *g = guard (&global_level, i);
   if (g->type == t) return;
 
-  struct indexed_int_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct indexed_int_undo, d);
   d->i = i;
   d->b = t;
   d->f = g->type;
@@ -721,7 +721,7 @@ register_guard_style_undo (struct undo *u, int i, int s, char *desc)
   struct guard *g = guard (&global_level, i);
   if (g->style == s) return;
 
-  struct indexed_int_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct indexed_int_undo, d);
   d->i = i;
   d->b = s;
   d->f = g->style;
@@ -745,7 +745,7 @@ register_int_undo (struct undo *u, int *f, int b, undo_f func, char *desc)
 {
   if (*f == b) return;
 
-  struct int_undo *d = xmalloc (sizeof (* d));
+  dmalloc (struct int_undo, d);
   d->i = f;
   d->b = b;
   d->f = *f;

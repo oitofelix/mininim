@@ -172,9 +172,8 @@ calibrate_joystick (void)
     min_int (al_get_max_haptic_effects (joystick_haptic),
              JOYSTICK_MAX_HAPTIC_EFFECTS);
 
-  joystick_haptic_effect_id =
-    xcalloc (joystick_max_haptic_effects,
-             sizeof (* joystick_haptic_effect_id));
+  scalloc (joystick_max_haptic_effects,
+	   joystick_haptic_effect_id);
 #endif
 
   return joystick;
@@ -557,7 +556,7 @@ gamepad_rumble (double intensity, double duration)
   if (joystick_haptic_effect_id[i])
     al_release_haptic_effect (joystick_haptic_effect_id[i]);
   else joystick_haptic_effect_id[i] =
-         xmalloc (sizeof (ALLEGRO_HAPTIC_EFFECT_ID));
+         XMALLOC (ALLEGRO_HAPTIC_EFFECT_ID);
 
   if (al_rumble_haptic (joystick_haptic, intensity * gamepad_rumble_gain,
                         duration, joystick_haptic_effect_id[i])) {

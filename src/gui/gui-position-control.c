@@ -113,7 +113,7 @@ gui_create_position_control (struct pos *p, char *norm_group)
   IupSetInt (floor_spin, "VISIBLECOLUMNS", 1);
   IupSetInt (place_spin, "VISIBLECOLUMNS", 1);
 
-  struct pos *last_p = xmalloc (sizeof (*last_p));
+  dzalloc (struct pos, last_p);
   invalid_pos (last_p);
   IupSetAttribute (ih, "_LAST_POS", (void *) last_p);
 
